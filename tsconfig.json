@@ -1,10 +1,9 @@
 {
   /* File Inclusion */
-  "include": ["**/*.ts"],
-  "exclude": ["node_modules"],
-  "files": [
-    "src/say.d.ts",
+  "include": [
+    "**/*.ts"
   ],
+  "exclude": ["node_modules"],
   "compilerOptions": {
     /* Basic Options */
     "isolatedModules": true,
