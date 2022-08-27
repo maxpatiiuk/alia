@@ -9,23 +9,6 @@ import {
 import type { Tokens } from './tokens.js';
 import type { MatcherResult, ParseError, Token } from './types.js';
 
-/*
- * TODO: update readme
- * TODO: add tests
- * TODO: test all cases agains the oracle
- * TODO: accept the following:
- * Make
- * ./dgc <infile.dg> -t <tokens.txt> 2> <errors.txt>
- * TODO: check everything into git
- */
-
-/*
- * TODO: ignore comments
- * TODO: ignore whitespace
- * TODO: throw appropaite error on invalid character
- *  TODO: throw errors
- */
-
 export function tokenize(
   input: string,
   positionOffset: number

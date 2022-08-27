@@ -11,7 +11,7 @@ export function defaultMatcher(
   // Don't match identifiers that begin with a reserved keyword
   if (
     !hasSpecialSymbols &&
-    input.search(new RegExp(`${matcher}\\b`, 'u')) === -1
+    input.search(new RegExp(`^${matcher}\\b`, 'u')) === -1
   )
     return undefined;
   return {

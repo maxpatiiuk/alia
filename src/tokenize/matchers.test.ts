@@ -20,6 +20,7 @@ theories(defaultMatcher, [
     { data: {}, errors: [], tokenLength: 3, type: 'AND' },
   ],
   [['WHILE', 'while', 'while1'], undefined],
+  [['MAYHEM', 'mayhem', 'mayhemor'], undefined],
   [
     ['ARROW', '->', '->while'],
     {
