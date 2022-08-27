@@ -333,6 +333,51 @@ this || or && and do some`,
       ],
     },
   ],
+  [
+    [
+      `2147483646
+2147483647
+2147483648`,
+      0,
+    ],
+    {
+      errors: [
+        {
+          end: 32,
+          message: 'Integer literal overflow',
+          start: 22,
+        },
+      ],
+      tokens: [
+        {
+          data: {
+            literal: 2_147_483_646,
+          },
+          simplePosition: 0,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {
+            literal: 2_147_483_647,
+          },
+          simplePosition: 11,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {
+            literal: 0,
+          },
+          simplePosition: 22,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {},
+          simplePosition: 32,
+          type: 'END',
+        },
+      ],
+    },
+  ],
 ]);
 
 theories(invalidToken, [

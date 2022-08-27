@@ -1,13 +1,13 @@
-import { Tokens } from './tokens.js';
+import type { RA } from '../utils/types.js';
+import { split } from '../utils/utils.js';
 import {
   endMatcher,
   idMatcher,
   intLiteralMatcher,
   stringLiteralMatcher,
 } from './matchers.js';
-import { split } from '../utils/utils.js';
-import { RA } from '../utils/types.js';
-import { MatcherResult } from './types.js';
+import type { Tokens } from './tokens.js';
+import type { MatcherResult } from './types.js';
 
 const tokenDefinitions: {
   readonly [T in keyof Tokens]:

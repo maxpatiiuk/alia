@@ -18,6 +18,9 @@ theories(parse, [
 ->=
 mayhemor
 this || or && and do some
+2147483646
+2147483647
+2147483648
 `,
     ],
     {
@@ -30,7 +33,8 @@ FATAL [10,12]-[10,13]: Illegal character .
 FATAL [14,6]-[14,7]: Illegal character |
 FATAL [14,7]-[14,8]: Illegal character |
 FATAL [14,12]-[14,13]: Illegal character &
-FATAL [14,13]-[14,14]: Illegal character &`,
+FATAL [14,13]-[14,14]: Illegal character &
+FATAL [17,1]-[17,11]: Integer literal overflow`,
       output: `STRINGLIT:"sup" [1,1]
 AND [1,7]
 STRINGLIT:"dope\\n" [2,1]
@@ -56,7 +60,10 @@ OR [14,9]
 AND [14,15]
 ID:do [14,19]
 ID:some [14,22]
-EOF [15,1]`,
+INTLIT:2147483646 [15,1]
+INTLIT:2147483647 [16,1]
+INTLIT:0 [17,1]
+EOF [18,1]`,
     },
   ],
 ]);

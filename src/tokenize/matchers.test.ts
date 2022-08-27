@@ -9,7 +9,6 @@ import {
   whitespaceMatcher,
 } from './matchers.js';
 
-// TODO: review if test returns expected results
 theories(defaultMatcher, [
   [['AND', 'and', 'basic'], undefined],
   [
@@ -120,6 +119,39 @@ theories(intLiteralMatcher, [
   [
     ['10_20'],
     { data: { literal: 10 }, errors: [], tokenLength: 2, type: 'INTLITERAL' },
+  ],
+  [
+    ['2147483646'],
+    {
+      data: { literal: 2_147_483_646 },
+      errors: [],
+      tokenLength: 10,
+      type: 'INTLITERAL',
+    },
+  ],
+  [
+    ['2147483647'],
+    {
+      data: { literal: 2_147_483_647 },
+      errors: [],
+      tokenLength: 10,
+      type: 'INTLITERAL',
+    },
+  ],
+  [
+    ['2147483648'],
+    {
+      data: { literal: 0 },
+      errors: [
+        {
+          message: 'Integer literal overflow',
+          start: 0,
+          end: 10,
+        },
+      ],
+      tokenLength: 10,
+      type: 'INTLITERAL',
+    },
   ],
 ]);
 

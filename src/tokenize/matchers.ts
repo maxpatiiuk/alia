@@ -48,6 +48,7 @@ export function idMatcher(input: string): MatcherResult<'ID'> | undefined {
 }
 
 const reInt = /^\d+/u;
+export const INT_MAX = 2_147_483_647;
 
 export function intLiteralMatcher(
   input: string
@@ -58,10 +59,19 @@ export function intLiteralMatcher(
   return {
     type: 'INTLITERAL',
     data: {
-      literal: number,
+      literal: number > INT_MAX ? 0 : number,
     },
     tokenLength: rawNumber.length,
-    errors: [],
+    errors:
+      number > INT_MAX
+        ? [
+            {
+              message: 'Integer literal overflow',
+              start: 0,
+              end: rawNumber.length,
+            },
+          ]
+        : [],
   };
 }
 
