@@ -35,7 +35,7 @@ export function tokenize(
 } {
   const { type, data, tokenLength, errors } =
     mappedFind(simpleTokens, ([type, matcher]) =>
-      defaultMatcher(type as 'AND', matcher, input)
+      defaultMatcher(type, matcher, input)
     ) ??
     mappedFind(complexTokens, ([_type, matcher]) => matcher(input)) ??
     commentMatcher(input) ??
@@ -56,7 +56,7 @@ export function tokenize(
       ? {
           type,
           data,
-          simplePosition: positionOffset + tokenLength,
+          simplePosition: positionOffset,
         }
       : undefined;
 
@@ -66,7 +66,7 @@ export function tokenize(
   };
 }
 
-const invalidToken = (input: string): MatcherResult<keyof Tokens> => ({
+export const invalidToken = (input: string): MatcherResult<keyof Tokens> => ({
   type: undefined,
   data: undefined,
   tokenLength: 1,
@@ -82,7 +82,7 @@ const invalidToken = (input: string): MatcherResult<keyof Tokens> => ({
 /**
  * Offset the positions in the error messages to match current position
  */
-const repositionErrors = (
+export const repositionErrors = (
   errors: RA<ParseError>,
   positionOffset: number
 ): RA<ParseError> =>

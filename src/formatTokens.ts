@@ -11,13 +11,16 @@ export const formatTokens = (
   tokens
     .map(
       ({ type, data, simplePosition }) =>
-        `${formatName(type, data)}: [${formatPosition(
+        `${formatName(type, data)} ${formatPosition(
           positionResolver(simplePosition)
-        )}]`
+        )}`
     )
     .join('\n');
 
-function formatName<T extends keyof Tokens>(type: T, data: Tokens[T]): string {
+export function formatName<T extends keyof Tokens>(
+  type: T,
+  data: Tokens[T]
+): string {
   const label = type in tokenLabels ? tokenLabels[type] ?? type : type;
   const payload = 'literal' in data ? `:${data.literal}` : '';
   return `${label}${payload}`;

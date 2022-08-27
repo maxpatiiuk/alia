@@ -8,9 +8,9 @@ export const formatErrors = (
   errors
     .map(
       ({ start, end, message }) =>
-        `FATAL [${formatPosition(positionResolver(start))}-${formatPosition(
+        `FATAL ${formatPosition(positionResolver(start))}-${formatPosition(
           positionResolver(end)
-        )}]: ${message}`
+        )}: ${message}`
     )
 
     .join('\n');
@@ -18,4 +18,4 @@ export const formatErrors = (
 export const formatPosition = ({
   lineNumber,
   columnNumber,
-}: Position): string => `${lineNumber},${columnNumber}`;
+}: Position): string => `[${lineNumber},${columnNumber}]`;

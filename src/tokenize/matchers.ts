@@ -1,17 +1,17 @@
+import type { Tokens } from './tokens.js';
 import type { MatcherResult } from './types.js';
 
 export function defaultMatcher(
-  // Using "AND" rather than a generic just to simplify typing
-  type: 'AND',
+  type: keyof Tokens,
   matcher: string,
   input: string
-): MatcherResult<'AND'> | undefined {
+): MatcherResult<keyof Tokens> | undefined {
   if (!input.startsWith(matcher)) return undefined;
   const hasSpecialSymbols = matcher.search(/\W/u) !== -1;
-  // Don't match identifiers that begin with a reserved keyboard
+  // Don't match identifiers that begin with a reserved keyword
   if (
     !hasSpecialSymbols &&
-    input.search(new RegExp(`${matcher}\b`, 'u')) === -1
+    input.search(new RegExp(`${matcher}\\b`, 'u')) === -1
   )
     return undefined;
   return {
@@ -47,20 +47,20 @@ export function idMatcher(input: string): MatcherResult<'ID'> | undefined {
   };
 }
 
-const reInt = /^(?:<number>\d)+/u;
+const reInt = /^\d+/u;
 
 export function intLiteralMatcher(
   input: string
 ): MatcherResult<'INTLITERAL'> | undefined {
-  const match = reInt.exec(input);
-  if (match === null) return undefined;
-  const rawNumber = Number.parseInt(match.groups!.number);
+  const rawNumber = reInt.exec(input)?.[0];
+  if (rawNumber === undefined) return undefined;
+  const number = Number.parseInt(rawNumber);
   return {
     type: 'INTLITERAL',
     data: {
-      literal: rawNumber,
+      literal: number,
     },
-    tokenLength: match.groups!.number.length,
+    tokenLength: rawNumber.length,
     errors: [],
   };
 }
@@ -69,7 +69,8 @@ export function stringLiteralMatcher(
   input: string
 ): MatcherResult<'STRINGLITERAL'> | undefined {
   if (!input.startsWith('"')) return undefined;
-  const line = input.slice(0, input.indexOf('\n'));
+  const lineEnd = input.indexOf('\n');
+  const line = lineEnd === -1 ? input : input.slice(0, lineEnd);
 
   let tokenLength = 1;
   let isEscaped = false;
@@ -89,26 +90,28 @@ export function stringLiteralMatcher(
     return true;
   });
 
+  const hasErrors = !isTerminated || hasInvalidEscape;
   return {
     type: 'STRINGLITERAL',
-    data: {
-      literal: line.slice(0, tokenLength),
-    },
+    data: hasErrors
+      ? undefined
+      : {
+          literal: line.slice(0, tokenLength),
+        },
     tokenLength,
-    errors:
-      isTerminated && !hasInvalidEscape
-        ? []
-        : [
-            {
-              start: 0,
-              end: tokenLength,
-              message: hasInvalidEscape
-                ? isTerminated
-                  ? 'String literal with bad escape sequence detected'
-                  : 'Unterminated string literal with bad escape sequence detected'
-                : 'Unterminated string literal detected',
-            },
-          ],
+    errors: hasErrors
+      ? [
+          {
+            start: 0,
+            end: tokenLength,
+            message: hasInvalidEscape
+              ? isTerminated
+                ? 'String literal with bad escape sequence detected'
+                : 'Unterminated string literal with bad escape sequence detected'
+              : 'Unterminated string literal detected',
+          },
+        ]
+      : [],
   };
 }
 

@@ -13,12 +13,3 @@ export const theories = <ARGUMENTS_TYPE extends RA<unknown>, RETURN_TYPE>(
     )
   );
 
-export const snapshots = <ARGUMENTS_TYPE extends RA<unknown>>(
-  testFunction: (...arguments_: ARGUMENTS_TYPE) => unknown,
-  inputs: RA<ARGUMENTS_TYPE>
-): void =>
-  describe(testFunction.name, () =>
-    inputs.forEach((input, index) =>
-      test(`#${index}`, () => expect(testFunction(...input)).toMatchSnapshot())
-    )
-  );

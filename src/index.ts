@@ -1,10 +1,7 @@
 import { program } from 'commander';
 import fs from 'node:fs';
 
-import { formatErrors } from './formatErrors.js';
-import { formatTokens } from './formatTokens.js';
-import { tokenize } from './tokenize/index.js';
-import { cretePositionResolver } from './utils/resolvePosition.js';
+import { parse } from './parser.js';
 
 program.name('dgc').description('The ultimate Drewgon compiler');
 
@@ -32,12 +29,9 @@ async function run(input: string, tokensOutput: string): Promise<void> {
   const rawText = await fs.promises
     .readFile(input)
     .then((data) => data.toString());
-  const { tokens, errors } = tokenize(rawText, 0);
 
-  const positionResolver = cretePositionResolver(rawText);
-  const formattedErrors = formatErrors(errors, positionResolver);
+  const { formattedErrors, output } = parse(rawText);
+
   if (formattedErrors.length > 0) console.error(formattedErrors);
-
-  const output = formatTokens(tokens, positionResolver);
   await fs.promises.writeFile(tokensOutput, output);
 }
