@@ -30,7 +30,7 @@ To see available options, run the script with `--help` argument:
 Example call:
 
 ```sh
-./dgc infile.dg -t tokens.txt 2> errors.txt
+./dgc file.dg -p
 ```
 
 ## Testing

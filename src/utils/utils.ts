@@ -37,3 +37,79 @@ export const split = <LEFT_ITEM, RIGHT_ITEM = LEFT_ITEM>(
       ],
       [[], []]
     ) as readonly [left: RA<LEFT_ITEM>, right: RA<RIGHT_ITEM>];
+
+/**
+ * Finds the point at which the source array begins to have values
+ * different from the ones in the search array
+ *
+ * @example
+ * Returns 0 if search array is empty
+ * Returns -1 if source array is empty / is shorter than the search array
+ * Examples:
+ *   If:
+ *     source is ['Accession','Accession Agents','#1','Agent','First Name'] and
+ *     search is []
+ *   returns 0
+ *   If:
+ *     source is ['Accession','Accession Agents','#1','Agent','First Name'] and
+ *     search is ['Accession','Accession Agents',]
+ *   returns 2
+ *   If
+ *     source is ['Accession','Accession Agents','#1','Agent','First Name'] and
+ *     search is ['Accession','Accession Agents','#2']
+ *   returns -1
+ *
+ */
+export function findArrayDivergencePoint<T>(
+  // The source array to use in the comparison
+  source: RA<T>,
+  // The search array to use in the comparison
+  search: RA<T>
+): number {
+  if (source === null || search === null) return -1;
+
+  const sourceLength = source.length;
+  const searchLength = search.length;
+
+  if (searchLength === 0) return 0;
+
+  if (sourceLength === 0 || sourceLength < searchLength) return -1;
+
+  return (
+    mappedFind(Object.entries(source), ([index, sourceValue]) => {
+      const searchValue = search[Number(index)];
+
+      if (searchValue === undefined) return Number(index);
+      else if (sourceValue === searchValue) return undefined;
+      else return -1;
+    }) ?? searchLength - 1
+  );
+}
+
+/** Create a new array with a given item replaced */
+export const replaceItem = <T>(array: RA<T>, index: number, item: T): RA<T> =>
+  array[index] === item
+    ? array
+    : [
+        ...array.slice(0, index),
+        item,
+        ...(index === -1 ? [] : array.slice(index + 1)),
+      ];
+
+/** Generate a sort function for Array.prototype.sort */
+export const sortFunction =
+  <T, V extends boolean | number | string | null | undefined>(
+    mapper: (value: T) => V,
+    reverse = false
+  ): ((left: T, right: T) => -1 | 0 | 1) =>
+  (left: T, right: T): -1 | 0 | 1 => {
+    const [leftValue, rightValue] = reverse
+      ? [mapper(right), mapper(left)]
+      : [mapper(left), mapper(right)];
+    if (leftValue === rightValue) return 0;
+    return typeof leftValue === 'string' && typeof rightValue === 'string'
+      ? (leftValue.localeCompare(rightValue) as -1 | 0 | 1)
+      : leftValue > rightValue
+      ? 1
+      : -1;
+  };

@@ -2,7 +2,7 @@
  * Fixes for various issues with default TypeScript declaration fils
  */
 
-import type { IR, RA, RR } from './types';
+import type { IR, RA, RR } from './utils/types.js';
 
 /**
  * Typescript does not recognize the definition overwrite when using
@@ -41,10 +41,7 @@ declare global {
     // Object
     entries<DICTIONARY extends IR<unknown>>(
       object: DICTIONARY
-    ): [
-      keyof DICTIONARY extends number ? string : string & keyof DICTIONARY,
-      DICTIONARY[keyof DICTIONARY]
-    ][];
+    ): [string & keyof DICTIONARY, DICTIONARY[keyof DICTIONARY]][];
 
     // Array
     entries<ITEM>(array: RA<ITEM>): [string, ITEM][];
