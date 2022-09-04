@@ -1,9 +1,9 @@
-import { parse } from './parser.js';
-import { theories } from './tests/utils.js';
+import { process } from '../process.js';
+import { theories } from '../tests/utils.js';
 
-theories(parse, [
-  [
-    [
+theories(process, [
+  {
+    in: [
       `"sup" and
 "dope\\n" or
 "\\b \\" "
@@ -23,7 +23,7 @@ this || or && and do some
 2147483648
 `,
     ],
-    {
+    out: {
       formattedErrors: `FATAL [3,1]-[3,9]: String literal with bad escape sequence detected
 FATAL [4,1]-[4,5]: String literal with bad escape sequence detected
 FATAL [5,1]-[5,2]: Unterminated string literal detected
@@ -35,7 +35,7 @@ FATAL [14,7]-[14,8]: Illegal character |
 FATAL [14,12]-[14,13]: Illegal character &
 FATAL [14,13]-[14,14]: Illegal character &
 FATAL [17,1]-[17,11]: Integer literal overflow`,
-      output: `STRINGLIT:"sup" [1,1]
+      tokenStream: `STRINGLIT:"sup" [1,1]
 AND [1,7]
 STRINGLIT:"dope\\n" [2,1]
 OR [2,10]
@@ -64,6 +64,11 @@ INTLIT:2147483646 [15,1]
 INTLIT:2147483647 [16,1]
 INTLIT:0 [17,1]
 EOF [18,1]`,
+      parseTree: {
+        type: 'program',
+        children: [],
+      },
+      parseErrors: [],
     },
-  ],
+  },
 ]);

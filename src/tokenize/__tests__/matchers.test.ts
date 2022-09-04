@@ -1,4 +1,4 @@
-import { theories } from '../tests/utils.js';
+import { theories } from '../../tests/utils.js';
 import {
   commentMatcher,
   defaultMatcher,
@@ -7,51 +7,51 @@ import {
   intLiteralMatcher,
   stringLiteralMatcher,
   whitespaceMatcher,
-} from './matchers.js';
+} from '../matchers.js';
 
 theories(defaultMatcher, [
-  [['AND', 'and', 'basic'], undefined],
-  [
-    ['FOR', 'for', 'for'],
-    { data: {}, errors: [], tokenLength: 3, type: 'FOR' },
-  ],
-  [
-    ['AND', 'and', 'and or'],
-    { data: {}, errors: [], tokenLength: 3, type: 'AND' },
-  ],
-  [['WHILE', 'while', 'while1'], undefined],
-  [['MAYHEM', 'mayhem', 'mayhemor'], undefined],
-  [
-    ['ARROW', '->', '->while'],
-    {
+  { in: ['AND', 'and', 'basic'], out: undefined },
+  {
+    in: ['FOR', 'for', 'for'],
+    out: { data: {}, syntaxErrors: [], tokenLength: 3, type: 'FOR' },
+  },
+  {
+    in: ['AND', 'and', 'and or'],
+    out: { data: {}, syntaxErrors: [], tokenLength: 3, type: 'AND' },
+  },
+  { in: ['WHILE', 'while', 'while1'], out: undefined },
+  { in: ['MAYHEM', 'mayhem', 'mayhemor'], out: undefined },
+  {
+    in: ['ARROW', '->', '->while'],
+    out: {
       data: {},
-      errors: [],
+      syntaxErrors: [],
       tokenLength: 2,
       type: 'ARROW',
     },
-  ],
-  [
-    ['ARROW', '->', '->='],
-    {
+  },
+  {
+    in: ['ARROW', '->', '->='],
+    out: {
       data: {},
-      errors: [],
+      syntaxErrors: [],
       tokenLength: 2,
       type: 'ARROW',
     },
-  ],
+  },
 ]);
 
 theories(endMatcher, [
-  [[' '], undefined],
-  [
-    [''],
-    {
+  { in: [' '], out: undefined },
+  {
+    in: [''],
+    out: {
       data: {},
-      errors: [],
+      syntaxErrors: [],
       tokenLength: 0,
       type: 'END',
     },
-  ],
+  },
 ]);
 
 theories(idMatcher, [
@@ -59,92 +59,108 @@ theories(idMatcher, [
    * Reserved keywords are matched by idMatcher, but that's not an issue, as
    * reserved keywords are matched before custom matchers
    */
-  [
-    ['while'],
-    {
+  {
+    in: ['while'],
+    out: {
       data: {
         literal: 'while',
       },
-      errors: [],
+      syntaxErrors: [],
       tokenLength: 5,
       type: 'ID',
     },
-  ],
-  [
-    ['while1'],
-    {
+  },
+  {
+    in: ['while1'],
+    out: {
       data: {
         literal: 'while1',
       },
-      errors: [],
+      syntaxErrors: [],
       tokenLength: 6,
       type: 'ID',
     },
-  ],
-  [['123ad'], undefined],
-  [['//abc'], undefined],
-  [
-    ['dope'],
-    {
+  },
+  { in: ['123ad'], out: undefined },
+  { in: ['//abc'], out: undefined },
+  {
+    in: ['dope'],
+    out: {
       data: {
         literal: 'dope',
       },
-      errors: [],
+      syntaxErrors: [],
       tokenLength: 4,
       type: 'ID',
     },
-  ],
-  [
-    ['_some'],
-    {
+  },
+  {
+    in: ['_some'],
+    out: {
       data: {
         literal: '_some',
       },
-      errors: [],
+      syntaxErrors: [],
       tokenLength: 5,
       type: 'ID',
     },
-  ],
+  },
 ]);
 
 theories(intLiteralMatcher, [
-  [
-    ['123'],
-    { data: { literal: 123 }, errors: [], tokenLength: 3, type: 'INTLITERAL' },
-  ],
-  [
-    ['12.34'],
-    { data: { literal: 12 }, errors: [], tokenLength: 2, type: 'INTLITERAL' },
-  ],
-  [['-1'], undefined],
-  [
-    ['10_20'],
-    { data: { literal: 10 }, errors: [], tokenLength: 2, type: 'INTLITERAL' },
-  ],
-  [
-    ['2147483646'],
-    {
+  {
+    in: ['123'],
+    out: {
+      data: { literal: 123 },
+      syntaxErrors: [],
+      tokenLength: 3,
+      type: 'INTLITERAL',
+    },
+  },
+  {
+    in: ['12.34'],
+    out: {
+      data: { literal: 12 },
+      syntaxErrors: [],
+      tokenLength: 2,
+      type: 'INTLITERAL',
+    },
+  },
+  { in: ['-1'], out: undefined },
+  {
+    in: ['10_20'],
+    out: {
+      data: { literal: 10 },
+      syntaxErrors: [],
+      tokenLength: 2,
+      type: 'INTLITERAL',
+    },
+  },
+  {
+    in: ['2147483646'],
+    out: {
       data: { literal: 2_147_483_646 },
-      errors: [],
+      syntaxErrors: [],
       tokenLength: 10,
       type: 'INTLITERAL',
     },
-  ],
-  [
-    ['2147483647'],
-    {
+  },
+  {
+    in: ['2147483647'],
+    out: {
       data: { literal: 2_147_483_647 },
-      errors: [],
+      syntaxErrors: [],
       tokenLength: 10,
       type: 'INTLITERAL',
     },
-  ],
-  [
-    ['2147483648'],
-    {
+  },
+  {
+    in: ['2147483648'],
+    out: {
       data: { literal: 0 },
-      errors: [
+      syntaxErrors: [
         {
+          type: 'SyntaxError',
           message: 'Integer literal overflow',
           start: 0,
           end: 10,
@@ -153,52 +169,53 @@ theories(intLiteralMatcher, [
       tokenLength: 10,
       type: 'INTLITERAL',
     },
-  ],
+  },
 ]);
 
 theories(stringLiteralMatcher, [
-  [
-    ['""'],
-    {
+  {
+    in: ['""'],
+    out: {
       data: { literal: '""' },
-      errors: [],
+      syntaxErrors: [],
       tokenLength: 2,
       type: 'STRINGLITERAL',
     },
-  ],
-  [
-    ['"&!88"'],
-    {
+  },
+  {
+    in: ['"&!88"'],
+    out: {
       data: { literal: '"&!88"' },
-      errors: [],
+      syntaxErrors: [],
       tokenLength: 6,
       type: 'STRINGLITERAL',
     },
-  ],
-  [
-    ['"use \\n to denote a newline character"'],
-    {
+  },
+  {
+    in: ['"use \\n to denote a newline character"'],
+    out: {
       data: { literal: '"use \\n to denote a newline character"' },
-      errors: [],
+      syntaxErrors: [],
       tokenLength: 38,
       type: 'STRINGLITERAL',
     },
-  ],
-  [
-    ['"use \\" to  for a quote and \\\\ for a backslash"'],
-    {
+  },
+  {
+    in: ['"use \\" to  for a quote and \\\\ for a backslash"'],
+    out: {
       data: { literal: '"use \\" to  for a quote and \\\\ for a backslash"' },
-      errors: [],
+      syntaxErrors: [],
       tokenLength: 47,
       type: 'STRINGLITERAL',
     },
-  ],
-  [
-    ['"unterminated'],
-    {
+  },
+  {
+    in: ['"unterminated'],
+    out: {
       data: undefined,
-      errors: [
+      syntaxErrors: [
         {
+          type: 'SyntaxError',
           end: 13,
           message: 'Unterminated string literal detected',
           start: 0,
@@ -207,13 +224,14 @@ theories(stringLiteralMatcher, [
       tokenLength: 13,
       type: 'STRINGLITERAL',
     },
-  ],
-  [
-    ['"also unterminated \\"'],
-    {
+  },
+  {
+    in: ['"also unterminated \\"'],
+    out: {
       data: undefined,
-      errors: [
+      syntaxErrors: [
         {
+          type: 'SyntaxError',
           end: 21,
           message: 'Unterminated string literal detected',
           start: 0,
@@ -222,13 +240,14 @@ theories(stringLiteralMatcher, [
       tokenLength: 21,
       type: 'STRINGLITERAL',
     },
-  ],
-  [
-    ['"backslash followed by space: \\ is not allowed"'],
-    {
+  },
+  {
+    in: ['"backslash followed by space: \\ is not allowed"'],
+    out: {
       data: undefined,
-      errors: [
+      syntaxErrors: [
         {
+          type: 'SyntaxError',
           end: 47,
           message: 'String literal with bad escape sequence detected',
           start: 0,
@@ -237,13 +256,14 @@ theories(stringLiteralMatcher, [
       tokenLength: 47,
       type: 'STRINGLITERAL',
     },
-  ],
-  [
-    ['"bad escaped character: \\a AND not terminated'],
-    {
+  },
+  {
+    in: ['"bad escaped character: \\a AND not terminated'],
+    out: {
       data: undefined,
-      errors: [
+      syntaxErrors: [
         {
+          type: 'SyntaxError',
           end: 45,
           message:
             'Unterminated string literal with bad escape sequence detected',
@@ -253,51 +273,51 @@ theories(stringLiteralMatcher, [
       tokenLength: 45,
       type: 'STRINGLITERAL',
     },
-  ],
+  },
 ]);
 
 theories(commentMatcher, [
-  [
-    ['//comment'],
-    {
+  {
+    in: ['//comment'],
+    out: {
       data: undefined,
-      errors: [],
+      syntaxErrors: [],
       tokenLength: 9,
       type: undefined,
     },
-  ],
-  [
-    ['// Also a comment'],
-    {
+  },
+  {
+    in: ['// Also a comment'],
+    out: {
       data: undefined,
-      errors: [],
+      syntaxErrors: [],
       tokenLength: 17,
       type: undefined,
     },
-  ],
-  [['/* not a comment*/'], undefined],
-  [['# not a // comment'], undefined],
+  },
+  { in: ['/* not a comment*/'], out: undefined },
+  { in: ['# not a // comment'], out: undefined },
 ]);
 
 theories(whitespaceMatcher, [
-  [[''], undefined],
-  [['abc'], undefined],
-  [
-    ['  '],
-    {
+  { in: [''], out: undefined },
+  { in: ['abc'], out: undefined },
+  {
+    in: ['  '],
+    out: {
       data: undefined,
-      errors: [],
+      syntaxErrors: [],
       tokenLength: 2,
       type: undefined,
     },
-  ],
-  [
-    [' \t \r\ndo'],
-    {
+  },
+  {
+    in: [' \t \r\ndo'],
+    out: {
       data: undefined,
-      errors: [],
+      syntaxErrors: [],
       tokenLength: 5,
       type: undefined,
     },
-  ],
+  },
 ]);

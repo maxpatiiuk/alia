@@ -1,6 +1,6 @@
-import { formatName, formatTokens } from './formatTokens.js';
-import { theories } from './tests/utils.js';
-import { cretePositionResolver } from './utils/resolvePosition.js';
+import { formatName, formatTokens } from '../formatTokens.js';
+import { theories } from '../tests/utils.js';
+import { cretePositionResolver } from '../utils/resolvePosition.js';
 
 const positionResolver = cretePositionResolver(`
 Example
@@ -9,8 +9,8 @@ Here
 `);
 
 theories(formatTokens, [
-  [
-    [
+  {
+    in: [
       [
         {
           type: 'AND',
@@ -20,10 +20,10 @@ theories(formatTokens, [
       ],
       positionResolver,
     ],
-    'AND [1,1]',
-  ],
-  [
-    [
+    out: 'AND [1,1]',
+  },
+  {
+    in: [
       [
         {
           type: 'STRINGLITERAL',
@@ -38,13 +38,13 @@ theories(formatTokens, [
       ],
       positionResolver,
     ],
-    'STRINGLIT:Test [1,1]\nINTLIT:10 [3,2]',
-  ],
+    out: 'STRINGLIT:Test [1,1]\nINTLIT:10 [3,2]',
+  },
 ]);
 
 theories(formatName, [
-  [['AND', {}], 'AND'],
-  [['STRINGLITERAL', { literal: 'Test' }], 'STRINGLIT:Test'],
-  [['INTLITERAL', { literal: 10 }], 'INTLIT:10'],
-  [['ID', { literal: 'while1' }], 'ID:while1'],
+  { in: ['AND', {}], out: 'AND' },
+  { in: ['STRINGLITERAL', { literal: 'Test' }], out: 'STRINGLIT:Test' },
+  { in: ['INTLITERAL', { literal: 10 }], out: 'INTLIT:10' },
+  { in: ['ID', { literal: 'while1' }], out: 'ID:while1' },
 ]);

@@ -1,15 +1,15 @@
-import { theories } from '../tests/utils.js';
-import { invalidToken, repositionErrors, tokenize } from './index.js';
+import { theories } from '../../tests/utils.js';
+import { invalidToken, repositionErrors, tokenize } from '../index.js';
 
 theories(tokenize, [
-  [
-    [
+  {
+    in: [
       `"sup" and
 "dope\\n" or`,
       0,
     ],
-    {
-      errors: [],
+    out: {
+      syntaxErrors: [],
       tokens: [
         {
           data: {
@@ -42,21 +42,23 @@ theories(tokenize, [
         },
       ],
     },
-  ],
-  [
-    [
+  },
+  {
+    in: [
       `"\\b \\" "
 "\\b"`,
       0,
     ],
-    {
-      errors: [
+    out: {
+      syntaxErrors: [
         {
+          type: 'SyntaxError',
           end: 8,
           message: 'String literal with bad escape sequence detected',
           start: 0,
         },
         {
+          type: 'SyntaxError',
           end: 13,
           message: 'String literal with bad escape sequence detected',
           start: 9,
@@ -70,21 +72,23 @@ theories(tokenize, [
         },
       ],
     },
-  ],
-  [
-    [
+  },
+  {
+    in: [
       `"
 "\\b`,
       0,
     ],
-    {
-      errors: [
+    out: {
+      syntaxErrors: [
         {
+          type: 'SyntaxError',
           end: 1,
           message: 'Unterminated string literal detected',
           start: 0,
         },
         {
+          type: 'SyntaxError',
           end: 5,
           message:
             'Unterminated string literal with bad escape sequence detected',
@@ -99,15 +103,15 @@ theories(tokenize, [
         },
       ],
     },
-  ],
-  [
-    [
+  },
+  {
+    in: [
       `3
 -1`,
       0,
     ],
-    {
-      errors: [],
+    out: {
+      syntaxErrors: [],
       tokens: [
         {
           data: {
@@ -135,21 +139,23 @@ theories(tokenize, [
         },
       ],
     },
-  ],
-  [
-    [
+  },
+  {
+    in: [
       `3.2
 212,312,123.00`,
       0,
     ],
-    {
-      errors: [
+    out: {
+      syntaxErrors: [
         {
+          type: 'SyntaxError',
           end: 2,
           message: 'Illegal character .',
           start: 1,
         },
         {
+          type: 'SyntaxError',
           end: 16,
           message: 'Illegal character .',
           start: 15,
@@ -215,15 +221,15 @@ theories(tokenize, [
         },
       ],
     },
-  ],
-  [
-    [
+  },
+  {
+    in: [
       `100_200
 ->=`,
       0,
     ],
-    {
-      errors: [],
+    out: {
+      syntaxErrors: [],
       tokens: [
         {
           data: {
@@ -256,31 +262,35 @@ theories(tokenize, [
         },
       ],
     },
-  ],
-  [
-    [
+  },
+  {
+    in: [
       `mayhemor
 this || or && and do some`,
       0,
     ],
-    {
-      errors: [
+    out: {
+      syntaxErrors: [
         {
+          type: 'SyntaxError',
           end: 15,
           message: 'Illegal character |',
           start: 14,
         },
         {
+          type: 'SyntaxError',
           end: 16,
           message: 'Illegal character |',
           start: 15,
         },
         {
+          type: 'SyntaxError',
           end: 21,
           message: 'Illegal character &',
           start: 20,
         },
         {
+          type: 'SyntaxError',
           end: 22,
           message: 'Illegal character &',
           start: 21,
@@ -332,17 +342,18 @@ this || or && and do some`,
         },
       ],
     },
-  ],
-  [
-    [
+  },
+  {
+    in: [
       `2147483646
 2147483647
 2147483648`,
       0,
     ],
-    {
-      errors: [
+    out: {
+      syntaxErrors: [
         {
+          type: 'SyntaxError',
           end: 32,
           message: 'Integer literal overflow',
           start: 22,
@@ -377,33 +388,40 @@ this || or && and do some`,
         },
       ],
     },
-  ],
+  },
 ]);
 
 theories(invalidToken, [
-  [
-    ['Test'],
-    {
+  {
+    in: ['Test'],
+    out: {
       type: undefined,
       data: undefined,
       tokenLength: 1,
-      errors: [
+      syntaxErrors: [
         {
+          type: 'SyntaxError',
           start: 0,
           end: 1,
           message: `Illegal character T`,
         },
       ],
     },
-  ],
+  },
 ]);
 
 theories(repositionErrors, [
-  [
-    [
+  {
+    in: [
       [
-        { start: 3, end: 10, message: 'Error message' },
         {
+          type: 'SyntaxError',
+          start: 3,
+          end: 10,
+          message: 'Error message',
+        },
+        {
+          type: 'SyntaxError',
           start: 1,
           end: 20,
           message: 'Error message #2',
@@ -411,13 +429,19 @@ theories(repositionErrors, [
       ],
       10,
     ],
-    [
-      { start: 13, end: 20, message: 'Error message' },
+    out: [
       {
+        type: 'SyntaxError',
+        start: 13,
+        end: 20,
+        message: 'Error message',
+      },
+      {
+        type: 'SyntaxError',
         start: 11,
         end: 30,
         message: 'Error message #2',
       },
     ],
-  ],
+  },
 ]);
