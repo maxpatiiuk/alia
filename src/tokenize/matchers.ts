@@ -18,7 +18,7 @@ export function defaultMatcher(
     type,
     data: {},
     tokenLength: matcher.length,
-    errors: [],
+    syntaxErrors: [],
   };
 }
 
@@ -28,7 +28,7 @@ export const endMatcher = (input: string): MatcherResult<'END'> | undefined =>
         type: 'END',
         data: {},
         tokenLength: 0,
-        errors: [],
+        syntaxErrors: [],
       }
     : undefined;
 
@@ -43,7 +43,7 @@ export function idMatcher(input: string): MatcherResult<'ID'> | undefined {
       literal: identifier,
     },
     tokenLength: identifier.length,
-    errors: [],
+    syntaxErrors: [],
   };
 }
 
@@ -62,10 +62,11 @@ export function intLiteralMatcher(
       literal: number > INT_MAX ? 0 : number,
     },
     tokenLength: rawNumber.length,
-    errors:
+    syntaxErrors:
       number > INT_MAX
         ? [
             {
+              type: 'SyntaxError',
               message: 'Integer literal overflow',
               start: 0,
               end: rawNumber.length,
@@ -109,9 +110,10 @@ export function stringLiteralMatcher(
           literal: line.slice(0, tokenLength),
         },
     tokenLength,
-    errors: hasErrors
+    syntaxErrors: hasErrors
       ? [
           {
+            type: 'SyntaxError',
             start: 0,
             end: tokenLength,
             message: hasInvalidEscape
@@ -136,7 +138,7 @@ export function commentMatcher(
     type: undefined,
     data: undefined,
     tokenLength: match[0].length,
-    errors: [],
+    syntaxErrors: [],
   };
 }
 
@@ -151,6 +153,6 @@ export function whitespaceMatcher(
     type: undefined,
     data: undefined,
     tokenLength: match[0].length,
-    errors: [],
+    syntaxErrors: [],
   };
 }

@@ -7,16 +7,16 @@ import {
   whitespaceMatcher,
 } from './matchers.js';
 import type { Tokens } from './tokens.js';
-import type { MatcherResult, ParseError, Token } from './types.js';
+import type { MatcherResult, SyntaxError, Token } from './types.js';
 
 export function tokenize(
   input: string,
   positionOffset: number
 ): {
   readonly tokens: RA<Token>;
-  readonly errors: RA<ParseError>;
+  readonly syntaxErrors: RA<SyntaxError>;
 } {
-  const { type, data, tokenLength, errors } =
+  const { type, data, tokenLength, syntaxErrors } =
     mappedFind(simpleTokens, ([type, matcher]) =>
       defaultMatcher(type, matcher, input)
     ) ??
@@ -26,11 +26,11 @@ export function tokenize(
     invalidToken(input);
 
   const remainingInput = input.slice(tokenLength);
-  const { tokens, errors: additionalErrors } =
+  const { tokens, syntaxErrors: additionalErrors } =
     type === 'END'
       ? {
           tokens: [],
-          errors: [],
+          syntaxErrors: [],
         }
       : tokenize(remainingInput, positionOffset + tokenLength);
 
@@ -45,7 +45,10 @@ export function tokenize(
 
   return {
     tokens: [...(typeof token === 'object' ? [token] : []), ...tokens],
-    errors: [...repositionErrors(errors, positionOffset), ...additionalErrors],
+    syntaxErrors: [
+      ...repositionErrors(syntaxErrors, positionOffset),
+      ...additionalErrors,
+    ],
   };
 }
 
@@ -53,8 +56,9 @@ export const invalidToken = (input: string): MatcherResult<keyof Tokens> => ({
   type: undefined,
   data: undefined,
   tokenLength: 1,
-  errors: [
+  syntaxErrors: [
     {
+      type: 'SyntaxError',
       start: 0,
       end: 1,
       message: `Illegal character ${input[0]}`,
@@ -66,9 +70,9 @@ export const invalidToken = (input: string): MatcherResult<keyof Tokens> => ({
  * Offset the positions in the error messages to match current position
  */
 export const repositionErrors = (
-  errors: RA<ParseError>,
+  errors: RA<SyntaxError>,
   positionOffset: number
-): RA<ParseError> =>
+): RA<SyntaxError> =>
   errors.map(({ start, end, ...error }) => ({
     ...error,
     start: start + positionOffset,

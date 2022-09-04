@@ -57,6 +57,9 @@ const tokenDefinitions: {
   WHILE: 'while',
 };
 
+export const isToken = (token: string): token is keyof Tokens =>
+  token in tokenDefinitions;
+
 const [rawSimpleTokens, rawComplexTokens] = split(
   Object.entries(tokenDefinitions),
   ([_type, matcher]) => typeof matcher === 'function'
@@ -70,3 +73,9 @@ export const complexTokens = rawComplexTokens as RA<
     (input: string) => MatcherResult<keyof Tokens> | undefined
   ]
 >;
+
+const lowerCaseKey = Object.keys(tokenDefinitions).find((key) =>
+  key.startsWith(key[0].toLowerCase())
+);
+if (typeof lowerCaseKey === 'string')
+  throw new Error(`Token names must be capitalized. Found: ${lowerCaseKey}`);

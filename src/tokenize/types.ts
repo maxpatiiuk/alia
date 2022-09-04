@@ -1,3 +1,5 @@
+import type { State } from 'typesafe-reducer';
+
 import type { RA } from '../utils/types.js';
 import type { Tokens } from './tokens.js';
 
@@ -16,11 +18,14 @@ export type MatcherResult<T extends keyof Tokens> = {
   readonly type: T | undefined;
   readonly data: Tokens[T] | undefined;
   readonly tokenLength: number;
-  readonly errors: RA<ParseError>;
+  readonly syntaxErrors: RA<SyntaxError>;
 };
 
-export type ParseError = {
-  readonly start: number;
-  readonly end: number;
-  readonly message: string;
-};
+export type SyntaxError = State<
+  'SyntaxError',
+  {
+    readonly start: number;
+    readonly end: number;
+    readonly message: string;
+  }
+>;

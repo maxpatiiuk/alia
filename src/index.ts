@@ -1,7 +1,7 @@
 import { program } from 'commander';
 import fs from 'node:fs';
 
-import { parse } from './parser.js';
+import { process } from './process.js';
 
 program.name('dgc').description('The ultimate Drewgon compiler');
 
@@ -12,6 +12,7 @@ program
   .action((inputString: string) => {
     input = inputString;
   })
+  .requiredOption('-p, --print', 'parse the input to check syntax')
   .requiredOption(
     '-t, --tokensOutput <string>',
     'path to output file for tokens'
@@ -20,18 +21,22 @@ program
 program.parse();
 
 const { tokensOutput } = program.opts<{
-  readonly tokensOutput: string;
+  readonly tokensOutput?: string;
 }>();
 
 run(input, tokensOutput).catch(console.error);
 
-async function run(input: string, tokensOutput: string): Promise<void> {
+async function run(
+  input: string,
+  tokensOutput: string | undefined
+): Promise<void> {
   const rawText = await fs.promises
     .readFile(input)
     .then((data) => data.toString());
 
-  const { formattedErrors, output } = parse(rawText);
+  const { formattedErrors, tokenStream } = process(rawText);
 
   if (formattedErrors.length > 0) console.error(formattedErrors);
-  await fs.promises.writeFile(tokensOutput, output);
+  if (typeof tokensOutput === 'string')
+    await fs.promises.writeFile(tokensOutput, tokenStream);
 }
