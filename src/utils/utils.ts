@@ -86,6 +86,12 @@ export function findArrayDivergencePoint<T>(
   );
 }
 
+/** Create a new array without a given item */
+export const removeItem = <T>(array: RA<T>, index: number): RA<T> =>
+  index < 0
+    ? [...array.slice(0, index - 1), ...array.slice(index)]
+    : [...array.slice(0, index), ...array.slice(index + 1)];
+
 /** Create a new array with a given item replaced */
 export const replaceItem = <T>(array: RA<T>, index: number, item: T): RA<T> =>
   array[index] === item
@@ -113,3 +119,23 @@ export const sortFunction =
       ? 1
       : -1;
   };
+
+/**
+ * Convert an array of [key,value] tuples to a RA<[key, RA<value>]>
+ *
+ * @remarks
+ * KEY doesn't have to be a string. It can be of any time
+ */
+export const group = <KEY, VALUE>(
+  entries: RA<readonly [key: KEY, value: VALUE]>
+): RA<readonly [key: KEY, values: RA<VALUE>]> =>
+  Array.from(
+    entries
+      // eslint-disable-next-line functional/prefer-readonly-type
+      .reduce<Map<KEY, RA<VALUE>>>(
+        (grouped, [key, value]) =>
+          grouped.set(key, [...(grouped.get(key) ?? []), value]),
+        new Map()
+      )
+      .entries()
+  );

@@ -1,7 +1,9 @@
 import { theories } from '../../tests/utils.js';
 import {
   findArrayDivergencePoint,
+  group,
   mappedFind,
+  removeItem,
   replaceItem,
   sortFunction,
   split,
@@ -57,6 +59,14 @@ theories(findArrayDivergencePoint, {
   },
 });
 
+theories(removeItem, {
+  'remove from the beginning': { in: [[0, 1, 2, 3, 4], 0], out: [1, 2, 3, 4] },
+  'remove in the middle': { in: [[1, 0, 2, 3, 4], 1], out: [1, 2, 3, 4] },
+  'remove at the end': { in: [[1, 2, 3, 4, 0], 4], out: [1, 2, 3, 4] },
+  'remove from the end': { in: [[1, 2, 3, 0, 4], -1], out: [1, 2, 3, 4] },
+  'remove after the end': { in: [[1, 2, 3, 4], 99], out: [1, 2, 3, 4] },
+});
+
 theories(replaceItem, {
   'replace at the beginning': { in: [[0, 2, 3, 4], 0, 1], out: [1, 2, 3, 4] },
   'replace in the middle': { in: [[1, 0, 3, 4], 1, 2], out: [1, 2, 3, 4] },
@@ -95,3 +105,22 @@ describe('sortFunction', () => {
     ).toEqual([10, 1, 9, 2, 8, 3, 7, 4, 6, 5]);
   });
 });
+
+theories(group, [
+  {
+    in: [
+      [
+        ['a', 1],
+        ['a', 2],
+        ['b', 3],
+        ['c', 4],
+        ['a', 5],
+      ],
+    ],
+    out: [
+      ['a', [1, 2, 5]],
+      ['b', [3]],
+      ['c', [4]],
+    ],
+  },
+]);
