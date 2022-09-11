@@ -7,6 +7,7 @@ import type {
   AbstractGrammarLine,
 } from '../contextFreeGrammar.js';
 
+// FIXME: check if this is still needed. if yes, add it back
 /**
  * Factor out common parts of rules to reduce unneeded computation in case first
  * element of union does not match but the second one does.

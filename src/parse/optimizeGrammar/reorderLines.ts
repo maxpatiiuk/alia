@@ -6,6 +6,7 @@ import type {
   AbstractGrammarLine,
 } from '../contextFreeGrammar.js';
 
+// FIXME: check if this is still needed, and if so, bring it back
 /**
  * The matcher recursively follows the references in the grammar until it found
  * the token that matches, or backs out if nothing matches.

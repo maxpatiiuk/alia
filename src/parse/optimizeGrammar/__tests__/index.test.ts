@@ -3,7 +3,6 @@ import { epsilon } from '../../contextFreeGrammar.js';
 import { optimizeGrammar, removeTypeFixes } from '../index.js';
 
 theories(optimizeGrammar, [
-  { in: [{}], out: {} },
   {
     in: [
       {
@@ -14,7 +13,7 @@ theories(optimizeGrammar, [
           ['a', 'b'],
           ['a', 'b', 'c'],
         ],
-        _: [['a']],
+        _: [['a', 'z']],
         [epsilon[0]]: [[epsilon[0]]],
       },
     ],

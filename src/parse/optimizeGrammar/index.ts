@@ -1,14 +1,14 @@
+import { toChomsky } from '../chomsky/convert.js';
+import { checkValidity } from '../chomsky/uselessRules.js';
 import type { AbstractGrammar } from '../contextFreeGrammar.js';
 import { epsilon, typeFixRule } from '../contextFreeGrammar.js';
-import { reorderRules } from './reorderLines.js';
-import { splitGrammar } from './splitGrammar.js';
 
 /**
  * Do various performance optimizations on the grammar
  */
 export const optimizeGrammar = <T extends string>(
   grammar: AbstractGrammar<T>
-): AbstractGrammar<T> => reorderRules(removeTypeFixes(splitGrammar(grammar)));
+): AbstractGrammar<T> => toChomsky(checkValidity(removeTypeFixes(grammar)));
 
 /**
  * Epsilon rules where replaced with '__' to simplify typing.
