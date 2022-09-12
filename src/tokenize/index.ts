@@ -17,11 +17,11 @@ export function tokenize(
   readonly syntaxErrors: RA<SyntaxError>;
 } {
   const { type, data, tokenLength, syntaxErrors } =
+    commentMatcher(input) ??
     mappedFind(simpleTokens, ([type, matcher]) =>
       defaultMatcher(type, matcher, input)
     ) ??
     mappedFind(complexTokens, ([_type, matcher]) => matcher(input)) ??
-    commentMatcher(input) ??
     whitespaceMatcher(input) ??
     invalidToken(input);
 

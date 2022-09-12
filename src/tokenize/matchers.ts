@@ -32,7 +32,7 @@ export const endMatcher = (input: string): MatcherResult<'END'> | undefined =>
       }
     : undefined;
 
-const reId = /^[_a-z]\w+/iu;
+const reId = /^[_a-z]\w*/iu;
 
 export function idMatcher(input: string): MatcherResult<'ID'> | undefined {
   const identifier = reId.exec(input)?.[0];

@@ -40,15 +40,6 @@ export function checkValidity<T extends string>(
       )
     );
 
-  const root = findGrammarRoot(grammar);
-  Object.entries(grammar)
-    .filter(([_name, lines]) => lines.some((line) => line.includes(root)))
-    .forEach(([name]) =>
-      error(
-        `Root rule ${root} must mot be included in any other rule, but it is in ${name}`
-      )
-    );
-
   Object.keys(grammar)
     .filter(
       (key) => key.includes('_') && key !== epsilon[0] && key !== typeFixRule

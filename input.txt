@@ -1,18 +1,58 @@
-"sup" and
-"dope\n" or
-"\b \" "
-"\b"
-"
-"\b
-3
--1
-3.2
-212,312,123.00
-100_200
-->=
-mayhemor
-mayhem or
-this || or && and do some
-2147483646
-2147483647
-2147483648
+int a;
+int b;
+
+bool c;
+void d;
+
+int bar(int b, int _3d){
+ int a;
+}
+
+void bar(){
+ int a;
+}
+
+fn() -> void bar() {
+ int b;
+}
+
+fn(int, fn () -> fn () -> void) -> void bar() {
+ int b;
+
+ while(-a) {
+
+ }
+
+ // for(int a; int b; int c) {
+ //
+ // }
+
+ for(int a; TRUE and true; int c) {
+
+ }
+
+ if(false) {}
+
+ if(3 * 4 == 42) {} else {
+   // test
+ }
+
+  val = 4;
+
+  val--;
+  val++;
+
+  return 4;
+  output 10;
+  input des;
+  output 10*4;
+  if(((10 != true)) or 10 <= 4) {}
+  output 10 < 4;
+
+  some();
+  some(do, 10 - 4);
+
+  output FALSE;
+  output 10;
+  output "Test\n\t";
+}

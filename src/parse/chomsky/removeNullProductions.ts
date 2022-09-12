@@ -7,6 +7,9 @@ import type {
 } from '../contextFreeGrammar.js';
 import { findGrammarRoot } from './uselessRules.js';
 
+/**
+ * Get rid of epsilon productions
+ */
 export function removeNullProductions<T extends string>(
   grammar: AbstractGrammar<T>
 ): AbstractGrammar<T> {
@@ -15,7 +18,9 @@ export function removeNullProductions<T extends string>(
     .map(([name]) => name);
   const rawNullableRules = findNullableRules(grammar, rulesWithEpsilons);
   const grammarRoot = findGrammarRoot(grammar);
-  const isRootNullable = rawNullableRules.includes(grammarRoot);
+  const isRootNullable =
+    rulesWithEpsilons.includes(grammarRoot) ||
+    rawNullableRules.includes(grammarRoot);
   const nullableRules = [
     ...rulesWithEpsilons,
     ...rawNullableRules.filter((rule) => rule !== grammarRoot),

@@ -71,6 +71,17 @@ theories(idMatcher, [
     },
   },
   {
+    in: ['a'],
+    out: {
+      data: {
+        literal: 'a',
+      },
+      syntaxErrors: [],
+      tokenLength: 1,
+      type: 'ID',
+    },
+  },
+  {
     in: ['while1'],
     out: {
       data: {

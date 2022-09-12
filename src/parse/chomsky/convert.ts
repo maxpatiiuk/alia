@@ -1,7 +1,6 @@
 import { isToken } from '../../tokenize/definitions.js';
 import type { R, RA } from '../../utils/types.js';
 import type { AbstractGrammar } from '../contextFreeGrammar.js';
-import { ruleJoinSymbol } from '../optimizeGrammar/splitGrammar.js';
 import { simplifyGrammar } from './simplify.js';
 
 /**
@@ -9,54 +8,9 @@ import { simplifyGrammar } from './simplify.js';
  */
 export const toChomsky = <T extends string>(
   grammar: AbstractGrammar<T>
-): AbstractGrammar<T> =>
-  maskTokens(splitLongLines(eliminateIntermixing(simplifyGrammar(grammar))));
+): AbstractGrammar<T> => splitLongLines(maskTokens(simplifyGrammar(grammar)));
 
-/**
- * Refactor rules that contain both terminal and non-terminal symbols to make
- * them refer to non-terminal only.
- *
- * Rules that refer to terminal only are left as is.
- */
-export function eliminateIntermixing<T extends string>(
-  grammar: AbstractGrammar<T>
-): AbstractGrammar<T> {
-  const tokenJoinSymbol = ' ';
-  const globalTokenStreams = new Set<string>();
-  const formatRule = (stream: string): string =>
-    `${ruleJoinSymbol}${stream.split(tokenJoinSymbol).join(ruleJoinSymbol)}`;
-  return Object.fromEntries([
-    ...Object.entries(grammar).map(([name, lines]) => [
-      name,
-      lines.map((line) => {
-        if (line.some(isToken) && !line.every(isToken)) {
-          const streams = line
-            .map((part) =>
-              isToken(part) ? part : `${ruleJoinSymbol}${part}${ruleJoinSymbol}`
-            )
-            .join(tokenJoinSymbol)
-            .split(ruleJoinSymbol)
-            .filter((stream) => stream.trim().length > 0);
-          const tokenStreams = streams.filter((stream) =>
-            stream.includes(tokenJoinSymbol)
-          );
-          tokenStreams.forEach((stream) =>
-            globalTokenStreams.add(stream.trim())
-          );
-          return streams.map((stream) =>
-            stream.includes(tokenJoinSymbol)
-              ? formatRule(stream.trim())
-              : stream
-          );
-        } else return line;
-      }),
-    ]),
-    ...Array.from(globalTokenStreams, (stream) => [
-      formatRule(stream),
-      [stream.split(tokenJoinSymbol)],
-    ]),
-  ]);
-}
+const ruleJoinSymbol = '__';
 
 /**
  * Make all rules contain at most 2 elements.
@@ -97,7 +51,7 @@ export function maskTokens<T extends string>(
   grammar: AbstractGrammar<T>
 ): AbstractGrammar<T> {
   const usedTokens = new Set<T>();
-  const formatToken = (token: T) => `${ruleJoinSymbol}${token}`;
+  const formatToken = (token: T): string => `${ruleJoinSymbol}${token}`;
   return Object.fromEntries([
     ...Object.entries(grammar).map(([name, lines]) => [
       name,

@@ -4,7 +4,7 @@ import { invalidToken, repositionErrors, tokenize } from '../index.js';
 theories(tokenize, [
   {
     in: [
-      `"sup" and
+      `"sup" and // d
 "dope\\n" or`,
       0,
     ],
@@ -27,17 +27,17 @@ theories(tokenize, [
           data: {
             literal: '"dope\\n"',
           },
-          simplePosition: 10,
+          simplePosition: 15,
           type: 'STRINGLITERAL',
         },
         {
           data: {},
-          simplePosition: 19,
+          simplePosition: 24,
           type: 'OR',
         },
         {
           data: {},
-          simplePosition: 21,
+          simplePosition: 26,
           type: 'END',
         },
       ],
@@ -387,6 +387,103 @@ this || or && and do some`,
           type: 'END',
         },
       ],
+    },
+  },
+  {
+    in: [`4-- 5++ == 10; 4!=4; 10>=1`, 0],
+    out: {
+      tokens: [
+        {
+          data: {
+            literal: 4,
+          },
+          simplePosition: 0,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {},
+          simplePosition: 1,
+          type: 'POSTDEC',
+        },
+        {
+          data: {
+            literal: 5,
+          },
+          simplePosition: 4,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {},
+          simplePosition: 5,
+          type: 'POSTINC',
+        },
+        {
+          data: {},
+          simplePosition: 8,
+          type: 'EQUALS',
+        },
+        {
+          data: {
+            literal: 10,
+          },
+          simplePosition: 11,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {},
+          simplePosition: 13,
+          type: 'SEMICOL',
+        },
+        {
+          data: {
+            literal: 4,
+          },
+          simplePosition: 15,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {},
+          simplePosition: 16,
+          type: 'NOTEQUALS',
+        },
+        {
+          data: {
+            literal: 4,
+          },
+          simplePosition: 18,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {},
+          simplePosition: 19,
+          type: 'SEMICOL',
+        },
+        {
+          data: {
+            literal: 10,
+          },
+          simplePosition: 21,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {},
+          simplePosition: 23,
+          type: 'GREATEREQ',
+        },
+        {
+          data: {
+            literal: 1,
+          },
+          simplePosition: 25,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {},
+          simplePosition: 26,
+          type: 'END',
+        },
+      ],
+      syntaxErrors: [],
     },
   },
 ]);

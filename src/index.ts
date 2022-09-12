@@ -12,31 +12,19 @@ program
   .action((inputString: string) => {
     input = inputString;
   })
-  .requiredOption('-p, --print', 'parse the input to check syntax')
-  .requiredOption(
-    '-t, --tokensOutput <string>',
-    'path to output file for tokens'
-  );
+  .option('-p, --print', 'parse the input to check syntax');
 
 program.parse();
 
-const { tokensOutput } = program.opts<{
-  readonly tokensOutput?: string;
-}>();
+run(input).catch(console.error);
 
-run(input, tokensOutput).catch(console.error);
-
-async function run(
-  input: string,
-  tokensOutput: string | undefined
-): Promise<void> {
+async function run(input: string): Promise<void> {
   const rawText = await fs.promises
     .readFile(input)
     .then((data) => data.toString());
 
-  const { formattedErrors, tokenStream } = process(rawText);
+  const { formattedErrors, parseResult } = process(rawText);
 
   if (formattedErrors.length > 0) console.error(formattedErrors);
-  if (typeof tokensOutput === 'string')
-    await fs.promises.writeFile(tokensOutput, tokenStream);
+  else if (!parseResult) console.error('syntax error\nParse failed');
 }

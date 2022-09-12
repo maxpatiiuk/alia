@@ -1,5 +1,5 @@
 import type { RA } from '../utils/types.js';
-import { split } from '../utils/utils.js';
+import { sortFunction, split } from '../utils/utils.js';
 import {
   endMatcher,
   idMatcher,
@@ -64,9 +64,9 @@ const [rawSimpleTokens, rawComplexTokens] = split(
   Object.entries(tokenDefinitions),
   ([_type, matcher]) => typeof matcher === 'function'
 );
-export const simpleTokens = rawSimpleTokens as RA<
-  readonly [keyof Tokens, string]
->;
+export const simpleTokens = Array.from(rawSimpleTokens).sort(
+  sortFunction(([_name, value]) => value.length, true)
+) as RA<readonly [keyof Tokens, string]>;
 export const complexTokens = rawComplexTokens as RA<
   readonly [
     keyof Tokens,

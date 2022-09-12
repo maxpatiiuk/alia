@@ -7,6 +7,7 @@ import {
   replaceItem,
   sortFunction,
   split,
+  store,
 } from '../utils.js';
 
 describe('mappedFind', () => {
@@ -124,3 +125,12 @@ theories(group, [
     ],
   },
 ]);
+
+test('store', () => {
+  const id = {};
+  const callback = jest.fn(() => id);
+  const memoized = store(callback);
+  expect(memoized()).toBe(id);
+  expect(memoized()).toBe(id);
+  expect(callback).toHaveBeenCalledTimes(1);
+});
