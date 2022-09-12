@@ -3,6 +3,7 @@
   "include": [
     "**/*.ts"
   ],
+  "files": ["./src/declarations.d.ts"],
   "exclude": ["node_modules"],
   "compilerOptions": {
     /* Basic Options */

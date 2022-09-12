@@ -1,7 +1,7 @@
 import { program } from 'commander';
 import fs from 'node:fs';
 
-import { process } from './process.js';
+import { process as processInput } from './process.js';
 
 program.name('dgc').description('The ultimate Drewgon compiler');
 
@@ -23,8 +23,13 @@ async function run(input: string): Promise<void> {
     .readFile(input)
     .then((data) => data.toString());
 
-  const { formattedErrors, parseResult } = process(rawText);
+  const { formattedErrors, parseResult } = processInput(rawText);
 
-  if (formattedErrors.length > 0) console.error(formattedErrors);
-  else if (!parseResult) console.error('syntax error\nParse failed');
+  if (formattedErrors.length > 0) {
+    console.error(formattedErrors);
+    process.exitCode = 1;
+  } else if (!parseResult) {
+    console.error('syntax error\nParse failed');
+    process.exitCode = 1;
+  }
 }

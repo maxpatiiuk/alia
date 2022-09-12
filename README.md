@@ -4,7 +4,7 @@ The ultimate Drewgon compiler.
 
 Written in TypeScript.
 
-> NOTE: at present this project only includes a parser
+> NOTE: at present this project only includes a tokenizer and a parser
 
 ## Prerequisites
 
