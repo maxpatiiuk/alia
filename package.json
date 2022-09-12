@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "The ultimate Drewgon compiler",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/.bin/jest"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
