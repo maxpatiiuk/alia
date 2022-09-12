@@ -12,23 +12,36 @@ program
   .action((inputString: string) => {
     input = inputString;
   })
-  .option('-p, --print', 'parse the input to check syntax');
+  .option('-t, --tokensOutput <string>', 'path to output file for tokens')
+  .option('-p, --print', 'parse the input to check syntax', false);
 
 program.parse();
 
-run(input).catch(console.error);
+const { tokensOutput, print } = program.opts<{
+  readonly tokensOutput?: string;
+  readonly print: boolean;
+}>();
 
-async function run(input: string): Promise<void> {
+run(input, tokensOutput, print).catch(console.error);
+
+async function run(
+  input: string,
+  tokensOutput: string | undefined,
+  print: boolean
+): Promise<void> {
   const rawText = await fs.promises
     .readFile(input)
     .then((data) => data.toString());
 
-  const { formattedErrors, parseResult } = processInput(rawText);
+  const { formattedErrors, formattedTokens, parseResult } =
+    processInput(rawText);
 
+  if (typeof tokensOutput === 'string')
+    await fs.promises.writeFile(tokensOutput, formattedTokens);
   if (formattedErrors.length > 0) {
     console.error(formattedErrors);
     process.exitCode = 1;
-  } else if (!parseResult) {
+  } else if (!parseResult && print) {
     console.error('syntax error\nParse failed');
     process.exitCode = 1;
   }
