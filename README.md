@@ -4,7 +4,7 @@ The ultimate Drewgon compiler.
 
 Written in TypeScript.
 
-> NOTE: at present this project only includes a tokenizer and a parser
+> NOTE: at present this project only includes a tokenizer, parser and a formatter
 
 ## Prerequisites
 
@@ -30,7 +30,7 @@ To see available options, run the script with `--help` argument:
 Example call:
 
 ```sh
-./dgc file.dg -p
+./dgc file.dg -u outfile.txt
 ```
 
 ## Testing

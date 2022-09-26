@@ -5,13 +5,13 @@ import { group } from '../utils/utils.js';
 import type { AbstractGrammar, GrammarKey } from './contextFreeGrammar.js';
 import { grammar, grammarRoot } from './contextFreeGrammar.js';
 
-export function parse(tokens: RA<Token>): boolean {
+export function cykParser(tokens: RA<Token>): boolean {
   const isNullable = grammar()[grammarRoot()].some((line) => line.length === 0);
   if (tokens.length === 0) {
     if (isNullable) return true;
     // TODO: turn this into a syntax error
     else throw new Error('Grammar does not allow an empty string');
-  } else return cykParser(tokens);
+  } else return parser(tokens);
 }
 
 /**
@@ -22,13 +22,13 @@ export function parse(tokens: RA<Token>): boolean {
  * https://cyberzhg.github.io/toolbox/cfg2cnf
  * https://www.xarg.org/tools/cyk-algorithm/
  */
-export function cykParser(tokens: RA<Token>): boolean {
+function parser(tokens: RA<Token>): boolean {
   const result = powerSetIterate(tokens);
   return result[tokensToString(tokens)].includes(grammarRoot());
 }
 
-export const setJoinSymbol = ' ';
-export const tokensToString = (subSet: RA<Token>): string =>
+const setJoinSymbol = ' ';
+const tokensToString = (subSet: RA<Token>): string =>
   subSet.map((token) => token.type).join(setJoinSymbol);
 
 /**
@@ -37,7 +37,7 @@ export const tokensToString = (subSet: RA<Token>): string =>
  * issues as the power set grows exponentially with the number of tokens.
  * (for 31 tokens, the power set has 2^31 = 2 billion items)
  */
-export function powerSetIterate(tokens: RA<Token>): IR<RA<GrammarKey>> {
+function powerSetIterate(tokens: RA<Token>): IR<RA<GrammarKey>> {
   const store: R<RA<GrammarKey>> = {};
   const getValue = (subSet: RA<Token>): RA<GrammarKey> =>
     store[tokensToString(subSet)];
@@ -54,7 +54,7 @@ export function powerSetIterate(tokens: RA<Token>): IR<RA<GrammarKey>> {
   return store;
 }
 
-export const powerSetIteratorCallback = (
+const powerSetIteratorCallback = (
   subSet: RA<Token>,
   getValue: (subSet: RA<Token>) => RA<GrammarKey>
 ): RA<GrammarKey> =>
@@ -67,7 +67,7 @@ export const powerSetIteratorCallback = (
         return matchRulePairs(getCartesianProduct(left, right));
       });
 
-export const getInverseGrammarIndex = <T extends string>(
+const getInverseGrammarIndex = <T extends string>(
   grammar: AbstractGrammar<T>
 ): IR<RA<T>> =>
   Object.fromEntries(
@@ -77,15 +77,15 @@ export const getInverseGrammarIndex = <T extends string>(
       )
     )
   );
-export const reverseIndexedGrammar = getInverseGrammarIndex(grammar());
+const reverseIndexedGrammar = getInverseGrammarIndex(grammar());
 
-export const getCartesianProduct = <T>(
+const getCartesianProduct = <T>(
   left: RA<T>,
   right: RA<T>
 ): RA<readonly [T, T]> =>
   left.flatMap((leftItem) => right.map((rightItem) => [leftItem, rightItem]));
 
-export const matchRulePairs = (
+const matchRulePairs = (
   pairs: RA<readonly [GrammarKey, GrammarKey]>
 ): RA<GrammarKey> =>
   filterArray(
@@ -94,3 +94,15 @@ export const matchRulePairs = (
         reverseIndexedGrammar[[left, right].join(setJoinSymbol)]
     )
   );
+
+export const exportsForTests = {
+  parser,
+  setJoinSymbol,
+  tokensToString,
+  powerSetIterate,
+  powerSetIteratorCallback,
+  getInverseGrammarIndex,
+  reverseIndexedGrammar,
+  getCartesianProduct,
+  matchRulePairs,
+};

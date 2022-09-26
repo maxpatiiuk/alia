@@ -1,25 +1,22 @@
 import { formatErrors } from './formatErrors.js';
-import { parse } from './parse/index.js';
 import { tokenize } from './tokenize/index.js';
 import { cretePositionResolver } from './utils/resolvePosition.js';
 import { formatTokens } from './formatTokens.js';
+import {Token} from './tokenize/types.js';
+import {RA} from './utils/types.js';
 
 export function process(rawText: string): {
   readonly formattedErrors: string;
   readonly formattedTokens: string;
-  readonly parseResult: boolean;
+  readonly tokens: RA<Token>;
 } {
   const { tokens, syntaxErrors } = tokenize(rawText, 0);
 
   const positionResolver = cretePositionResolver(rawText);
 
-  // Don't include the END token
-  const trimmedStream = tokens.slice(0, -1);
-  const parseResult = syntaxErrors.length === 0 ? parse(trimmedStream) : false;
-
   return {
     formattedErrors: formatErrors(syntaxErrors, positionResolver),
     formattedTokens: formatTokens(tokens, positionResolver),
-    parseResult,
+    tokens,
   };
 }

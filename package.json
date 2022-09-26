@@ -9,14 +9,6 @@
     "type": "git",
     "url": "git+https://github.com/maxxxxxdlp/tts-reader.git"
   },
-  "keywords": [
-    "tts",
-    "tts",
-    "reader",
-    "news",
-    "to",
-    "tts"
-  ],
   "type": "module",
   "author": "Max Patiiuk",
   "license": "MIT",

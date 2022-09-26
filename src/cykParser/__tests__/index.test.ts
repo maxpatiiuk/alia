@@ -3,18 +3,19 @@ import { tokenize } from '../../tokenize/index.js';
 import type { Token } from '../../tokenize/types.js';
 import { error } from '../../utils/assert.js';
 import type { RA } from '../../utils/types.js';
-import {
-  cykParser,
-  getCartesianProduct,
-  getInverseGrammarIndex,
-  matchRulePairs,
-  parse,
+import { cykParser, exportsForTests } from '../index.js';
+
+const {
+  parser,
+  tokensToString,
   powerSetIterate,
   powerSetIteratorCallback,
-  tokensToString,
-} from '../index.js';
+  getInverseGrammarIndex,
+  getCartesianProduct,
+  matchRulePairs,
+} = exportsForTests;
 
-theories(parse, [
+theories(cykParser, [
   {
     in: [[]],
     out: true,
@@ -122,7 +123,7 @@ fn(int, fn () -> fn () -> void) -> void bar() {
 }
 `;
 
-theories(cykParser, [
+theories(parser, [
   {
     // Remove the END token
     in: [tokenize(input, 0).tokens.slice(0, -1)],
