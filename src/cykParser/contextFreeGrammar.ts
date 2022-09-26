@@ -14,8 +14,6 @@ export type AbstractGrammarLine<T extends string> = RA<T | keyof Tokens>;
 export const epsilon = ['__'] as const;
 export const typeFixRule = '_' as string;
 
-// TODO: detect and fix the ambiguity errors
-// TODO: enforce left/right associativity as appropriate
 /**
  * A type-safe definition of a context-free grammar for Drewgon language
  * Need to wrap in store() to fix circular dependency
@@ -129,6 +127,7 @@ export const grammar = store(() =>
       ['FALSE'],
       ['LPAREN', 'exp', 'RPAREN'],
       ['callExp'],
+      ['MAYHEM'],
     ],
     id: [['ID']],
     // These rules are just to simplify TypeScript typing:

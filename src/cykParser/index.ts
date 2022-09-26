@@ -9,7 +9,6 @@ export function cykParser(tokens: RA<Token>): boolean {
   const isNullable = grammar()[grammarRoot()].some((line) => line.length === 0);
   if (tokens.length === 0) {
     if (isNullable) return true;
-    // TODO: turn this into a syntax error
     else throw new Error('Grammar does not allow an empty string');
   } else return parser(tokens);
 }
