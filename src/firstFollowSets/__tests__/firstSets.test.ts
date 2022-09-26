@@ -6,9 +6,10 @@ import {
   getFirstSets,
   toPureGrammar,
   lineToString,
+  saturateSets,
 } from '../firstSets.js';
 
-const { saturate, getSetsLength, buildSet } = exportsForTests;
+const { getSetsLength, buildSet } = exportsForTests;
 
 describe('a', () => {
   theories(getFirstSets, [
@@ -109,7 +110,7 @@ theories(lineToString, [
   },
 ]);
 
-theories(saturate, [
+theories(saturateSets, [
   {
     in: [
       (sets) =>

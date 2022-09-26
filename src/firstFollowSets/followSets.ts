@@ -1,7 +1,7 @@
 import type { IR, RA } from '../../../t2/src/utils/types.js';
 import { filterArray } from '../../../t2/src/utils/types.js';
 import type { PureGrammar } from './firstSets.js';
-import { lineToString, saturate } from './firstSets.js';
+import { lineToString, saturateSets } from './firstSets.js';
 
 /**
  * Compute follow sets for all non-terminals
@@ -10,7 +10,7 @@ export const getFollowSets = (
   grammar: PureGrammar,
   firstSets: IR<ReadonlySet<string>>
 ): IR<ReadonlySet<string>> =>
-  saturate(
+  saturateSets(
     saturateFollowSets.bind(undefined, grammar, firstSets),
     Object.fromEntries(Object.keys(grammar).map((key) => [key, new Set()]))
   );

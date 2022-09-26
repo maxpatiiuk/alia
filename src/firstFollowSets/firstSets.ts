@@ -16,7 +16,7 @@ export function getFirstSets(grammar: PureGrammar): IR<ReadonlySet<string>> {
     )
   );
 
-  return saturate(
+  return saturateSets(
     saturateFirstSets.bind(undefined, grammar),
     Object.fromEntries(allKeys.map((key) => [key, new Set()]))
   );
@@ -51,15 +51,16 @@ export const lineToString = (line: RA<string>): string =>
 /**
  * Call a hash-set producing function until the result does not change
  */
-export function saturate(
-  callback: (sets: IR<ReadonlySet<string>>) => IR<ReadonlySet<string>>,
-  initialSets: IR<ReadonlySet<string>>
-): IR<ReadonlySet<string>> {
-  const initialLength = getSetsLength(initialSets);
+export function saturate<T>(
+  getLength: (structure: T) => number,
+  callback: (sets: T) => T,
+  initialSets: T
+): T {
+  const initialLength = getLength(initialSets);
   const newSets = callback(initialSets);
-  return getSetsLength(newSets) === initialLength
+  return getLength(newSets) === initialLength
     ? newSets
-    : saturate(callback, newSets);
+    : saturate(getLength, callback, newSets);
 }
 
 /**
@@ -68,6 +69,11 @@ export function saturate(
  */
 const getSetsLength = (firstSets: IR<ReadonlySet<string>>): number =>
   Object.values(firstSets).reduce((sum, { size }) => sum + size, 0);
+
+export const saturateSets = saturate<IR<ReadonlySet<string>>>.bind(
+  undefined,
+  getSetsLength
+);
 
 /**
  * Recursive algorithm for computing first sets.
