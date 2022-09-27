@@ -7,14 +7,17 @@ import { getTable } from './buildTable.js';
 
 type StackItem<TERMINALS extends keyof Tokens, NON_TERMINALS extends string> = {
   readonly state: number;
-  readonly item: Tree<TERMINALS, NON_TERMINALS>;
+  readonly item: ParseTreeNode<TERMINALS, NON_TERMINALS>;
 };
 
-type Tree<TERMINALS extends keyof Tokens, NON_TERMINALS extends string> =
+export type ParseTreeNode<
+  TERMINALS extends keyof Tokens,
+  NON_TERMINALS extends string
+> =
   | Token<TERMINALS>
   | {
       readonly token: NON_TERMINALS;
-      readonly children: RA<Tree<TERMINALS, NON_TERMINALS>>;
+      readonly children: RA<ParseTreeNode<TERMINALS, NON_TERMINALS>>;
     };
 
 export function slrParser<
@@ -23,7 +26,7 @@ export function slrParser<
 >(
   grammar: AbstractGrammar<NON_TERMINALS>,
   tokens: RA<Token<TERMINALS>>
-): Token<TERMINALS> | Tree<TERMINALS, NON_TERMINALS> {
+): ParseTreeNode<TERMINALS, NON_TERMINALS> | Token<TERMINALS> {
   const table = getTable(grammar);
   let stack: WritableArray<StackItem<TERMINALS, NON_TERMINALS>> = [
     {
@@ -56,7 +59,7 @@ export function slrParser<
       };
     else if (cell.type === 'Reduce') {
       const rule = grammar[cell.to.nonTerminal][cell.to.index];
-      const tree: Tree<TERMINALS, NON_TERMINALS> = {
+      const tree: ParseTreeNode<TERMINALS, NON_TERMINALS> = {
         token: cell.to.nonTerminal,
         children: stack.slice(-1 * rule.length).map(({ item }) => item),
       };

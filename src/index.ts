@@ -6,6 +6,7 @@ import { cykParser } from './cykParser/index.js';
 import { process as processInput } from './process.js';
 import { slrParser } from './slrParser/index.js';
 import { unparseAst } from './unparseAst/index.js';
+import { removeNullProductions } from './cykParser/chomsky/removeNullProductions.js';
 
 program.name('dgc').description('The ultimate Drewgon compiler');
 
@@ -19,11 +20,11 @@ program
   .option('-t, --tokensOutput <string>', 'path to output file for tokens')
   .option(
     '-p, --parser <string>',
-    'the parser to use. Allowed values include CYK and LR1. Note, unparser is only available for the LR1 parser',
-    'LR1'
+    'the parser to use. Allowed values include CYK and SLR. Note, unparser is only available for the SLR parser',
+    'SLR'
   )
   .option(
-    '-u, --unparse',
+    '-u, --unparse <string>',
     'path to output file that would include preety-printed program'
   );
 
@@ -75,7 +76,7 @@ async function run(
       process.exitCode = 1;
     }
   } else {
-    const ast = slrParser(grammar(), trimmedStream);
+    const ast = slrParser(removeNullProductions(grammar()), trimmedStream);
     if (ast === undefined) {
       console.error('syntax error\nParse failed');
       process.exitCode = 1;

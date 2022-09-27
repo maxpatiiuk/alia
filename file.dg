@@ -42,6 +42,7 @@ fn(int, fn () -> fn () -> void) -> void bar() {
   val--;
   val++;
 
+  return;
   return 4;
   output 10;
   input des;
