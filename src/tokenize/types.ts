@@ -3,9 +3,9 @@ import type { State } from 'typesafe-reducer';
 import type { RA } from '../utils/types.js';
 import type { Tokens } from './tokens.js';
 
-export type Token<T extends keyof Tokens = keyof Tokens> = {
-  readonly type: T;
-  readonly data: Tokens[T];
+export type Token<TERMINAL extends keyof Tokens = keyof Tokens> = {
+  readonly type: TERMINAL;
+  readonly data: Tokens[TERMINAL];
   readonly simplePosition: number;
 };
 
