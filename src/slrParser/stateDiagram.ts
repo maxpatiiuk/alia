@@ -6,7 +6,7 @@ import type { Closure } from './closure.js';
 import { getClosureStates, reduceClosure } from './closure.js';
 import { getGoToSet } from './goTo.js';
 
-type DiagramNode<T extends string> = {
+export type DiagramNode<T extends string> = {
   readonly closure: RA<Closure<T>>;
   readonly edges: IR<number>;
 };
@@ -54,16 +54,58 @@ const buildDiagram = <T extends string>(
 /**
  * Expand the diagram with new nodes based on go to set of the current node
  */
-const produceNodes = <T extends string>(
+function produceNodes<T extends string>(
   diagram: RA<DiagramNode<T>>,
   node: DiagramNode<T>,
+  rawEntries: IR<RA<Closure<T>>>
+): RA<DiagramNode<T>> {
+  const entries = detectRecursive(diagram, rawEntries);
+  return [
+    ...replaceItem(diagram, diagram.indexOf(node), {
+      closure: node.closure,
+      edges: Object.fromEntries([
+        ...Object.entries(entries)
+          .filter((entry): entry is [string, RA<Closure<T>>] =>
+            Array.isArray(entry[1])
+          )
+          .map(([part, resolved], index) => [
+            part,
+            typeof resolved === 'number' ? resolved : diagram.length + index,
+          ]),
+        ...Object.entries(entries).filter(
+          (entry): entry is [string, number] => typeof entry[1] === 'number'
+        ),
+      ]),
+    }),
+    ...Object.values(entries)
+      .filter((entry): entry is RA<Closure<T>> => Array.isArray(entry))
+      .map((closure) => ({
+        closure,
+        edges: {},
+      })),
+  ];
+}
+
+/**
+ * Rather than creating nodes with identical closure, detect such cases and
+ * point back to the existing closure.
+ *
+ * Otherwise, recursive references may cause infinite loops.
+ */
+const detectRecursive = <T extends string>(
+  diagram: RA<DiagramNode<T>>,
   entries: IR<RA<Closure<T>>>
-): RA<DiagramNode<T>> => [
-  ...replaceItem(diagram, diagram.indexOf(node), {
-    closure: node.closure,
-    edges: Object.fromEntries(
-      Object.keys(entries).map((part, index) => [part, diagram.length + index])
-    ),
-  }),
-  ...Object.values(entries).map((closure) => ({ closure, edges: {} })),
-];
+): IR<RA<Closure<T>> | number> =>
+  Object.fromEntries(
+    Object.entries(entries).map(([part, newClosure]) => {
+      const stringified = new Set(
+        newClosure.map((closure) => JSON.stringify(closure))
+      );
+      const reference = diagram.findIndex(
+        ({ closure }) =>
+          closure.length === newClosure.length &&
+          closure.every((part) => stringified.has(JSON.stringify(part)))
+      );
+      return [part, reference === -1 ? newClosure : reference] as const;
+    })
+  );

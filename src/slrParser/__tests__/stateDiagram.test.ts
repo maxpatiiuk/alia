@@ -1,18 +1,21 @@
 import type { AbstractGrammar } from '../../cykParser/contextFreeGrammar.js';
-import { theories } from '../../tests/utils.js';
 import type { Tokens } from '../../tokenize/tokens.js';
 import { buildStateDiagram } from '../stateDiagram.js';
 
 const abstractGrammar: AbstractGrammar<'L' | 'P' | 'S'> = {
   S: [['P']],
-  P: [['(' as keyof Tokens, 'L', ')' as keyof Tokens]],
-  L: [['id' as keyof Tokens], ['L', 'id' as keyof Tokens]],
+  P: [['LPAREN', 'L', 'RPAREN']],
+  L: [['ID'], ['L', 'ID']],
 };
 
-theories(buildStateDiagram, [
-  {
-    in: [abstractGrammar],
-    out: [
+const recursiveGrammar: AbstractGrammar<'S' | 'X'> = {
+  S: [['X']],
+  X: [['a' as keyof Tokens, 'X'], ['a' as keyof Tokens]],
+};
+
+describe('buildStateDiagram', () => {
+  test('simple grammar', () =>
+    expect(buildStateDiagram(abstractGrammar)).toEqual([
       {
         closure: [
           {
@@ -27,7 +30,7 @@ theories(buildStateDiagram, [
           },
         ],
         edges: {
-          '(': 2,
+          LPAR: 2,
           P: 1,
         },
       },
@@ -61,7 +64,7 @@ theories(buildStateDiagram, [
         ],
         edges: {
           L: 3,
-          id: 4,
+          ID: 4,
         },
       },
       {
@@ -78,8 +81,8 @@ theories(buildStateDiagram, [
           },
         ],
         edges: {
-          ')': 5,
-          id: 6,
+          RPAR: 5,
+          ID: 6,
         },
       },
       {
@@ -112,6 +115,81 @@ theories(buildStateDiagram, [
         ],
         edges: {},
       },
-    ],
-  },
-]);
+    ]));
+
+  // This diagram has an edge pointing back at itself
+  test('recursive grammar', () =>
+    expect(buildStateDiagram(recursiveGrammar)).toEqual([
+      {
+        closure: [
+          {
+            index: 0,
+            nonTerminal: 'S',
+            position: 0,
+          },
+          {
+            index: 0,
+            nonTerminal: 'X',
+            position: 0,
+          },
+          {
+            index: 1,
+            nonTerminal: 'X',
+            position: 0,
+          },
+        ],
+        edges: {
+          X: 1,
+          a: 2,
+        },
+      },
+      {
+        closure: [
+          {
+            index: 0,
+            nonTerminal: 'S',
+            position: 1,
+          },
+        ],
+        edges: {},
+      },
+      {
+        closure: [
+          {
+            index: 0,
+            nonTerminal: 'X',
+            position: 1,
+          },
+          {
+            index: 0,
+            nonTerminal: 'X',
+            position: 0,
+          },
+          {
+            index: 1,
+            nonTerminal: 'X',
+            position: 0,
+          },
+          {
+            index: 1,
+            nonTerminal: 'X',
+            position: 1,
+          },
+        ],
+        edges: {
+          X: 3,
+          a: 2,
+        },
+      },
+      {
+        closure: [
+          {
+            index: 0,
+            nonTerminal: 'X',
+            position: 2,
+          },
+        ],
+        edges: {},
+      },
+    ]));
+});
