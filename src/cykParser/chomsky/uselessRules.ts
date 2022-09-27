@@ -1,7 +1,7 @@
 import { error } from '../../utils/assert.js';
 import type { RA } from '../../utils/types.js';
 import type { AbstractGrammar } from '../contextFreeGrammar.js';
-import { epsilon, typeFixRule } from '../contextFreeGrammar.js';
+import { epsilon } from '../contextFreeGrammar.js';
 
 export function removeUselessProductions<T extends string>(
   grammar: AbstractGrammar<T>
@@ -41,9 +41,7 @@ export function checkValidity<T extends string>(
     );
 
   Object.keys(grammar)
-    .filter(
-      (key) => key.includes('_') && key !== epsilon[0] && key !== typeFixRule
-    )
+    .filter((key) => key.includes('_') && key !== epsilon[0])
     .forEach((name) =>
       error(`Grammar rule names must not contain underscores. Found: ${name}`)
     );

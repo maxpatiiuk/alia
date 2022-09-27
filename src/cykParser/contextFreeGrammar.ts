@@ -11,7 +11,6 @@ export type AbstractGrammar<T extends string> = RR<
 export type AbstractGrammarLine<T extends string> = RA<T | keyof Tokens>;
 
 export const epsilon = ['__'] as const;
-export const typeFixRule = '_' as string;
 
 /**
  * A type-safe definition of a context-free grammar for Drewgon language
@@ -129,13 +128,11 @@ export const grammar = store(() =>
       ['MAYHEM'],
     ],
     id: [['ID']],
-    // These rules are just to simplify TypeScript typing:
-    [epsilon[0]]: [],
     /*
-     * Current typing does not allow a type that is not reference anywhere
-     * That is why this fake rule is added
+     * This rule will never get called. It is here just to simplify TypeScript
+     * typing
      */
-    [typeFixRule]: [[typeFixRule, 'program']],
+    [epsilon[0]]: [['program']],
   } as const)
 );
 

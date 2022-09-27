@@ -1,6 +1,6 @@
 import { checkValidity } from '../chomsky/uselessRules.js';
 import type { AbstractGrammar } from '../contextFreeGrammar.js';
-import { epsilon, typeFixRule } from '../contextFreeGrammar.js';
+import { epsilon } from '../contextFreeGrammar.js';
 
 /**
  * Do various performance optimizations on the grammar
@@ -18,7 +18,7 @@ export const removeTypeFixes = <T extends string>(
 ): AbstractGrammar<T> =>
   Object.fromEntries(
     Object.entries(grammar)
-      .filter(([name]) => name !== epsilon[0] && name !== typeFixRule)
+      .filter(([name]) => name !== epsilon[0])
       .map(([name, lines]) => [
         name,
         lines.map((line) => line.filter((part) => part !== epsilon[0])),
