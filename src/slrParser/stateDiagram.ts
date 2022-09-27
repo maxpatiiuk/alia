@@ -1,3 +1,4 @@
+import { getGrammarRoot } from '../cykParser/chomsky/uselessRules.js';
 import type { AbstractGrammar } from '../cykParser/contextFreeGrammar.js';
 import { saturate } from '../firstFollowSets/firstSets.js';
 import type { IR, RA } from '../utils/types.js';
@@ -17,7 +18,7 @@ export function buildStateDiagram<T extends string>(
   const diagram: RA<DiagramNode<T>> = [
     {
       closure: getClosureStates(grammar, {
-        nonTerminal: Object.keys(grammar)[0],
+        nonTerminal: getGrammarRoot(grammar),
         index: 0,
         position: 0,
       }),

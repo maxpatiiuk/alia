@@ -1,7 +1,7 @@
 import { epsilon } from '../../contextFreeGrammar.js';
 import {
   checkValidity,
-  findGrammarRoot,
+  getGrammarRoot,
   findUnreachableRules,
   removeUselessProductions,
 } from '../uselessRules.js';
@@ -70,7 +70,7 @@ describe('checkValidity', () => {
 
 describe('findGrammarRoot', () => {
   test('empty grammar', () =>
-    expect(() => findGrammarRoot({})).toThrow('Grammar cannot be empty'));
+    expect(() => getGrammarRoot({})).toThrow('Grammar cannot be empty'));
   test('non empty grammar', () =>
-    expect(findGrammarRoot({ a: [['b']], b: [['a']] })).toBe('a'));
+    expect(getGrammarRoot({ a: [['b']], b: [['a']] })).toBe('a'));
 });

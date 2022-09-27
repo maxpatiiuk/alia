@@ -20,7 +20,7 @@ export function findUnreachableRules<T extends string>(
       lines.flatMap((line) => line.filter((part) => part !== name))
     )
   );
-  const root = findGrammarRoot(grammar);
+  const root = getGrammarRoot(grammar);
   reachable.add(root);
   return Object.keys(grammar).filter((key) => !reachable.has(key));
 }
@@ -57,6 +57,6 @@ export function checkValidity<T extends string>(
   return grammar;
 }
 
-export const findGrammarRoot = <T extends string>(
+export const getGrammarRoot = <T extends string>(
   grammar: AbstractGrammar<T>
 ): T => Object.keys(grammar)?.[0] ?? error('Grammar cannot be empty');

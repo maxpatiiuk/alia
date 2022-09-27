@@ -1,3 +1,4 @@
+import { getGrammarRoot } from '../cykParser/chomsky/uselessRules.js';
 import type { AbstractGrammar } from '../cykParser/contextFreeGrammar.js';
 import type { Tokens } from '../tokenize/tokens.js';
 import type { Token } from '../tokenize/types.js';
@@ -50,7 +51,7 @@ export function slrParser<
       tokenIndex += 1;
     } else if (cell.type === 'Accept')
       return {
-        token: Object.keys(grammar)[0],
+        token: getGrammarRoot(grammar),
         children: stack.slice(1).map(({ item }) => item),
       };
     else if (cell.type === 'Reduce') {

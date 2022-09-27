@@ -1,5 +1,6 @@
 import type { IR, RA } from '../../../t2/src/utils/types.js';
 import { filterArray } from '../../../t2/src/utils/types.js';
+import { getGrammarRoot } from '../cykParser/chomsky/uselessRules.js';
 import type { PureGrammar } from './firstSets.js';
 import { lineToString, saturateSets } from './firstSets.js';
 
@@ -28,7 +29,7 @@ const saturateFollowSets = (
       const followSet = new Set<string>();
 
       // Is start non-terminal
-      if (Object.keys(grammar)[0] === key) followSet.add('');
+      if (getGrammarRoot(grammar) === key) followSet.add('');
 
       findTerminalEndings(grammar, key).forEach(({ terminalName, ending }) => {
         const rawFirstSet = Array.from(firstSets[lineToString(ending)] ?? []);

@@ -1,4 +1,3 @@
-import { toChomsky } from '../chomsky/convert.js';
 import { checkValidity } from '../chomsky/uselessRules.js';
 import type { AbstractGrammar } from '../contextFreeGrammar.js';
 import { epsilon, typeFixRule } from '../contextFreeGrammar.js';
@@ -8,7 +7,7 @@ import { epsilon, typeFixRule } from '../contextFreeGrammar.js';
  */
 export const optimizeGrammar = <T extends string>(
   grammar: AbstractGrammar<T>
-): AbstractGrammar<T> => toChomsky(checkValidity(removeTypeFixes(grammar)));
+): AbstractGrammar<T> => checkValidity(removeTypeFixes(grammar));
 
 /**
  * Epsilon rules where replaced with '__' to simplify typing.

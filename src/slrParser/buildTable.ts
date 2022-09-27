@@ -1,5 +1,6 @@
 import type { Action } from 'typesafe-reducer';
 
+import { getGrammarRoot } from '../cykParser/chomsky/uselessRules.js';
 import type {
   AbstractGrammar,
   AbstractGrammarLine,
@@ -32,7 +33,7 @@ function buildTable<T extends string>(
   diagram: RA<DiagramNode<T>>,
   followSet: IR<ReadonlySet<string>>
 ): SlrTable<T> {
-  const startState = Object.keys(grammar)[0];
+  const startState = getGrammarRoot(grammar);
   const { terminals, nonTerminals } = splitGrammar(grammar);
 
   return diagram.map(({ closure, edges }) => {
@@ -76,7 +77,7 @@ export function splitGrammar<T extends string>(
   const [terminals, nonTerminals] = split(
     Array.from(
       new Set([
-        Object.keys(grammar)[0],
+        getGrammarRoot(grammar),
         ...Object.values<RA<AbstractGrammarLine<T>>>(grammar).flat(2),
       ])
     ),

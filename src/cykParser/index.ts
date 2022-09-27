@@ -2,11 +2,16 @@ import type { Token } from '../tokenize/types.js';
 import type { IR, R, RA } from '../utils/types.js';
 import { filterArray } from '../utils/types.js';
 import { group } from '../utils/utils.js';
+import { toChomsky } from './chomsky/convert.js';
 import type { AbstractGrammar, GrammarKey } from './contextFreeGrammar.js';
-import { grammar, grammarRoot } from './contextFreeGrammar.js';
+import { grammar } from './contextFreeGrammar.js';
+import { getGrammarRoot } from './chomsky/uselessRules.js';
 
 export function cykParser(tokens: RA<Token>): boolean {
-  const isNullable = grammar()[grammarRoot()].some((line) => line.length === 0);
+  const chomskyGrammar = toChomsky(grammar);
+  const isNullable = chomskyGrammar[getGrammarRoot(chomskyGrammar)].some(
+    (line) => line.length === 0
+  );
   if (tokens.length === 0) {
     if (isNullable) return true;
     else throw new Error('Grammar does not allow an empty string');
@@ -23,7 +28,7 @@ export function cykParser(tokens: RA<Token>): boolean {
  */
 function parser(tokens: RA<Token>): boolean {
   const result = powerSetIterate(tokens);
-  return result[tokensToString(tokens)].includes(grammarRoot());
+  return result[tokensToString(tokens)].includes(getGrammarRoot(grammar));
 }
 
 const setJoinSymbol = ' ';
@@ -76,7 +81,7 @@ const getInverseGrammarIndex = <T extends string>(
       )
     )
   );
-const reverseIndexedGrammar = getInverseGrammarIndex(grammar());
+const reverseIndexedGrammar = getInverseGrammarIndex(grammar);
 
 const getCartesianProduct = <T>(
   left: RA<T>,
