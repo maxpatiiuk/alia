@@ -1,12 +1,11 @@
 import type { AbstractGrammar } from '../../cykParser/contextFreeGrammar.js';
 import { theories } from '../../tests/utils.js';
-import type { Tokens } from '../../tokenize/tokens.js';
 import { getClosureStates, reduceClosure } from '../closure.js';
 
 const abstractGrammar: AbstractGrammar<'L' | 'P' | 'S'> = {
   S: [['P']],
-  P: [['(' as keyof Tokens, 'L', ')' as keyof Tokens]],
-  L: [['id' as keyof Tokens], ['L', 'id' as keyof Tokens]],
+  P: [['LPAREN', 'L', 'RPAREN']],
+  L: [['ID'], ['L', 'ID']],
 };
 
 theories(getClosureStates, [
@@ -89,6 +88,6 @@ theories(reduceClosure, [
         },
       ],
     ],
-    out: ['P', '('],
+    out: ['P', 'LPAR'],
   },
 ]);
