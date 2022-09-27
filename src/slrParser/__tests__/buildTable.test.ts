@@ -18,7 +18,7 @@ describe('buildTable', () => {
   test('regular grammar', () =>
     expect(getTable(abstractGrammar)).toEqual([
       {
-        LPAR: {
+        LPAREN: {
           to: 2,
           type: 'Move',
         },
@@ -43,7 +43,7 @@ describe('buildTable', () => {
         },
       },
       {
-        RPAR: {
+        RPAREN: {
           to: 5,
           type: 'Move',
         },
@@ -53,7 +53,7 @@ describe('buildTable', () => {
         },
       },
       {
-        RPAR: {
+        RPAREN: {
           to: {
             index: 0,
             nonTerminal: 'L',
@@ -81,7 +81,7 @@ describe('buildTable', () => {
         },
       },
       {
-        RPAR: {
+        RPAREN: {
           to: {
             index: 1,
             nonTerminal: 'L',
@@ -148,10 +148,6 @@ describe('buildTable', () => {
 });
 
 theories(splitGrammar, [
-  {
-    in: [{}],
-    out: { terminals: [], nonTerminals: [] },
-  },
   {
     in: [{ a: [['a', 'b']], b: [['c']] }],
     out: { terminals: ['c'], nonTerminals: ['a', 'b'] },

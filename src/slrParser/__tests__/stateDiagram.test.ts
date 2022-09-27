@@ -30,7 +30,7 @@ describe('buildStateDiagram', () => {
           },
         ],
         edges: {
-          LPAR: 2,
+          LPAREN: 2,
           P: 1,
         },
       },
@@ -81,7 +81,7 @@ describe('buildStateDiagram', () => {
           },
         ],
         edges: {
-          RPAR: 5,
+          RPAREN: 5,
           ID: 6,
         },
       },

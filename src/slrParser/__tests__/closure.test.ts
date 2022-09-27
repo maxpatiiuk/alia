@@ -88,6 +88,6 @@ theories(reduceClosure, [
         },
       ],
     ],
-    out: ['P', 'LPAR'],
+    out: ['P', 'LPAREN'],
   },
 ]);

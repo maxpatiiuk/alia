@@ -1,6 +1,7 @@
 import { program } from 'commander';
 import fs from 'node:fs';
 
+import { grammar } from './cykParser/contextFreeGrammar.js';
 import { cykParser } from './cykParser/index.js';
 import { process as processInput } from './process.js';
 import { slrParser } from './slrParser/index.js';
@@ -74,7 +75,7 @@ async function run(
       process.exitCode = 1;
     }
   } else {
-    const ast = slrParser(trimmedStream);
+    const ast = slrParser(grammar(), trimmedStream);
     if (ast === undefined) {
       console.error('syntax error\nParse failed');
       process.exitCode = 1;

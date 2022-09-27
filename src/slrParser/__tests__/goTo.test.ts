@@ -25,7 +25,7 @@ theories(getGoToSet, [
     }),
   },
   {
-    in: [abstractGrammar, closures, '('],
+    in: [abstractGrammar, closures, 'LPAREN'],
     out: getClosureStates(abstractGrammar, {
       nonTerminal: 'P',
       index: 0,

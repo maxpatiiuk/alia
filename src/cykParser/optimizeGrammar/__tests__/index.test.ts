@@ -3,10 +3,6 @@ import { epsilon } from '../../contextFreeGrammar.js';
 import { optimizeGrammar, removeTypeFixes } from '../index.js';
 
 theories(optimizeGrammar, {
-  'calls toChomsky': {
-    in: [{ b: [['TRUE', 'TRUE']] }],
-    out: { b: [['__TRUE', '__TRUE']], __TRUE: [['TRUE']] },
-  },
   'calls removeTypeFixes': {
     in: [
       {
@@ -17,8 +13,8 @@ theories(optimizeGrammar, {
       },
     ],
     out: {
-      a: [['a', 'b'], ['b'], ['a'], []],
-      b: [['a', 'b'], ['b'], ['a'], []],
+      a: [['a', 'b'], []],
+      b: [['a']],
     },
   },
 });

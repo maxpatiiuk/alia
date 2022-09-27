@@ -3,12 +3,12 @@ import type { IR, R, RA } from '../utils/types.js';
 import { filterArray } from '../utils/types.js';
 import { group } from '../utils/utils.js';
 import { toChomsky } from './chomsky/convert.js';
+import { getGrammarRoot } from './chomsky/uselessRules.js';
 import type { AbstractGrammar, GrammarKey } from './contextFreeGrammar.js';
 import { grammar } from './contextFreeGrammar.js';
-import { getGrammarRoot } from './chomsky/uselessRules.js';
 
 export function cykParser(tokens: RA<Token>): boolean {
-  const chomskyGrammar = toChomsky(grammar);
+  const chomskyGrammar = toChomsky(grammar());
   const isNullable = chomskyGrammar[getGrammarRoot(chomskyGrammar)].some(
     (line) => line.length === 0
   );
@@ -28,7 +28,7 @@ export function cykParser(tokens: RA<Token>): boolean {
  */
 function parser(tokens: RA<Token>): boolean {
   const result = powerSetIterate(tokens);
-  return result[tokensToString(tokens)].includes(getGrammarRoot(grammar));
+  return result[tokensToString(tokens)].includes(getGrammarRoot(grammar()));
 }
 
 const setJoinSymbol = ' ';
@@ -81,7 +81,7 @@ const getInverseGrammarIndex = <T extends string>(
       )
     )
   );
-const reverseIndexedGrammar = getInverseGrammarIndex(grammar);
+const reverseIndexedGrammar = getInverseGrammarIndex(toChomsky(grammar()));
 
 const getCartesianProduct = <T>(
   left: RA<T>,
