@@ -8,14 +8,20 @@ export const getGoToSet = <T extends string>(
   items: RA<Closure<T>>,
   part: string
 ): RA<Closure<T>> =>
-  items
-    .filter(
-      ({ nonTerminal, index, position }) =>
-        grammar[nonTerminal][index][position] === part
-    )
-    .flatMap(({ position, ...closure }) =>
-      getClosureStates(grammar, {
-        ...closure,
-        position: position + 1,
-      })
-    );
+  Array.from(
+    new Set(
+      items
+        .filter(
+          ({ nonTerminal, index, position }) =>
+            grammar[nonTerminal][index][position] === part
+        )
+        .flatMap(({ position, ...closure }) =>
+          getClosureStates(grammar, {
+            ...closure,
+            position: position + 1,
+          })
+        )
+        .map((closure) => JSON.stringify(closure))
+    ),
+    (closure) => JSON.parse(closure)
+  );
