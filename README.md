@@ -16,7 +16,7 @@ Written in TypeScript.
 Install dependencies: 
 
 ```sh
-make
+make all
 ```
 
 ## Running

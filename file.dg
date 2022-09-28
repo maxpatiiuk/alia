@@ -37,6 +37,8 @@ fn(int, fn () -> fn () -> void) -> void bar() {
    // test
  }
 
+  if(a){if(a){if(a){if(a){if(a){if(a){if(a){if(a){if(a){if(a){if(a){pikachu++;}}}}}}}}}}}
+
   val = 4;
 
   val--;

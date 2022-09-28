@@ -1,12 +1,13 @@
 import { program } from 'commander';
 import fs from 'node:fs';
 
+import { parseTreeToAst } from './ast/index.js';
+import { removeNullProductions } from './cykParser/chomsky/removeNullProductions.js';
 import { grammar } from './cykParser/contextFreeGrammar.js';
 import { cykParser } from './cykParser/index.js';
 import { process as processInput } from './process.js';
 import { slrParser } from './slrParser/index.js';
-import { unparseAst } from './unparseAst/index.js';
-import { removeNullProductions } from './cykParser/chomsky/removeNullProductions.js';
+import { unparseParseTree } from './unparseParseTree/index.js';
 
 program.name('dgc').description('The ultimate Drewgon compiler');
 
@@ -23,6 +24,11 @@ program
     'the parser to use. Allowed values include CYK and SLR. Note, unparser is only available for the SLR parser',
     'SLR'
   )
+  // .option(
+  //   '-m, --unparseMode <string>',
+  //   'parseTree - prettify directly from the parse tree (faster). ast - convert to AST and prettify that (better results)',
+  //   'parseTree'
+  // )
   .option(
     '-u, --unparse <string>',
     'path to output file that would include preety-printed program'
@@ -34,10 +40,12 @@ const {
   tokensOutput,
   parser: rawParser,
   unparse,
+  unparseMode = 'parseTree',
 } = program.opts<{
   readonly tokensOutput?: string;
   readonly parser: string;
   readonly unparse?: string;
+  readonly unparseMode: string;
 }>();
 
 const parser = rawParser.toUpperCase().trim();
@@ -45,14 +53,19 @@ if (parser !== 'CYK' && parser !== 'SLR')
   throw new Error(
     `Unknown parser "${parser}". Allowed values include CYK and SLR.`
   );
+if (unparseMode !== 'ast' && unparseMode !== 'parseTree')
+  throw new Error(
+    `Unknown unparse mode "${unparseMode}". Allowed values include ast and parseTree.`
+  );
 
-run(input, tokensOutput, parser, unparse).catch(console.error);
+run(input, tokensOutput, parser, unparse, unparseMode).catch(console.error);
 
 async function run(
   input: string,
   tokensOutput: string | undefined,
   parser: 'CYK' | 'SLR',
-  unparseOutput: string | undefined
+  unparseOutput: string | undefined,
+  unparseMode: 'ast' | 'parseTree'
 ): Promise<void> {
   const rawText = await fs.promises
     .readFile(input)
@@ -76,13 +89,20 @@ async function run(
       process.exitCode = 1;
     }
   } else {
-    const ast = slrParser(removeNullProductions(grammar()), trimmedStream);
-    if (ast === undefined) {
+    const parseTree = slrParser(
+      removeNullProductions(grammar()),
+      trimmedStream
+    );
+    if (parseTree === undefined) {
       console.error('syntax error\nParse failed');
       process.exitCode = 1;
     }
     if (unparseOutput === undefined) return;
-    const unparse = unparseAst(ast);
-    await fs.promises.writeFile(unparseOutput, unparse);
+
+    const pretty =
+      unparseMode === 'parseTree'
+        ? unparseParseTree(parseTree)
+        : parseTreeToAst(parseTree).pretty();
+    await fs.promises.writeFile(unparseOutput, pretty);
   }
 }

@@ -8,8 +8,7 @@ theories(optimizeGrammar, {
       {
         a: [['a', 'b'], epsilon],
         b: [['a']],
-        _: [['a']],
-        [epsilon[0]]: [[epsilon[0]]],
+        [epsilon[0]]: [['a', epsilon[0]]],
       },
     ],
     out: {
@@ -25,8 +24,7 @@ theories(removeTypeFixes, [
     in: [
       {
         a: [['a'], epsilon],
-        _: [['a']],
-        [epsilon[0]]: [[epsilon[0]]],
+        [epsilon[0]]: [['a', epsilon[0]]],
       },
     ],
     out: {

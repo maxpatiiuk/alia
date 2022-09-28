@@ -189,7 +189,13 @@ theories(powerSetIterate, [
     out: {
       INT: ['type', 'typeList'],
       ID: ['exp', 'actualsList', 'term', 'id'],
-      'INT ID': ['varDecl', 'formals', 'formalDecl', 'stmt', '__type__id'],
+      'INT ID': [
+        'varDecl',
+        'formals',
+        'formalDecl',
+        'stmt',
+        '__type__id' as 'id',
+      ],
     },
   },
   {
@@ -215,8 +221,14 @@ theories(powerSetIterate, [
     out: {
       INT: ['type', 'typeList'],
       ID: ['exp', 'actualsList', 'term', 'id'],
-      SEMICOL: ['__SEMICOL'],
-      'INT ID': ['varDecl', 'formals', 'formalDecl', 'stmt', '__type__id'],
+      SEMICOL: ['__SEMICOL' as 'id'],
+      'INT ID': [
+        'varDecl',
+        'formals',
+        'formalDecl',
+        'stmt',
+        '__type__id' as 'id',
+      ],
       'ID SEMICOL': [],
       'INT ID SEMICOL': ['program', 'globals', 'stmtList'],
     },
@@ -254,9 +266,9 @@ theories(powerSetIteratorCallback, [
       ([{ type }]: RA<Token>) =>
         type === 'INT'
           ? ['type', 'typeList']
-          : ['exp', 'actualList', 'term', 'id'],
+          : ['exp', 'actualsList', 'term', 'id'],
     ],
-    out: ['varDecl', 'formals', 'formalDecl', 'stmt', '__type__id'],
+    out: ['varDecl', 'formals', 'formalDecl', 'stmt', '__type__id' as 'id'],
   },
 ]);
 
@@ -293,7 +305,7 @@ theories(matchRulePairs, [
   {
     in: [
       [
-        ['stmt', '__SEMICOL'],
+        ['stmt', '__SEMICOL' as 'id'],
         ['globals', 'fnDecl'],
       ],
     ],
