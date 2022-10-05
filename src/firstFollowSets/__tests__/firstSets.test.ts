@@ -84,21 +84,6 @@ theories(findAllSubsets, [
   },
 ]);
 
-theories(toPureGrammar, [
-  {
-    in: [
-      {
-        a: [[{ type: 'ActionReference', number: 2 }]],
-        b: wrapLine([['b']]),
-      },
-    ],
-    out: {
-      a: [[]],
-      b: [['b']],
-    },
-  },
-]);
-
 theories(lineToString, [
   {
     in: [[]],

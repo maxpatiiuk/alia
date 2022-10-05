@@ -1,7 +1,7 @@
-import type { AbstractGrammar } from '../../cykParser/contextFreeGrammar.js';
 import { slrParser } from '../index.js';
+import {PureGrammar} from '../../grammar/utils.js';
 
-const abstractGrammar: AbstractGrammar<'L' | 'P' | 'S'> = {
+const abstractGrammar: PureGrammar<'L' | 'P' | 'S'> = {
   S: [['MAYHEM', 'P', 'MAYHEM']],
   P: [['LPAREN', 'L', 'RPAREN']],
   L: [['ID'], ['L', 'ID']],

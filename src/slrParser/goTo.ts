@@ -1,10 +1,10 @@
-import type { AbstractGrammar } from '../cykParser/contextFreeGrammar.js';
 import type { RA } from '../utils/types.js';
 import type { Closure } from './closure.js';
 import { getClosureStates } from './closure.js';
+import {PureGrammar} from '../grammar/utils.js';
 
 export const getGoToSet = <T extends string>(
-  grammar: AbstractGrammar<T>,
+  grammar: PureGrammar<T>,
   items: RA<Closure<T>>,
   part: string
 ): RA<Closure<T>> =>

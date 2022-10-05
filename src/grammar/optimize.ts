@@ -1,6 +1,5 @@
-import { checkValidity } from '../chomsky/uselessRules.js';
-import type { AbstractGrammar } from '../contextFreeGrammar.js';
-import { epsilon } from '../contextFreeGrammar.js';
+import { checkValidity } from '../cykParser/chomsky/uselessRules.js';
+import {AbstractGrammar, epsilon} from './utils.js';
 
 /**
  * Do various performance optimizations on the grammar

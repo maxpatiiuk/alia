@@ -3,7 +3,7 @@ import fs from 'node:fs';
 
 import { parseTreeToAst } from './ast/index.js';
 import { removeNullProductions } from './cykParser/chomsky/removeNullProductions.js';
-import { grammar } from './cykParser/contextFreeGrammar.js';
+import { grammar } from './grammar/index.js';
 import { cykParser } from './cykParser/index.js';
 import { process as processInput } from './process.js';
 import { slrParser } from './slrParser/index.js';

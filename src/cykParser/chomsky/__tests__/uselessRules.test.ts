@@ -1,4 +1,3 @@
-import { epsilon } from '../../contextFreeGrammar.js';
 import {
   checkValidity,
   getGrammarRoot,
@@ -6,6 +5,7 @@ import {
   removeUselessProductions,
 } from '../uselessRules.js';
 import { theories } from '../../../tests/utils.js';
+import {epsilon} from '../../../grammar/utils.js';
 
 theories(removeUselessProductions, [
   {

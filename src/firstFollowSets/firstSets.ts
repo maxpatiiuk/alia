@@ -1,6 +1,5 @@
-import type { Grammar } from '../../../t2/src/grammar/types.js';
-import type { IR, RA } from '../../../t2/src/utils/types.js';
-import { filterArray } from '../../../t2/src/utils/types.js';
+import type { IR, RA} from '../utils/types.js';
+import {filterArray} from '../utils/types.js';
 
 /**
  * Computer first sets for all non-terminals and sequences of terminals
@@ -30,20 +29,6 @@ export const findAllSubsets = <T>(array: RA<T>): RA<RA<T>> =>
   );
 
 export type PureGrammar = IR<RA<RA<string>>>;
-/**
- * Remove actions from the grammar. Leave only terminals and non-terminals
- */
-export const toPureGrammar = (grammar: Grammar): PureGrammar =>
-  Object.fromEntries(
-    Object.entries(grammar).map(([name, lines]) => [
-      name,
-      lines.map((line) =>
-        filterArray(
-          line.map((part) => (part.type === 'Part' ? part.name : undefined))
-        )
-      ),
-    ])
-  );
 
 export const lineToString = (line: RA<string>): string =>
   JSON.stringify(filterArray(line));
@@ -124,6 +109,5 @@ export const exportsForTests = {
   lineToString,
   saturateFirstSets,
   buildSet,
-  saturate,
   getSetsLength,
 };

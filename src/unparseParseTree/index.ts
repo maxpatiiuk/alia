@@ -1,4 +1,4 @@
-import type { GrammarKey } from '../cykParser/contextFreeGrammar.js';
+import type { GrammarKey } from '../grammar/index.js';
 import type { ParseTreeNode } from '../slrParser/index.js';
 import { simpleTokens } from '../tokenize/definitions.js';
 import type { Tokens } from '../tokenize/tokens.js';

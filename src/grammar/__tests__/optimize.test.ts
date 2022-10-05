@@ -1,6 +1,6 @@
-import { theories } from '../../../tests/utils.js';
-import { epsilon } from '../../contextFreeGrammar.js';
-import { optimizeGrammar, removeTypeFixes } from '../index.js';
+import { theories } from '../../tests/utils.js';
+import { optimizeGrammar, removeTypeFixes } from '../optimize.js';
+import {epsilon} from '../utils.js';
 
 theories(optimizeGrammar, {
   'calls removeTypeFixes': {

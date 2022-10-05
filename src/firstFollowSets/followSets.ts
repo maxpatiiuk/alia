@@ -1,6 +1,6 @@
-import type { IR, RA } from '../../../t2/src/utils/types.js';
-import { filterArray } from '../../../t2/src/utils/types.js';
 import { getGrammarRoot } from '../cykParser/chomsky/uselessRules.js';
+import type { IR, RA} from '../utils/types.js';
+import {filterArray} from '../utils/types.js';
 import type { PureGrammar } from './firstSets.js';
 import { lineToString, saturateSets } from './firstSets.js';
 

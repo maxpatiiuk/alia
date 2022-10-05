@@ -1,10 +1,6 @@
 import type { Action } from 'typesafe-reducer';
 
 import { getGrammarRoot } from '../cykParser/chomsky/uselessRules.js';
-import type {
-  AbstractGrammar,
-  AbstractGrammarLine,
-} from '../cykParser/contextFreeGrammar.js';
 import { getFirstSets } from '../firstFollowSets/firstSets.js';
 import { getFollowSets } from '../firstFollowSets/followSets.js';
 import type { IR, RA } from '../utils/types.js';
@@ -12,6 +8,7 @@ import { split } from '../utils/utils.js';
 import type { Closure } from './closure.js';
 import type { DiagramNode } from './stateDiagram.js';
 import { buildStateDiagram } from './stateDiagram.js';
+import {PureGrammar, PureGrammarLine} from '../grammar/utils.js';
 
 type Move = Action<'Move', { readonly to: number }>;
 type Accept = Action<'Accept'>;
@@ -20,7 +17,7 @@ export type TableCell<T extends string> = Accept | Move | Reduce<T> | undefined;
 export type SlrTable<T extends string> = RA<IR<TableCell<T>>>;
 
 export function getTable<T extends string>(
-  grammar: AbstractGrammar<T>
+  grammar: PureGrammar<T>
 ): SlrTable<T> {
   const firstSets = getFirstSets(grammar);
   const followSets = getFollowSets(grammar, firstSets);
@@ -29,7 +26,7 @@ export function getTable<T extends string>(
 }
 
 function buildTable<T extends string>(
-  grammar: AbstractGrammar<T>,
+  grammar: PureGrammar<T>,
   diagram: RA<DiagramNode<T>>,
   followSet: IR<ReadonlySet<string>>
 ): SlrTable<T> {
@@ -69,7 +66,7 @@ function buildTable<T extends string>(
 }
 
 export function splitGrammar<T extends string>(
-  grammar: AbstractGrammar<T>
+  grammar: PureGrammar<T>
 ): {
   readonly terminals: RA<string>;
   readonly nonTerminals: RA<T>;
@@ -78,7 +75,7 @@ export function splitGrammar<T extends string>(
     Array.from(
       new Set([
         getGrammarRoot(grammar),
-        ...Object.values<RA<AbstractGrammarLine<T>>>(grammar).flat(2),
+        ...Object.values<RA<PureGrammarLine<T>>>(grammar).flat(2),
       ])
     ),
     (key) => key in grammar

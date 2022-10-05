@@ -1,5 +1,6 @@
 import { getGrammarRoot } from '../cykParser/chomsky/uselessRules.js';
-import type { AbstractGrammar } from '../cykParser/contextFreeGrammar.js';
+import type {AbstractGrammar} from '../grammar/utils.js';
+import { toPureGrammar} from '../grammar/utils.js';
 import type { Tokens } from '../tokenize/tokens.js';
 import type { Token } from '../tokenize/types.js';
 import type { RA, WritableArray } from '../utils/types.js';
@@ -27,7 +28,7 @@ export function slrParser<
   grammar: AbstractGrammar<NON_TERMINALS>,
   tokens: RA<Token<TERMINALS>>
 ): ParseTreeNode<TERMINALS, NON_TERMINALS> | Token<TERMINALS> {
-  const table = getTable(grammar);
+  const table = getTable(toPureGrammar(grammar));
   let stack: WritableArray<StackItem<TERMINALS, NON_TERMINALS>> = [
     {
       state: 0,

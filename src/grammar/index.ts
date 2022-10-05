@@ -1,16 +1,6 @@
-import type { Tokens } from '../tokenize/tokens.js';
-import type { RA, RR } from '../utils/types.js';
-import { store } from '../utils/utils.js';
-import { optimizeGrammar } from './optimizeGrammar/index.js';
-
-export type AbstractGrammar<T extends string> = RR<
-  T,
-  RA<AbstractGrammarLine<T>>
->;
-
-export type AbstractGrammarLine<T extends string> = RA<T | keyof Tokens>;
-
-export const epsilon = ['__'] as const;
+import {store} from '../utils/utils.js';
+import {optimizeGrammar} from './optimize.js';
+import {epsilon} from './utils.js';
 
 /**
  * A type-safe definition of a context-free grammar for Drewgon language

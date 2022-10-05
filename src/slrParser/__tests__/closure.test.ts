@@ -1,8 +1,8 @@
-import type { AbstractGrammar } from '../../cykParser/contextFreeGrammar.js';
 import { theories } from '../../tests/utils.js';
 import { getClosureStates, reduceClosure } from '../closure.js';
+import {PureGrammar} from '../../grammar/utils.js';
 
-const abstractGrammar: AbstractGrammar<'L' | 'P' | 'S'> = {
+const abstractGrammar: PureGrammar<'L' | 'P' | 'S'> = {
   S: [['P']],
   P: [['LPAREN', 'L', 'RPAREN']],
   L: [['ID'], ['L', 'ID']],

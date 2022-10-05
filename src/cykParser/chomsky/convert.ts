@@ -1,14 +1,14 @@
 import { isToken } from '../../tokenize/definitions.js';
 import type { R, RA } from '../../utils/types.js';
-import type { AbstractGrammar } from '../contextFreeGrammar.js';
 import { simplifyGrammar } from './simplify.js';
+import {PureGrammar} from '../../grammar/utils.js';
 
 /**
  * Convert grammar to Chomsky Normal Form
  */
 export const toChomsky = <T extends string>(
-  grammar: AbstractGrammar<T>
-): AbstractGrammar<T> => splitLongLines(maskTokens(simplifyGrammar(grammar)));
+  grammar: PureGrammar<T>
+): PureGrammar<T> => splitLongLines(maskTokens(simplifyGrammar(grammar)));
 
 const ruleJoinSymbol = '__';
 
@@ -17,12 +17,12 @@ const ruleJoinSymbol = '__';
  * Converts rules like A->BCD into A->ED, E->BC
  */
 export function splitLongLines<T extends string>(
-  grammar: AbstractGrammar<T>
-): AbstractGrammar<T> {
+  grammar: PureGrammar<T>
+): PureGrammar<T> {
   const split: R<RA<T>> = {};
   const formatRule = (stream: RA<string>): string =>
     `${ruleJoinSymbol}${stream.join(ruleJoinSymbol)}`;
-  const processed: AbstractGrammar<T> = Object.fromEntries([
+  const processed: PureGrammar<T> = Object.fromEntries([
     ...Object.entries(grammar).map(([name, lines]) => [
       name,
       lines.map((line) => {
@@ -48,8 +48,8 @@ export function splitLongLines<T extends string>(
 
 /** Convert rules like like B->xx into B->XX and X->x */
 export function maskTokens<T extends string>(
-  grammar: AbstractGrammar<T>
-): AbstractGrammar<T> {
+  grammar: PureGrammar<T>
+): PureGrammar<T> {
   const usedTokens = new Set<T>();
   const formatToken = (token: T): string => `${ruleJoinSymbol}${token}`;
   return Object.fromEntries([

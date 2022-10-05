@@ -1,10 +1,4 @@
-/**
- * The unparser can do a reasonably good job just from the parse tree, thus
- * conversion to AST was no necessary. However, AST would be necessary for
- * semantic analysis, and thus this file would be augmented then.
- */
-
-import type { GrammarKey } from '../cykParser/contextFreeGrammar.js';
+import type { GrammarKey } from '../grammar/index.js';
 import type { ParseTreeNode } from '../slrParser/index.js';
 import { simpleTokens } from '../tokenize/definitions.js';
 import type { Tokens } from '../tokenize/tokens.js';
@@ -22,7 +16,7 @@ export function parseTreeToAst(
 /* eslint-disable functional/no-class */
 
 /* eslint-disable functional/no-this-expression */
-abstract class AstNode {
+export abstract class AstNode {
   protected readonly children: RA<AstNode>;
 
   public constructor(children: RA<ParseTreeNode<keyof Tokens, GrammarKey>>) {
@@ -57,8 +51,6 @@ class TokenNode extends AstNode {
   }
 }
 
-// TODO: define reminding nodes
-// @ts-expect-error Not all nodes are defined yet
 const translators: RR<
   GrammarKey,
   new (...props: ConstructorParameters<typeof AstNode>) => AstNode

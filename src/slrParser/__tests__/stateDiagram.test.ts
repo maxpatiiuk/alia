@@ -1,14 +1,14 @@
-import type { AbstractGrammar } from '../../cykParser/contextFreeGrammar.js';
 import type { Tokens } from '../../tokenize/tokens.js';
 import { buildStateDiagram } from '../stateDiagram.js';
+import {PureGrammar} from '../../grammar/utils.js';
 
-const abstractGrammar: AbstractGrammar<'L' | 'P' | 'S'> = {
+const abstractGrammar: PureGrammar<'L' | 'P' | 'S'> = {
   S: [['P']],
   P: [['LPAREN', 'L', 'RPAREN']],
   L: [['ID'], ['L', 'ID']],
 };
 
-const recursiveGrammar: AbstractGrammar<'S' | 'X'> = {
+const recursiveGrammar: PureGrammar<'S' | 'X'> = {
   S: [['X']],
   X: [['a' as keyof Tokens, 'X'], ['a' as keyof Tokens]],
 };

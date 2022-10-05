@@ -1,9 +1,9 @@
 import { isToken } from '../../tokenize/definitions.js';
-import type { AbstractGrammar } from '../contextFreeGrammar.js';
+import {PureGrammar} from '../../grammar/utils.js';
 
 export function removeUnitProductions<T extends string>(
-  grammar: AbstractGrammar<T>
-): AbstractGrammar<T> {
+  grammar: PureGrammar<T>
+): PureGrammar<T> {
   let changed = false;
   const newGrammar = Object.fromEntries(
     Object.entries(grammar).map(([name, lines]) => [

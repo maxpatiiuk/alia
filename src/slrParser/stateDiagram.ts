@@ -1,11 +1,11 @@
 import { getGrammarRoot } from '../cykParser/chomsky/uselessRules.js';
-import type { AbstractGrammar } from '../cykParser/contextFreeGrammar.js';
 import { saturate } from '../firstFollowSets/firstSets.js';
 import type { IR, RA } from '../utils/types.js';
 import { replaceItem } from '../utils/utils.js';
 import type { Closure } from './closure.js';
 import { getClosureStates, reduceClosure } from './closure.js';
 import { getGoToSet } from './goTo.js';
+import {PureGrammar} from '../grammar/utils.js';
 
 export type DiagramNode<T extends string> = {
   readonly closure: RA<Closure<T>>;
@@ -13,7 +13,7 @@ export type DiagramNode<T extends string> = {
 };
 
 export function buildStateDiagram<T extends string>(
-  grammar: AbstractGrammar<T>
+  grammar: PureGrammar<T>
 ): RA<DiagramNode<T>> {
   const diagram: RA<DiagramNode<T>> = [
     {
@@ -29,7 +29,7 @@ export function buildStateDiagram<T extends string>(
 }
 
 const buildDiagram = <T extends string>(
-  grammar: AbstractGrammar<T>,
+  grammar: PureGrammar<T>,
   diagram: RA<DiagramNode<T>>
 ): RA<DiagramNode<T>> =>
   saturate<readonly [diagram: RA<DiagramNode<T>>, visited: RA<number>]>(

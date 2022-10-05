@@ -1,7 +1,7 @@
-import type { AbstractGrammar } from '../cykParser/contextFreeGrammar.js';
 import { saturate } from '../firstFollowSets/firstSets.js';
 import type { IR, R, RA } from '../utils/types.js';
 import { filterArray } from '../utils/types.js';
+import {PureGrammar} from '../grammar/utils.js';
 
 export type Closure<T extends string> = {
   readonly nonTerminal: T;
@@ -11,10 +11,10 @@ export type Closure<T extends string> = {
 
 const toString = JSON.stringify;
 
-const store = new WeakMap<AbstractGrammar<string>, R<RA<Closure<string>>>>();
+const store = new WeakMap<PureGrammar<string>, R<RA<Closure<string>>>>();
 
 export function getClosureStates<T extends string>(
-  grammar: AbstractGrammar<T>,
+  grammar: PureGrammar<T>,
   closure: Closure<T>
 ): RA<Closure<T>> {
   if (!store.has(grammar)) store.set(grammar, {});
@@ -27,7 +27,7 @@ export function getClosureStates<T extends string>(
  * Build closures for all possible states
  */
 const buildClosureStates = <T extends string>(
-  grammar: AbstractGrammar<T>,
+  grammar: PureGrammar<T>,
   { nonTerminal, index, position }: Closure<T>
 ): RA<Closure<T>> =>
   Object.values(
@@ -51,7 +51,7 @@ const buildClosureStates = <T extends string>(
  * closure
  */
 const searchRelated = <T extends string>(
-  grammar: AbstractGrammar<T>,
+  grammar: PureGrammar<T>,
   closure: IR<Closure<T>>
 ): RA<Closure<T>> =>
   reduceClosure(grammar, Object.values(closure))
@@ -68,7 +68,7 @@ const searchRelated = <T extends string>(
  * Turn array of closures into array of parts that closures are pointing at
  */
 export const reduceClosure = <T extends string>(
-  grammar: AbstractGrammar<T>,
+  grammar: PureGrammar<T>,
   closure: RA<Closure<T>>
 ): RA<string> =>
   filterArray(
