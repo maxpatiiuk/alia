@@ -15,16 +15,15 @@ const nodes = [
   new StatementList([]),
   new TypeListNode([]),
 ] as const;
-describe('a', () => {
-  theories(indexParts, [
-    {
-      in: [['a', 'b', 'a', 'd'], nodes],
-      out: {
-        a: nodes[0],
-        b: nodes[1],
-        a2: nodes[2],
-        d: nodes[3],
-      },
+
+theories(indexParts, [
+  {
+    in: [['a', 'b', 'a', 'd'], nodes],
+    out: {
+      a: nodes[0],
+      b: nodes[1],
+      a2: nodes[2],
+      d: nodes[3],
     },
-  ]);
-});
+  },
+]);

@@ -3,8 +3,8 @@ import fs from 'node:fs';
 
 import { parseTreeToAst } from './ast/index.js';
 import { removeNullProductions } from './cykParser/chomsky/removeNullProductions.js';
-import { grammar } from './grammar/index.js';
 import { cykParser } from './cykParser/index.js';
+import { grammar } from './grammar/index.js';
 import { process as processInput } from './process.js';
 import { slrParser } from './slrParser/index.js';
 import { unparseParseTree } from './unparseParseTree/index.js';
@@ -29,6 +29,7 @@ program
     'parseTree - prettify directly from the parse tree (faster). ast - convert to AST and prettify that (better results)',
     'parseTree'
   )
+  .option('-d, --debug', 'output debug information', false)
   .option(
     '-u, --unparse <string>',
     'path to output file that would include preety-printed program'
@@ -40,11 +41,13 @@ const {
   tokensOutput,
   parser: rawParser,
   unparse,
+  debug,
   unparseMode = 'parseTree',
 } = program.opts<{
   readonly tokensOutput?: string;
   readonly parser: string;
   readonly unparse?: string;
+  readonly debug: boolean;
   readonly unparseMode: string;
 }>();
 
@@ -58,11 +61,9 @@ if (unparseMode !== 'ast' && unparseMode !== 'parseTree')
     `Unknown unparse mode "${unparseMode}". Allowed values include ast and parseTree.`
   );
 
-run(input, tokensOutput, parser, unparse, unparseMode).catch(console.error);
+run(parser, unparse, unparseMode).catch(console.error);
 
 async function run(
-  input: string,
-  tokensOutput: string | undefined,
   parser: 'CYK' | 'SLR',
   unparseOutput: string | undefined,
   unparseMode: 'ast' | 'parseTree'
@@ -100,7 +101,12 @@ async function run(
     const pretty =
       unparseMode === 'parseTree'
         ? unparseParseTree(parseTree)
-        : parseTreeToAst(nullFreeGrammar, parseTree).pretty();
+        : parseTreeToAst(nullFreeGrammar, parseTree).pretty({
+            indent: 0,
+            mode: 'pretty',
+            debug,
+            needWrapping: false,
+          });
     await fs.promises.writeFile(unparseOutput, pretty);
   }
 }

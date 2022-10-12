@@ -3,9 +3,8 @@ import type { AbstractGrammar } from '../grammar/utils.js';
 import { epsilon } from '../grammar/utils.js';
 import type { ParseTreeLevel, ParseTreeNode } from '../slrParser/index.js';
 import type { Tokens } from '../tokenize/tokens.js';
-import type { IR, R, RA } from '../utils/types.js';
+import type { IR, R, RA, WritableArray } from '../utils/types.js';
 import { getUniqueName } from '../utils/uniquifyName.js';
-import { removeItem } from '../utils/utils.js';
 import type { AstNode } from './definitions.js';
 import { TokenNode } from './definitions.js';
 
@@ -40,12 +39,15 @@ function toAst(
   );
 }
 
-const indexParts = (keys: RA<string>, partValues: RA<AstNode>): IR<AstNode> =>
-  keys.reduce<R<AstNode>>((result, key, index) => {
-    const uniqueKey = getUniqueName(key, removeItem(Object.keys(keys), index));
+function indexParts(keys: RA<string>, partValues: RA<AstNode>): IR<AstNode> {
+  const usedNames: WritableArray<string> = [];
+  return keys.reduce<R<AstNode>>((result, key, index) => {
+    const uniqueKey = getUniqueName(key, usedNames);
+    usedNames.push(uniqueKey);
     result[uniqueKey] ??= partValues[index];
     return result;
   }, {});
+}
 
 export const exportsForTests = {
   indexParts,

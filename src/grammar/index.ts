@@ -8,7 +8,7 @@ import {
   ComparisonOperator,
   DecimalOperator,
   Expression,
-  FnTypeNode as FunctionTypeNode,
+  FunctionTypeNode,
   FormalDeclNode,
   FormalsDeclNode,
   ForNode,
@@ -67,7 +67,7 @@ export const grammar = store(() =>
         'globals',
         'varDecl',
         'SEMICOL',
-        ({ globals, varDecl }) =>
+        ({ globals = new GlobalsNode([]), varDecl }) =>
           new GlobalsNode(
             [...(globals?.children ?? []), varDecl].map((node) =>
               type(node, VariableDeclaration, FunctionDecl)
@@ -77,7 +77,7 @@ export const grammar = store(() =>
       [
         'globals',
         'fnDecl',
-        ({ globals, fnDecl }) =>
+        ({ globals = new GlobalsNode([]), fnDecl }) =>
           new GlobalsNode(
             [...(globals.children ?? []), fnDecl].map((node) =>
               type(node, VariableDeclaration, FunctionDecl)
@@ -110,7 +110,8 @@ export const grammar = store(() =>
         'RPAREN',
         'ARROW',
         'type',
-        ({ typeList, type }) => new FunctionTypeNode(typeList, type),
+        ({ typeList, type: returnType }) =>
+          new FunctionTypeNode(type(typeList, TypeListNode), returnType),
       ],
       [
         'LPAREN',
@@ -147,7 +148,7 @@ export const grammar = store(() =>
             type(returnType, TypeNode),
             type(id, IdNode),
             new FormalsDeclNode([]),
-            stmtList
+            type(stmtList, StatementList)
           ),
       ],
       [
@@ -228,7 +229,7 @@ export const grammar = store(() =>
         'stmtList',
         'RCURLY',
         ({ exp, stmtList = new StatementList([]) }) =>
-          new WhileNode(exp, stmtList),
+          new WhileNode(exp, type(stmtList, StatementList)),
       ],
       [
         'FOR',
@@ -243,7 +244,7 @@ export const grammar = store(() =>
         'stmtList',
         'RCURLY',
         ({ stmt, exp, stmt2, stmtList = new StatementList([]) }) =>
-          new ForNode(stmt, exp, stmt2, stmtList),
+          new ForNode(stmt, exp, stmt2, type(stmtList, StatementList)),
       ],
       [
         'IF',
@@ -254,7 +255,7 @@ export const grammar = store(() =>
         'stmtList',
         'RCURLY',
         ({ exp, stmtList = new StatementList([]) }) =>
-          new IfNode(exp, stmtList, undefined),
+          new IfNode(exp, type(stmtList, StatementList), undefined),
       ],
       [
         'IF',
@@ -272,7 +273,12 @@ export const grammar = store(() =>
           exp,
           stmtList = new StatementList([]),
           stmtList2 = new StatementList([]),
-        }) => new IfNode(exp, stmtList, stmtList2),
+        }) =>
+          new IfNode(
+            exp,
+            type(stmtList, StatementList),
+            type(stmtList2, StatementList) as StatementList
+          ),
       ],
     ],
     stmt: [

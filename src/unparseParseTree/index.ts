@@ -22,7 +22,7 @@ export const unparseParseTree = <
     .map((line) => (line.trim() === '' ? '' : line))
     .join('\n');
 
-const indentation = '    ';
+export const indentation = '    ';
 
 export function recursiveUnparse<
   TERMINALS extends keyof Tokens,
@@ -58,7 +58,7 @@ export function recursiveUnparse<
 }
 
 /** Define separator overwrites for tokens or grammar keys */
-const separatorOverwrites: Partial<
+export const separatorOverwrites: Partial<
   RR<
     keyof Tokens | GrammarKey,
     {
