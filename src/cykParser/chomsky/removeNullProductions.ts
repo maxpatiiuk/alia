@@ -1,21 +1,30 @@
 import type {
-  AbstractGrammar, AbstractGrammarLine,
+  AbstractGrammar,
+  AbstractGrammarLine,
   PureGrammar,
-  PureGrammarLine
+  PureGrammarLine,
 } from '../../grammar/utils.js';
-import type {RA} from '../../utils/types.js';
-import {filterArray} from '../../utils/types.js';
-import {removeItem, sortFunction} from '../../utils/utils.js';
-import {getGrammarRoot} from './uselessRules.js';
+import type { RA } from '../../utils/types.js';
+import { filterArray } from '../../utils/types.js';
+import { removeItem, sortFunction } from '../../utils/utils.js';
+import { getGrammarRoot } from './uselessRules.js';
 
 /**
  * Get rid of epsilon productions
  */
-export function removeNullProductions<T extends string, GRAMMAR_TYPE extends AbstractGrammar<T> | PureGrammar<T>>(
-  grammar: GRAMMAR_TYPE
-): GRAMMAR_TYPE {
+export function removeNullProductions<
+  T extends string,
+  GRAMMAR_TYPE extends AbstractGrammar<T> | PureGrammar<T>
+>(grammar: GRAMMAR_TYPE): GRAMMAR_TYPE {
+  const isPureGrammar =
+    typeof (Object.values(grammar) as RA<RA<AbstractGrammarLine<T>>>)[0][0].at(
+      -1
+    ) !== 'function';
+  const nullLineLength = isPureGrammar ? 0 : 1;
   const rulesWithEpsilons = Object.entries(grammar)
-    .filter(([_name, lines]) => lines.some((line) => line.length === 0))
+    .filter(([_name, lines]) =>
+      lines.some((line) => line.length === nullLineLength)
+    )
     .map(([name]) => name);
   const rawNullableRules = findNullableRules(grammar, rulesWithEpsilons);
   const grammarRoot = getGrammarRoot(grammar);
@@ -26,12 +35,12 @@ export function removeNullProductions<T extends string, GRAMMAR_TYPE extends Abs
     ...rulesWithEpsilons,
     ...rawNullableRules.filter((rule) => rule !== grammarRoot),
   ];
-  const newGrammar: AbstractGrammar<T> =  Object.fromEntries(
+  const newGrammar: AbstractGrammar<T> = Object.fromEntries(
     Object.entries(grammar).map(([name, lines]) => [
       name,
       filterArray([
         ...lines
-          .filter((line) => line.length > 0)
+          .filter((line) => line.length > nullLineLength)
           .flatMap((line) => eliminateEpsilons(line, nullableRules)),
         isRootNullable && name === grammarRoot ? [] : undefined,
       ]),
@@ -40,7 +49,10 @@ export function removeNullProductions<T extends string, GRAMMAR_TYPE extends Abs
   return newGrammar as GRAMMAR_TYPE;
 }
 
-export function findNullableRules<T extends string, GRAMMAR_TYPE extends AbstractGrammar<T> | PureGrammar<T>>(
+export function findNullableRules<
+  T extends string,
+  GRAMMAR_TYPE extends AbstractGrammar<T> | PureGrammar<T>
+>(
   grammar: GRAMMAR_TYPE,
   rulesWithEpsilons: RA<string>,
   discoveredRules: RA<string> = []
@@ -53,8 +65,9 @@ export function findNullableRules<T extends string, GRAMMAR_TYPE extends Abstrac
         lines.some((line) =>
           line.every(
             (part) =>
-              typeof part === 'string' && (
-                rulesWithEpsilons.includes(part) || discoveredRules.includes(part))
+              typeof part !== 'string' ||
+              rulesWithEpsilons.includes(part) ||
+              discoveredRules.includes(part)
           )
         )
     )
@@ -62,30 +75,38 @@ export function findNullableRules<T extends string, GRAMMAR_TYPE extends Abstrac
   return newDiscoveredRules.length === 0
     ? []
     : [
-      ...newDiscoveredRules,
-      ...findNullableRules(grammar, rulesWithEpsilons, [
-        ...discoveredRules,
         ...newDiscoveredRules,
-      ]),
-    ];
+        ...findNullableRules(grammar, rulesWithEpsilons, [
+          ...discoveredRules,
+          ...newDiscoveredRules,
+        ]),
+      ];
 }
 
-export function eliminateEpsilons<T extends string, LINE_TYPE extends AbstractGrammarLine<T> | PureGrammarLine<T>>(
-  line: LINE_TYPE,
-  nullableRules: RA<string>
-): RA<LINE_TYPE> {
+export function eliminateEpsilons<
+  T extends string,
+  LINE_TYPE extends AbstractGrammarLine<T> | PureGrammarLine<T>
+>(line: LINE_TYPE, nullableRules: RA<string>): RA<LINE_TYPE> {
+  const isPureGrammar = typeof line.at(-1) !== 'function';
   const nullableIndexes = getPowerSet(
     filterArray(
       line.map((part, index) =>
-        typeof part === 'string' && nullableRules.includes(part) ? index : undefined
+        typeof part === 'string' && nullableRules.includes(part)
+          ? index
+          : undefined
       )
     )
   )
     // Prevent creation of empty lines
-    .filter((indexes) => indexes.length !== line.length)
+    .filter(
+      (indexes) => indexes.length + (isPureGrammar ? 0 : 1) !== line.length
+    )
     .map((indexes) => Array.from(indexes).sort(sortFunction((index) => index)));
   return nullableIndexes.map((indexes) =>
-    indexes.reduceRight((line, index) => removeItem(line, index) as LINE_TYPE, line)
+    indexes.reduceRight(
+      (line, index) => removeItem(line, index) as LINE_TYPE,
+      line
+    )
   );
 }
 

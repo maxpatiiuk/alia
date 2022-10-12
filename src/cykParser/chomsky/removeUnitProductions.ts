@@ -1,5 +1,5 @@
 import { isToken } from '../../tokenize/definitions.js';
-import {PureGrammar} from '../../grammar/utils.js';
+import { PureGrammar } from '../../grammar/utils.js';
 
 export function removeUnitProductions<T extends string>(
   grammar: PureGrammar<T>
@@ -12,6 +12,7 @@ export function removeUnitProductions<T extends string>(
         if (
           line.length === 1 &&
           !isToken(line[0]) &&
+          typeof line[0] !== 'function' &&
           // Don't expand if already expanded
           grammar[line[0]].some((toAddLine) =>
             lines.every(

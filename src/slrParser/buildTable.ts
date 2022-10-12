@@ -12,7 +12,7 @@ import {PureGrammar, PureGrammarLine} from '../grammar/utils.js';
 
 type Move = Action<'Move', { readonly to: number }>;
 type Accept = Action<'Accept'>;
-type Reduce<T extends string> = Action<'Reduce', { readonly to: Closure<T> }>;
+type Reduce<T extends string> = Action<'Reduce', { readonly to: Omit<Closure<T>, 'position'> }>;
 export type TableCell<T extends string> = Accept | Move | Reduce<T> | undefined;
 export type SlrTable<T extends string> = RA<IR<TableCell<T>>>;
 

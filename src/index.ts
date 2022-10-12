@@ -24,11 +24,11 @@ program
     'the parser to use. Allowed values include CYK and SLR. Note, unparser is only available for the SLR parser',
     'SLR'
   )
-  // .option(
-  //   '-m, --unparseMode <string>',
-  //   'parseTree - prettify directly from the parse tree (faster). ast - convert to AST and prettify that (better results)',
-  //   'parseTree'
-  // )
+  .option(
+    '-m, --unparseMode <string>',
+    'parseTree - prettify directly from the parse tree (faster). ast - convert to AST and prettify that (better results)',
+    'parseTree'
+  )
   .option(
     '-u, --unparse <string>',
     'path to output file that would include preety-printed program'
@@ -89,10 +89,8 @@ async function run(
       process.exitCode = 1;
     }
   } else {
-    const parseTree = slrParser(
-      removeNullProductions(grammar()),
-      trimmedStream
-    );
+    const nullFreeGrammar = removeNullProductions(grammar());
+    const parseTree = slrParser(nullFreeGrammar, trimmedStream);
     if (parseTree === undefined) {
       console.error('syntax error\nParse failed');
       process.exitCode = 1;
@@ -102,7 +100,7 @@ async function run(
     const pretty =
       unparseMode === 'parseTree'
         ? unparseParseTree(parseTree)
-        : parseTreeToAst(parseTree).pretty();
+        : parseTreeToAst(nullFreeGrammar, parseTree).pretty();
     await fs.promises.writeFile(unparseOutput, pretty);
   }
 }

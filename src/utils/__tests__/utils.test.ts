@@ -134,3 +134,10 @@ test('store', () => {
   expect(memoized()).toBe(id);
   expect(callback).toHaveBeenCalledTimes(1);
 });
+
+theories(escapeRegExp, [
+  {
+    in: ['/^[a]{1,4}.a?b+$/'],
+    out: '/\\^\\[a\\]\\{1,4\\}\\.a\\?b\\+\\$/',
+  },
+]);

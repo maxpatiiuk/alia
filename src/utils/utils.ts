@@ -163,3 +163,7 @@ export const store =
     if (!storage.has(callback)) storage.set(callback, callback());
     return storage.get(callback) as RETURN;
   };
+
+/** Escape all characters that have special meaning in regular expressions */
+export const escapeRegExp = (string: string): string =>
+  string.replace(/[$()*+.?[\\\]^{|}]/g, '\\$&');

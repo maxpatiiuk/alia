@@ -51,7 +51,8 @@ export function recursiveUnparse<
       if (indentChange === -1) result = result.slice(0, -indentation.length);
       result += `${formattedToken}${indentString}`;
     });
-    const separators = separatorOverwrites[parseTree.token as GrammarKey];
+    const separators =
+      separatorOverwrites[parseTree.closure.nonTerminal as GrammarKey];
     return `${separators?.pre ?? ''}${result}${separators?.post ?? ''}`;
   }
 }

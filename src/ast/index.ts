@@ -1,68 +1,52 @@
 import type { GrammarKey } from '../grammar/index.js';
-import type { ParseTreeNode } from '../slrParser/index.js';
-import { simpleTokens } from '../tokenize/definitions.js';
+import type { AbstractGrammar } from '../grammar/utils.js';
+import { epsilon } from '../grammar/utils.js';
+import type { ParseTreeLevel, ParseTreeNode } from '../slrParser/index.js';
 import type { Tokens } from '../tokenize/tokens.js';
-import type { Token } from '../tokenize/types.js';
-import type { RA, RR } from '../utils/types.js';
+import type { IR, R, RA } from '../utils/types.js';
+import { getUniqueName } from '../utils/uniquifyName.js';
+import { removeItem } from '../utils/utils.js';
+import type { AstNode } from './definitions.js';
+import { TokenNode } from './definitions.js';
 
 export function parseTreeToAst(
+  nullFreeGrammar: AbstractGrammar<GrammarKey>,
   parseTree: ParseTreeNode<keyof Tokens, GrammarKey>
 ): AstNode {
-  if ('type' in parseTree || parseTree.token !== 'program')
+  if ('type' in parseTree || parseTree.closure.nonTerminal !== 'program')
     throw new Error('Invalid parse tree');
-  else return new translators.program(parseTree.children);
+  else return toAst(nullFreeGrammar, parseTree);
 }
 
-/* eslint-disable functional/no-class */
-
-/* eslint-disable functional/no-this-expression */
-export abstract class AstNode {
-  protected readonly children: RA<AstNode>;
-
-  public constructor(children: RA<ParseTreeNode<keyof Tokens, GrammarKey>>) {
-    this.children = children.map((part) =>
-      'type' in part
-        ? new TokenNode(part)
-        : new translators[part.token](part.children)
-    );
-  }
-
-  public pretty(): string {
-    return this.children.map((part) => part.pretty()).join('');
-  }
-}
-
-const indexedSimpleTokens = Object.fromEntries(simpleTokens);
-
-class TokenNode extends AstNode {
-  public constructor(public readonly token: Token) {
-    super([]);
-  }
-
-  public pretty(): string {
-    if (this.token.type === 'END') return '';
-    else if (
-      this.token.type === 'ID' ||
-      this.token.type === 'INTLITERAL' ||
-      this.token.type === 'STRINGLITERAL'
+function toAst(
+  grammar: AbstractGrammar<GrammarKey>,
+  { closure, children }: ParseTreeLevel<keyof Tokens, GrammarKey>
+): AstNode {
+  if (closure.nonTerminal === epsilon[0])
+    throw new Error('Received unprocessed grammar');
+  const builder = grammar[closure.nonTerminal][closure.index].at(-1);
+  const parts = grammar[closure.nonTerminal][closure.index]
+    .slice(0, -1)
+    .filter((part): part is string => typeof part === 'string');
+  if (typeof builder !== 'function')
+    throw new Error('Received invalid grammar');
+  return builder(
+    indexParts(
+      parts,
+      children.map((child) =>
+        'type' in child ? new TokenNode(child) : toAst(grammar, child)
+      )
     )
-      return (this.token.data as Tokens['ID']).literal.toString();
-    else return indexedSimpleTokens[this.token.type];
-  }
+  );
 }
 
-const translators: RR<
-  GrammarKey,
-  new (...props: ConstructorParameters<typeof AstNode>) => AstNode
-> = {
-  program: class extends AstNode {},
-  globals: class extends AstNode {
-    public pretty(): string {
-      if (this.children.at(-1)?.pretty() === ';')
-        return this.children.map((part) => part.pretty()).join('');
-      return super.pretty();
-    }
-  },
+const indexParts = (keys: RA<string>, partValues: RA<AstNode>): IR<AstNode> =>
+  keys.reduce<R<AstNode>>((result, key, index) => {
+    const uniqueKey = getUniqueName(key, removeItem(Object.keys(keys), index));
+    result[uniqueKey] ??= partValues[index];
+    return result;
+  }, {});
+
+export const exportsForTests = {
+  indexParts,
 };
-/* eslint-enable functional/no-class */
-/* eslint-enable functional/no-this-expression */
