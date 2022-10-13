@@ -1,27 +1,29 @@
 import { simpleTokens } from '../tokenize/definitions.js';
 import type { Tokens } from '../tokenize/tokens.js';
-import type { Position, Token } from '../tokenize/types.js';
+import type { Token } from '../tokenize/types.js';
 import { indentation } from '../unparseParseTree/index.js';
-import type { RA } from '../utils/types.js';
+import type { RA, WritableArray } from '../utils/types.js';
 
 /* eslint-disable functional/no-class */
-
 /* eslint-disable functional/no-this-expression */
-
 /* eslint-disable functional/prefer-readonly-type */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable functional/no-throw-statement */
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 export abstract class AstNode {
-  private context: Context;
+  public context: Context;
+
+  private readonly items: WritableArray<FunctionDecl | VariableDeclaration>;
 
   public constructor(public readonly children: RA<AstNode>) {
+    this.items = [];
     this.context = {
       symbolTable: [],
-      positionResolver(): never {
-        throw new Error('Position Resolver is not defined');
-      },
       isDeclaration: false,
+      reportError: (_token, error) => {
+        throw new Error(error);
+      },
     };
   }
 
@@ -29,6 +31,23 @@ export abstract class AstNode {
     this.context = context;
 
     this.children.forEach((child) => child.nameAnalysis(context));
+  }
+
+  public createScope(): Scope {
+    return {
+      items: this.items,
+      addItem: (item) => {
+        const itemName = item.id.getName();
+        this.items.forEach((declaration) => {
+          if (declaration.id.getName() === itemName)
+            this.context.reportError(
+              item.id.token,
+              'Multiply declared identifier'
+            );
+        });
+        this.items.push(item);
+      },
+    };
   }
 
   public print(printContext: PrintContext): string {
@@ -46,8 +65,9 @@ export abstract class AstNode {
 
 export type Context = {
   readonly symbolTable: RA<Scope>;
-  readonly positionResolver: (position: number) => Position;
+  // If IdNode is used inside a declaration, supress undefined identifier errors
   readonly isDeclaration: boolean;
+  readonly reportError: (token: TokenNode, message: string) => void;
 };
 
 type Scope = {
@@ -93,16 +113,28 @@ export class GlobalsNode extends AstNode {
 
 export class Statement extends AstNode {}
 
+function getScope(node: AstNode) {
+  const currentScope = node.context.symbolTable.at(-1);
+  if (currentScope === undefined)
+    throw new Error('Trying to declare a function outside of scope');
+  else return currentScope;
+}
+
 export class VariableDeclaration extends Statement {
   public constructor(
-    private readonly type: TypeNode,
-    private readonly id: IdNode
+    public readonly type: TypeNode,
+    public readonly id: IdNode
   ) {
     super([type, id]);
   }
 
-  public pretty(printContext: PrintContext): RA<string> | string {
-    return `${this.type.print(printContext)} ${this.id.print(printContext)}`;
+  public nameAnalysis(context: Context) {
+    super.nameAnalysis({ ...context, isDeclaration: true });
+    getScope(this).addItem(this);
+  }
+
+  public pretty(printContext: PrintContext) {
+    return [this.type.print(printContext), ' ', this.id.print(printContext)];
   }
 }
 
@@ -112,6 +144,12 @@ export class PrimaryTypeNode extends TypeNode {
   public constructor(private readonly token: TokenNode) {
     super([token]);
   }
+
+  public nameAnalysis(context: Context) {
+    super.nameAnalysis(context);
+    if (this.token.token.type === 'VOID')
+      this.context.reportError(this.token, 'Invalid type in declaration');
+  }
 }
 
 export class Expression extends AstNode {}
@@ -119,12 +157,28 @@ export class Expression extends AstNode {}
 export class Term extends Expression {}
 
 export class IdNode extends Term {
-  public constructor(private readonly token: TokenNode) {
+  public constructor(public readonly token: TokenNode) {
     super([token]);
   }
 
-  public pretty() {
+  public getName(): string {
     return (this.token.token.data as Tokens['ID']).literal.toString();
+  }
+
+  public nameAnalysis(context: Context) {
+    super.nameAnalysis(context);
+    if (context.isDeclaration) return;
+    const name = this.getName();
+    if (
+      context.symbolTable.every(({ items }) =>
+        items.every((item) => item.id.getName() !== name)
+      )
+    )
+      this.context.reportError(this.token, 'Undeclared identifier');
+  }
+
+  public pretty() {
+    return this.getName();
   }
 }
 
@@ -178,12 +232,25 @@ function indent(printContext: PrintContext, node: AstNode): string {
 
 export class FunctionDecl extends AstNode {
   public constructor(
-    private readonly type: TypeNode,
-    private readonly id: IdNode,
-    private readonly formals: FormalsDeclNode,
+    public readonly type: TypeNode,
+    public readonly id: IdNode,
+    public readonly formals: FormalsDeclNode,
     private readonly statements: StatementList
   ) {
     super([type, id, formals, statements]);
+  }
+
+  public nameAnalysis(context: Context) {
+    this.context = context;
+    getScope(this).addItem(this);
+    this.type.nameAnalysis(context);
+    this.id.nameAnalysis({ ...context, isDeclaration: true });
+    const newScope = {
+      ...context,
+      symbolTable: [...context.symbolTable, this.createScope()],
+    };
+    this.formals.nameAnalysis(newScope);
+    this.statements.nameAnalysis(newScope);
   }
 
   public pretty(printContext: PrintContext) {
@@ -211,18 +278,7 @@ export class FormalsDeclNode extends AstNode {
   }
 }
 
-export class FormalDeclNode extends AstNode {
-  public constructor(
-    private readonly type: TypeNode,
-    private readonly id: IdNode
-  ) {
-    super([type, id]);
-  }
-
-  public pretty(printContext: PrintContext) {
-    return [this.type.print(printContext), ' ', this.id.print(printContext)];
-  }
-}
+export class FormalDeclNode extends VariableDeclaration {}
 
 export class StatementList extends AstNode {
   public constructor(public readonly children: RA<Statement>) {
@@ -249,6 +305,16 @@ export class WhileNode extends BlockStatement {
     super([condition, statements]);
   }
 
+  public nameAnalysis(context: Context) {
+    this.context = context;
+    this.condition.nameAnalysis(context);
+    const newScope = {
+      ...context,
+      symbolTable: [...context.symbolTable, this.createScope()],
+    };
+    this.statements.nameAnalysis(newScope);
+  }
+
   public pretty(printContext: PrintContext) {
     return [
       token('WHILE'),
@@ -269,6 +335,21 @@ export class ForNode extends BlockStatement {
     public readonly statements: StatementList
   ) {
     super([declaration, condition, action, statements]);
+  }
+
+  public nameAnalysis(context: Context) {
+    this.context = context;
+    const newScope = {
+      ...context,
+      symbolTable: [...context.symbolTable, this.createScope()],
+    };
+    this.declaration.nameAnalysis(newScope);
+    this.condition.nameAnalysis(newScope);
+    const fullStatements = new StatementList([
+      ...this.statements.children,
+      this.action,
+    ]);
+    fullStatements.nameAnalysis(newScope);
   }
 
   public pretty(printContext: PrintContext) {
@@ -300,6 +381,23 @@ export class IfNode extends BlockStatement {
       statements,
       ...(elseStatements === undefined ? [] : [elseStatements]),
     ]);
+  }
+
+  public nameAnalysis(context: Context) {
+    this.context = context;
+    this.condition.nameAnalysis(context);
+    const newScope = {
+      ...context,
+      symbolTable: [...context.symbolTable, this.createScope()],
+    };
+    this.statements.nameAnalysis(newScope);
+    if (typeof this.elseStatements === 'object') {
+      const newScope = {
+        ...context,
+        symbolTable: [...context.symbolTable, this.createScope()],
+      };
+      this.elseStatements.nameAnalysis(newScope);
+    }
   }
 
   public pretty(printContext: PrintContext) {
@@ -563,4 +661,5 @@ export class MayhemNode extends Term {
 /* eslint-enable functional/no-this-expression */
 /* eslint-enable functional/prefer-readonly-type */
 /* eslint-enable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-enable functional/no-throw-statement */
 /* eslint-enable @typescript-eslint/explicit-function-return-type */

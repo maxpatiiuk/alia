@@ -9,6 +9,7 @@ import { process as processInput } from './process.js';
 import { slrParser } from './slrParser/index.js';
 import { unparseParseTree } from './unparseParseTree/index.js';
 import { cretePositionResolver } from './utils/resolvePosition.js';
+import { TokenNode } from './ast/definitions.js';
 
 program.name('dgc').description('The ultimate Drewgon compiler');
 
@@ -132,11 +133,20 @@ async function run(
   }
 
   if (typeof namedUnparse === 'string') {
+    let hasErrors = false;
+    const positionResolver = cretePositionResolver(rawText);
     ast.nameAnalysis({
-      symbolTable: [],
-      positionResolver: cretePositionResolver(rawText),
+      symbolTable: [ast.createScope()],
       isDeclaration: false,
+      reportError(token: TokenNode, error: string) {
+        const lineNumber = positionResolver(
+          token.token.simplePosition
+        ).lineNumber;
+        console.error(`<${lineNumber}> ${error}`);
+        hasErrors = true;
+      },
     });
+    if (hasErrors) return;
     const pretty = ast.pretty({
       indent: 0,
       mode: 'nameAnalysis',
