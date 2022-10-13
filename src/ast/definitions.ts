@@ -21,6 +21,7 @@ export abstract class AstNode {
       positionResolver(): never {
         throw new Error('Position Resolver is not defined');
       },
+      isDeclaration: false,
     };
   }
 
@@ -46,6 +47,7 @@ export abstract class AstNode {
 export type Context = {
   readonly symbolTable: RA<Scope>;
   readonly positionResolver: (position: number) => Position;
+  readonly isDeclaration: boolean;
 };
 
 type Scope = {

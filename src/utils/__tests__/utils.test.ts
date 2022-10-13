@@ -1,5 +1,6 @@
 import { theories } from '../../tests/utils.js';
 import {
+  escapeRegExp,
   findArrayDivergencePoint,
   group,
   mappedFind,

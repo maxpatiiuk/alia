@@ -8,10 +8,18 @@ import { grammar } from './grammar/index.js';
 import { process as processInput } from './process.js';
 import { slrParser } from './slrParser/index.js';
 import { unparseParseTree } from './unparseParseTree/index.js';
+import { cretePositionResolver } from './utils/resolvePosition.js';
 
 program.name('dgc').description('The ultimate Drewgon compiler');
 
 let input = '';
+
+// FIXME: update CLI options, makefile and README.md
+// FIXME: add a CLI option to pretify with type information
+// FIXME: follow the stated format for the function type output
+// FIXME: re-read the error reporting guidelines
+// FIXME: enforce operator precedence
+// FIXME: re-read the project spec just in case
 
 program
   .argument('<input>', 'path to input file')
@@ -27,6 +35,11 @@ program
   .option(
     '-m, --unparseMode <string>',
     'parseTree - prettify directly from the parse tree (faster). ast - convert to AST and prettify that (better results)',
+    'ast'
+  )
+  .option(
+    '-n, --namedUnparse <string>',
+    'the file to which the augmented unparse output will be written. Ignored if unparseMode is not "ast"',
     'parseTree'
   )
   .option('-d, --debug', 'output debug information', false)
@@ -40,14 +53,16 @@ program.parse();
 const {
   tokensOutput,
   parser: rawParser,
-  unparse,
+  unparse: unparseOutput,
   debug,
+  namedUnparse,
   unparseMode = 'parseTree',
 } = program.opts<{
   readonly tokensOutput?: string;
   readonly parser: string;
   readonly unparse?: string;
   readonly debug: boolean;
+  readonly namedUnparse?: string;
   readonly unparseMode: string;
 }>();
 
@@ -61,11 +76,10 @@ if (unparseMode !== 'ast' && unparseMode !== 'parseTree')
     `Unknown unparse mode "${unparseMode}". Allowed values include ast and parseTree.`
   );
 
-run(parser, unparse, unparseMode).catch(console.error);
+run(parser, unparseMode).catch(console.error);
 
 async function run(
   parser: 'CYK' | 'SLR',
-  unparseOutput: string | undefined,
   unparseMode: 'ast' | 'parseTree'
 ): Promise<void> {
   const rawText = await fs.promises
@@ -89,24 +103,46 @@ async function run(
       console.error('syntax error\nParse failed');
       process.exitCode = 1;
     }
-  } else {
-    const nullFreeGrammar = removeNullProductions(grammar());
-    const parseTree = slrParser(nullFreeGrammar, trimmedStream);
-    if (parseTree === undefined) {
-      console.error('syntax error\nParse failed');
-      process.exitCode = 1;
-    }
-    if (unparseOutput === undefined) return;
+    return;
+  }
 
-    const pretty =
-      unparseMode === 'parseTree'
-        ? unparseParseTree(parseTree)
-        : parseTreeToAst(nullFreeGrammar, parseTree).pretty({
-            indent: 0,
-            mode: 'pretty',
-            debug,
-            needWrapping: false,
-          });
+  const nullFreeGrammar = removeNullProductions(grammar());
+  const parseTree = slrParser(nullFreeGrammar, trimmedStream);
+  if (parseTree === undefined) {
+    console.error('syntax error\nParse failed');
+    process.exitCode = 1;
+  }
+
+  if (unparseMode === 'parseTree') {
+    if (unparseOutput === undefined) return;
+    await fs.promises.writeFile(unparseOutput, unparseParseTree(parseTree));
+    return;
+  }
+
+  const ast = parseTreeToAst(nullFreeGrammar, parseTree);
+
+  if (typeof unparseOutput === 'string') {
+    const pretty = ast.pretty({
+      indent: 0,
+      mode: 'pretty',
+      debug,
+      needWrapping: false,
+    });
     await fs.promises.writeFile(unparseOutput, pretty);
+  }
+
+  if (typeof namedUnparse === 'string') {
+    ast.nameAnalysis({
+      symbolTable: [],
+      positionResolver: cretePositionResolver(rawText),
+      isDeclaration: false,
+    });
+    const pretty = ast.pretty({
+      indent: 0,
+      mode: 'nameAnalysis',
+      debug,
+      needWrapping: false,
+    });
+    await fs.promises.writeFile(namedUnparse, pretty);
   }
 }

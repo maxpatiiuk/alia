@@ -30,7 +30,7 @@ To see available options, run the script with `--help` argument:
 Example call:
 
 ```sh
-./dgc file.dg -u outfile.txt
+./dgc file.dg -n namedunparse.txt 2> errors.txt
 ```
 
 ## Testing

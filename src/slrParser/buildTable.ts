@@ -8,11 +8,14 @@ import { split } from '../utils/utils.js';
 import type { Closure } from './closure.js';
 import type { DiagramNode } from './stateDiagram.js';
 import { buildStateDiagram } from './stateDiagram.js';
-import {PureGrammar, PureGrammarLine} from '../grammar/utils.js';
+import { PureGrammar, PureGrammarLine } from '../grammar/utils.js';
 
 type Move = Action<'Move', { readonly to: number }>;
 type Accept = Action<'Accept'>;
-type Reduce<T extends string> = Action<'Reduce', { readonly to: Omit<Closure<T>, 'position'> }>;
+type Reduce<T extends string> = Action<
+  'Reduce',
+  { readonly to: Omit<Closure<T>, 'position'> }
+>;
 export type TableCell<T extends string> = Accept | Move | Reduce<T> | undefined;
 export type SlrTable<T extends string> = RA<IR<TableCell<T>>>;
 
@@ -33,7 +36,7 @@ function buildTable<T extends string>(
   const startState = getGrammarRoot(grammar);
   const { terminals, nonTerminals } = splitGrammar(grammar);
 
-  return diagram.map(({ closure, edges }) => {
+  return diagram.map(({ closure, edges }, index) => {
     const reducibleClosures = closure.filter(
       ({ nonTerminal, index, position }) =>
         grammar[nonTerminal][index].length === position
