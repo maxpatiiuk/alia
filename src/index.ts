@@ -9,7 +9,7 @@ import { process as processInput } from './process.js';
 import { slrParser } from './slrParser/index.js';
 import { unparseParseTree } from './unparseParseTree/index.js';
 import { cretePositionResolver } from './utils/resolvePosition.js';
-import { TokenNode } from './ast/definitions.js';
+import { PrintContext, TokenNode } from './ast/definitions.js';
 
 program.name('dgc').description('The ultimate Drewgon compiler');
 
@@ -122,13 +122,14 @@ async function run(
 
   const ast = parseTreeToAst(nullFreeGrammar, parseTree);
 
+  const printContext: PrintContext = {
+    indent: 0,
+    mode: 'pretty',
+    debug,
+    needWrapping: false,
+  };
   if (typeof unparseOutput === 'string') {
-    const pretty = ast.pretty({
-      indent: 0,
-      mode: 'pretty',
-      debug,
-      needWrapping: false,
-    });
+    const pretty = ast.pretty(printContext);
     await fs.promises.writeFile(unparseOutput, pretty);
   }
 
@@ -139,19 +140,21 @@ async function run(
       symbolTable: [ast.createScope()],
       isDeclaration: false,
       reportError(token: TokenNode, error: string) {
-        const lineNumber = positionResolver(
+        const { lineNumber, columnNumber } = positionResolver(
           token.token.simplePosition
-        ).lineNumber;
-        console.error(`<${lineNumber}> ${error}`);
+        );
+        console.error(
+          `[${lineNumber},${columnNumber}]-[${lineNumber},${
+            columnNumber + token.print(printContext).length
+          }] ${error}`
+        );
         hasErrors = true;
       },
     });
     if (hasErrors) return;
     const pretty = ast.pretty({
-      indent: 0,
+      ...printContext,
       mode: 'nameAnalysis',
-      debug,
-      needWrapping: false,
     });
     await fs.promises.writeFile(namedUnparse, pretty);
   }

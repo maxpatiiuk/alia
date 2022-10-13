@@ -61,6 +61,10 @@ export abstract class AstNode {
   public pretty(printContext: PrintContext): RA<string> | string {
     return this.children.map((part) => part.print(printContext));
   }
+
+  public printType(_printContext: PrintContext): string {
+    throw new Error('PrintType is not implemented');
+  }
 }
 
 export type Context = {
@@ -75,7 +79,7 @@ type Scope = {
   readonly addItem: (item: FunctionDecl | VariableDeclaration) => void;
 };
 
-type PrintContext = {
+export type PrintContext = {
   readonly indent: number;
   readonly mode: 'nameAnalysis' | 'pretty';
   readonly debug: boolean;
@@ -131,6 +135,11 @@ export class VariableDeclaration extends Statement {
   public nameAnalysis(context: Context) {
     super.nameAnalysis({ ...context, isDeclaration: true });
     getScope(this).addItem(this);
+    if (
+      this.type instanceof PrimaryTypeNode &&
+      this.type.token.token.type === 'VOID'
+    )
+      this.context.reportError(this.type.token, 'Invalid type in declaration');
   }
 
   public pretty(printContext: PrintContext) {
@@ -141,14 +150,12 @@ export class VariableDeclaration extends Statement {
 export class TypeNode extends AstNode {}
 
 export class PrimaryTypeNode extends TypeNode {
-  public constructor(private readonly token: TokenNode) {
+  public constructor(public readonly token: TokenNode) {
     super([token]);
   }
 
-  public nameAnalysis(context: Context) {
-    super.nameAnalysis(context);
-    if (this.token.token.type === 'VOID')
-      this.context.reportError(this.token, 'Invalid type in declaration');
+  public printType(printContext: PrintContext) {
+    return this.print(printContext);
   }
 }
 
@@ -168,17 +175,31 @@ export class IdNode extends Term {
   public nameAnalysis(context: Context) {
     super.nameAnalysis(context);
     if (context.isDeclaration) return;
-    const name = this.getName();
-    if (
-      context.symbolTable.every(({ items }) =>
-        items.every((item) => item.id.getName() !== name)
-      )
-    )
+    if (this.getDeclaration() === undefined)
       this.context.reportError(this.token, 'Undeclared identifier');
   }
 
-  public pretty() {
-    return this.getName();
+  private getDeclaration(): FunctionDecl | VariableDeclaration | undefined {
+    const name = this.getName();
+    return Array.from(this.context.symbolTable)
+      .reverse()
+      .flatMap(({ items }) => items)
+      .find((item) => item.id.getName() === name);
+  }
+
+  public pretty(printContext: PrintContext) {
+    return [
+      this.getName(),
+      printContext.mode === 'nameAnalysis' ? this.printType(printContext) : '',
+    ];
+  }
+
+  public printType(printContext: PrintContext): string {
+    return [
+      token('LPAREN'),
+      this.getDeclaration()!.type.printType(printContext),
+      token('RPAREN'),
+    ].join('');
   }
 }
 
@@ -203,6 +224,14 @@ export class FunctionTypeNode extends TypeNode {
       this.returnType.print(printContext),
     ];
   }
+
+  public printType(printContext: PrintContext) {
+    return [
+      this.typeList.printType(printContext),
+      token('ARROW'),
+      this.returnType.printType(printContext),
+    ].join('');
+  }
 }
 
 export class TypeListNode extends TypeNode {
@@ -214,6 +243,12 @@ export class TypeListNode extends TypeNode {
     return this.children
       .map((child) => child.print(printContext))
       .join(`${token('COMMA')} `);
+  }
+
+  public printType(printContext: PrintContext): string {
+    return this.children
+      .map((child) => child.printType(printContext))
+      .join(',');
   }
 }
 
@@ -257,12 +292,23 @@ export class FunctionDecl extends AstNode {
     return [
       this.type.print(printContext),
       ' ',
-      this.id.print(printContext),
+      this.id.print({ ...printContext, mode: 'pretty' }),
+      printContext.mode === 'nameAnalysis' ? this.printType(printContext) : '',
       token('LPAREN'),
       this.formals.print(printContext),
       token('RPAREN'),
       indent(printContext, this.statements),
     ];
+  }
+
+  public printType(printContext: PrintContext): string {
+    return [
+      token('LPAREN'),
+      this.formals.printType(printContext),
+      token('ARROW'),
+      this.type.printType(printContext),
+      token('RPAREN'),
+    ].join('');
   }
 }
 
@@ -275,6 +321,12 @@ export class FormalsDeclNode extends AstNode {
     return this.children
       .map((child) => child.print(printContext))
       .join(`${token('COMMA')} `);
+  }
+
+  public printType(printContext: PrintContext) {
+    return this.children
+      .map((child) => child.type.printType(printContext))
+      .join(',');
   }
 }
 

@@ -36,7 +36,7 @@ function buildTable<T extends string>(
   const startState = getGrammarRoot(grammar);
   const { terminals, nonTerminals } = splitGrammar(grammar);
 
-  return diagram.map(({ closure, edges }, index) => {
+  return diagram.map(({ closure, edges }) => {
     const reducibleClosures = closure.filter(
       ({ nonTerminal, index, position }) =>
         grammar[nonTerminal][index].length === position
