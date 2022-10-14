@@ -2,21 +2,21 @@ int a;
 int b;
 
 bool c;
-void d;
+bool d;
 
 int bar(int b, int _3d){
  int a;
 }
 
-void bar(){
+void baz(){
  int a;
 }
 
-fn() -> void bar() {
+fn() -> void baq() {
  int b;
 }
 
-fn(int, fn () -> fn () -> void) -> void bar() {
+fn(int, fn () -> fn () -> void) -> void biz() {
  int b;
 
  while(-a) {
@@ -27,6 +27,7 @@ fn(int, fn () -> fn () -> void) -> void bar() {
  //
  // }
 
+ int TRUE;
  for(int a; TRUE and true; int c) {
 
  }
@@ -37,13 +38,17 @@ fn(int, fn () -> fn () -> void) -> void bar() {
    // test
  }
 
+  int a;
+  int pikachu;
   if(a){if(a){if(a){if(a){if(a){if(a){if(a){if(a){if(a){if(a){if(a){pikachu++;}}}}}}}}}}}
 
+  int val;
   val = 4;
 
   val--;
   val++;
 
+  int des;
   return;
   return 4;
   output 10;
@@ -52,8 +57,9 @@ fn(int, fn () -> fn () -> void) -> void bar() {
   if(((10 != true)) or 10 <= 4) {}
   output 10 < 4;
 
-  some();
-  some(do, 10 - 4);
+  bool FALSE;
+  baz();
+  bar(val, 10 - 4);
 
   output FALSE;
   output 10;
