@@ -1,11 +1,10 @@
-import { process } from '../process.js';
+import { processInput } from '../process.js';
 import { theories } from '../tests/utils.js';
 
-describe('a', () => {
-  theories(process, [
-    {
-      in: [
-        `"sup" and
+theories(processInput, [
+  {
+    in: [
+      `"sup" and
 "dope\\n" or
 "\\b \\" "
 "\\b"
@@ -23,9 +22,9 @@ this || or && and do some
 2147483647
 2147483648
 `,
-      ],
-      out: {
-        formattedErrors: `FATAL [3,1]-[3,9]: String literal with bad escape sequence detected
+    ],
+    out: {
+      formattedErrors: `FATAL [3,1]-[3,9]: String literal with bad escape sequence detected
 FATAL [4,1]-[4,5]: String literal with bad escape sequence detected
 FATAL [5,1]-[5,2]: Unterminated string literal detected
 FATAL [6,1]-[6,4]: Unterminated string literal with bad escape sequence detected
@@ -36,7 +35,7 @@ FATAL [14,7]-[14,8]: Illegal character |
 FATAL [14,12]-[14,13]: Illegal character &
 FATAL [14,13]-[14,14]: Illegal character &
 FATAL [17,1]-[17,11]: Integer literal overflow`,
-        formattedTokens: `STRINGLIT:"sup" [1,1]
+      formattedTokens: `STRINGLIT:"sup" [1,1]
 AND [1,7]
 STRINGLIT:"dope\\n" [2,1]
 OR [2,10]
@@ -65,192 +64,191 @@ INTLIT:2147483646 [15,1]
 INTLIT:2147483647 [16,1]
 INTLIT:0 [17,1]
 EOF [18,1]`,
-        tokens: [
-          {
-            data: {
-              literal: '"sup"',
-            },
-            simplePosition: 0,
-            type: 'STRINGLITERAL',
+      tokens: [
+        {
+          data: {
+            literal: '"sup"',
           },
-          {
-            data: {},
-            simplePosition: 6,
-            type: 'AND',
+          simplePosition: 0,
+          type: 'STRINGLITERAL',
+        },
+        {
+          data: {},
+          simplePosition: 6,
+          type: 'AND',
+        },
+        {
+          data: {
+            literal: '"dope\\n"',
           },
-          {
-            data: {
-              literal: '"dope\\n"',
-            },
-            simplePosition: 10,
-            type: 'STRINGLITERAL',
+          simplePosition: 10,
+          type: 'STRINGLITERAL',
+        },
+        {
+          data: {},
+          simplePosition: 19,
+          type: 'OR',
+        },
+        {
+          data: {
+            literal: 3,
           },
-          {
-            data: {},
-            simplePosition: 19,
-            type: 'OR',
+          simplePosition: 42,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {},
+          simplePosition: 44,
+          type: 'MINUS',
+        },
+        {
+          data: {
+            literal: 1,
           },
-          {
-            data: {
-              literal: 3,
-            },
-            simplePosition: 42,
-            type: 'INTLITERAL',
+          simplePosition: 45,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {
+            literal: 3,
           },
-          {
-            data: {},
-            simplePosition: 44,
-            type: 'MINUS',
+          simplePosition: 47,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {
+            literal: 2,
           },
-          {
-            data: {
-              literal: 1,
-            },
-            simplePosition: 45,
-            type: 'INTLITERAL',
+          simplePosition: 49,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {
+            literal: 212,
           },
-          {
-            data: {
-              literal: 3,
-            },
-            simplePosition: 47,
-            type: 'INTLITERAL',
+          simplePosition: 51,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {},
+          simplePosition: 54,
+          type: 'COMMA',
+        },
+        {
+          data: {
+            literal: 312,
           },
-          {
-            data: {
-              literal: 2,
-            },
-            simplePosition: 49,
-            type: 'INTLITERAL',
+          simplePosition: 55,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {},
+          simplePosition: 58,
+          type: 'COMMA',
+        },
+        {
+          data: {
+            literal: 123,
           },
-          {
-            data: {
-              literal: 212,
-            },
-            simplePosition: 51,
-            type: 'INTLITERAL',
+          simplePosition: 59,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {
+            literal: 0,
           },
-          {
-            data: {},
-            simplePosition: 54,
-            type: 'COMMA',
+          simplePosition: 63,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {
+            literal: 100,
           },
-          {
-            data: {
-              literal: 312,
-            },
-            simplePosition: 55,
-            type: 'INTLITERAL',
+          simplePosition: 66,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {
+            literal: '_200',
           },
-          {
-            data: {},
-            simplePosition: 58,
-            type: 'COMMA',
+          simplePosition: 69,
+          type: 'ID',
+        },
+        {
+          data: {},
+          simplePosition: 74,
+          type: 'ARROW',
+        },
+        {
+          data: {},
+          simplePosition: 76,
+          type: 'ASSIGN',
+        },
+        {
+          data: {
+            literal: 'mayhemor',
           },
-          {
-            data: {
-              literal: 123,
-            },
-            simplePosition: 59,
-            type: 'INTLITERAL',
+          simplePosition: 78,
+          type: 'ID',
+        },
+        {
+          data: {
+            literal: 'this',
           },
-          {
-            data: {
-              literal: 0,
-            },
-            simplePosition: 63,
-            type: 'INTLITERAL',
+          simplePosition: 87,
+          type: 'ID',
+        },
+        {
+          data: {},
+          simplePosition: 95,
+          type: 'OR',
+        },
+        {
+          data: {},
+          simplePosition: 101,
+          type: 'AND',
+        },
+        {
+          data: {
+            literal: 'do',
           },
-          {
-            data: {
-              literal: 100,
-            },
-            simplePosition: 66,
-            type: 'INTLITERAL',
+          simplePosition: 105,
+          type: 'ID',
+        },
+        {
+          data: {
+            literal: 'some',
           },
-          {
-            data: {
-              literal: '_200',
-            },
-            simplePosition: 69,
-            type: 'ID',
+          simplePosition: 108,
+          type: 'ID',
+        },
+        {
+          data: {
+            literal: 2147483646,
           },
-          {
-            data: {},
-            simplePosition: 74,
-            type: 'ARROW',
+          simplePosition: 113,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {
+            literal: 2147483647,
           },
-          {
-            data: {},
-            simplePosition: 76,
-            type: 'ASSIGN',
+          simplePosition: 124,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {
+            literal: 0,
           },
-          {
-            data: {
-              literal: 'mayhemor',
-            },
-            simplePosition: 78,
-            type: 'ID',
-          },
-          {
-            data: {
-              literal: 'this',
-            },
-            simplePosition: 87,
-            type: 'ID',
-          },
-          {
-            data: {},
-            simplePosition: 95,
-            type: 'OR',
-          },
-          {
-            data: {},
-            simplePosition: 101,
-            type: 'AND',
-          },
-          {
-            data: {
-              literal: 'do',
-            },
-            simplePosition: 105,
-            type: 'ID',
-          },
-          {
-            data: {
-              literal: 'some',
-            },
-            simplePosition: 108,
-            type: 'ID',
-          },
-          {
-            data: {
-              literal: 2147483646,
-            },
-            simplePosition: 113,
-            type: 'INTLITERAL',
-          },
-          {
-            data: {
-              literal: 2147483647,
-            },
-            simplePosition: 124,
-            type: 'INTLITERAL',
-          },
-          {
-            data: {
-              literal: 0,
-            },
-            simplePosition: 135,
-            type: 'INTLITERAL',
-          },
-          {
-            data: {},
-            simplePosition: 146,
-            type: 'END',
-          },
-        ],
-      },
+          simplePosition: 135,
+          type: 'INTLITERAL',
+        },
+        {
+          data: {},
+          simplePosition: 146,
+          type: 'END',
+        },
+      ],
     },
-  ]);
-});
+  },
+]);
