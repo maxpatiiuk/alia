@@ -1,0 +1,70 @@
+int a(int);
+int b(int);
+bool c(bool);
+bool d(bool);
+int bar(int,int->int)(int b(int), int _3d(int)){
+    int a(int);
+}
+void baz(->void)(){
+    int a(int);
+}
+fn ()->void baq(->->void)(){
+    int b(int);
+}
+fn (int, fn ()->fn ()->void)->void biz(->int,->->void->void)(){
+    int b(int);
+    while (-a(int)){
+    }
+    int TRUE(int);
+    for (int a(int); TRUE(int) and true; int c(int)){
+    }
+    if (false){
+    }
+    if ((3 * 4) == 42){
+    } else {
+    }
+    int a(int);
+    int pikachu(int);
+    if (a(int)){
+        if (a(int)){
+            if (a(int)){
+                if (a(int)){
+                    if (a(int)){
+                        if (a(int)){
+                            if (a(int)){
+                                if (a(int)){
+                                    if (a(int)){
+                                        if (a(int)){
+                                            if (a(int)){
+                                                pikachu(int)++;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    int val(int);
+    val(int) = 4;
+    val(int)--;
+    val(int)++;
+    int des(int);
+    return;
+    return 4;
+    output 10;
+    input des(int);
+    output 10 * 4;
+    if (((10 != true) or 10) <= 4){
+    }
+    output 10 < 4;
+    bool FALSE(bool);
+    baz(void)();
+    bar(int)(val(int), 10 - 4);
+    output FALSE(bool);
+    output 10;
+    output "Test\n\t";
+}
