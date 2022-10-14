@@ -159,6 +159,10 @@ export class VariableDeclaration extends Statement {
   public pretty(printContext: PrintContext) {
     return [this.type.print(printContext), ' ', this.id.print(printContext)];
   }
+
+  public printType(printContext: PrintContext) {
+    return this.id.printType(printContext);
+  }
 }
 
 export class TypeNode extends AstNode {}
@@ -177,6 +181,15 @@ export class Expression extends AstNode {}
 
 export class Term extends Expression {}
 
+const findDeclaration = (
+  name: string,
+  context: Context
+): FunctionDecl | VariableDeclaration | undefined =>
+  Array.from(context.symbolTable)
+    .reverse()
+    .flatMap(({ items }) => items)
+    .find((item) => item.id.getName() === name);
+
 export class IdNode extends Term {
   public constructor(public readonly token: TokenNode) {
     super([token]);
@@ -194,11 +207,7 @@ export class IdNode extends Term {
   }
 
   private getDeclaration(): FunctionDecl | VariableDeclaration | undefined {
-    const name = this.getName();
-    return Array.from(this.context.symbolTable)
-      .reverse()
-      .flatMap(({ items }) => items)
-      .find((item) => item.id.getName() === name);
+    return findDeclaration(this.getName(), this.context);
   }
 
   public pretty(printContext: PrintContext) {
@@ -669,11 +678,17 @@ export class FunctionCall extends Expression {
 
   public pretty(printContext: PrintContext) {
     return [
-      this.id.print(printContext),
+      this.id.print({ ...printContext, mode: 'pretty' }),
+      printContext.mode === 'nameAnalysis' ? this.printType(printContext) : '',
       token('LPAREN'),
       this.actualsList.print(printContext),
       token('RPAREN'),
     ];
+  }
+
+  public printType(printContext: PrintContext) {
+    const declaration = findDeclaration(this.id.getName(), this.context)!;
+    return declaration.printType(printContext);
   }
 }
 

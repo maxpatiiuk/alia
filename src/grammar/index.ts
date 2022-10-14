@@ -62,6 +62,26 @@ export const grammar = store(() =>
     /* eslint-disable @typescript-eslint/explicit-function-return-type */
     /* eslint-disable @typescript-eslint/naming-convention */
     program: [['globals', ({ globals }) => globals]],
+    /*program: [['plus', ({ globals }) => globals]],
+    plus: [
+      [
+        'times',
+        'PLUS',
+        'plus',
+        ({ times, plus }) => new DecimalOperator(times, '+', plus),
+      ],
+      ['times', ({ times }) => times],
+    ],
+    times: [
+      [
+        'id',
+        'TIMES',
+        'times',
+        ({ id, times }) => new DecimalOperator(id, '*', times),
+      ],
+      ['id', ({ id }) => id],
+    ],
+    id: [['ID', ({ ID }) => new IdNode(type(ID, TokenNode))]],*/
     globals: [
       [
         'globals',
@@ -301,80 +321,102 @@ export const grammar = store(() =>
     ],
     exp: [
       ['assignExp', ({ assignExp }) => assignExp],
-      [
-        'exp',
-        'MINUS',
-        'exp',
-        ({ exp, exp2 }) => new DecimalOperator(exp, '-', exp2),
-      ],
-      [
-        'exp',
-        'PLUS',
-        'exp',
-        ({ exp, exp2 }) => new DecimalOperator(exp, '+', exp2),
-      ],
-      [
-        'exp',
-        'TIMES',
-        'exp',
-        ({ exp, exp2 }) => new DecimalOperator(exp, '*', exp2),
-      ],
-      [
-        'exp',
-        'DIVIDE',
-        'exp',
-        ({ exp, exp2 }) => new DecimalOperator(exp, '/', exp2),
-      ],
-      [
-        'exp',
-        'AND',
-        'exp',
-        ({ exp, exp2 }) => new BooleanOperator(exp, 'and', exp2),
-      ],
-      [
-        'exp',
-        'OR',
-        'exp',
-        ({ exp, exp2 }) => new BooleanOperator(exp, 'or', exp2),
-      ],
-      [
-        'exp',
-        'EQUALS',
-        'exp',
-        ({ exp, exp2 }) => new ComparisonOperator(exp, '==', exp2),
-      ],
-      [
-        'exp',
-        'NOTEQUALS',
-        'exp',
-        ({ exp, exp2 }) => new ComparisonOperator(exp, '!=', exp2),
-      ],
-      [
-        'exp',
-        'GREATER',
-        'exp',
-        ({ exp, exp2 }) => new ComparisonOperator(exp, '>', exp2),
-      ],
-      [
-        'exp',
-        'GREATEREQ',
-        'exp',
-        ({ exp, exp2 }) => new ComparisonOperator(exp, '>=', exp2),
-      ],
-      [
-        'exp',
-        'LESS',
-        'exp',
-        ({ exp, exp2 }) => new ComparisonOperator(exp, '<', exp2),
-      ],
-      [
-        'exp',
-        'LESSEQ',
-        'exp',
-        ({ exp, exp2 }) => new ComparisonOperator(exp, '<=', exp2),
-      ],
       ['NOT', 'exp', ({ exp }) => new NotNode(exp)],
       ['MINUS', 'term', ({ term }) => new MinusNode(term)],
+      ['expOr', ({ expOr }) => expOr],
+    ],
+    expOr: [
+      [
+        'expAnd',
+        'OR',
+        'expOr',
+        ({ expAnd, expOr }) => new BooleanOperator(expAnd, 'or', expOr),
+      ],
+      ['expAnd', ({ expAnd }) => expAnd],
+    ],
+    expAnd: [
+      [
+        'expCompare',
+        'AND',
+        'expAnd',
+        ({ expCompare, expAnd }) =>
+          new BooleanOperator(expCompare, 'and', expAnd),
+      ],
+      ['expCompare', ({ expCompare }) => expCompare],
+    ],
+    expCompare: [
+      [
+        'expPlus',
+        'EQUALS',
+        'expCompare',
+        ({ expPlus, expCompare }) =>
+          new ComparisonOperator(expPlus, '==', expCompare),
+      ],
+      [
+        'expPlus',
+        'NOTEQUALS',
+        'expCompare',
+        ({ expPlus, expCompare }) =>
+          new ComparisonOperator(expPlus, '!=', expCompare),
+      ],
+      [
+        'expPlus',
+        'GREATER',
+        'expCompare',
+        ({ expPlus, expCompare }) =>
+          new ComparisonOperator(expPlus, '>', expCompare),
+      ],
+      [
+        'expPlus',
+        'GREATEREQ',
+        'expCompare',
+        ({ expPlus, expCompare }) =>
+          new ComparisonOperator(expPlus, '>=', expCompare),
+      ],
+      [
+        'expPlus',
+        'LESS',
+        'expCompare',
+        ({ expPlus, expCompare }) =>
+          new ComparisonOperator(expPlus, '<', expCompare),
+      ],
+      [
+        'expPlus',
+        'LESSEQ',
+        'expCompare',
+        ({ expPlus, expCompare }) =>
+          new ComparisonOperator(expPlus, '<=', expCompare),
+      ],
+      ['expPlus', ({ expPlus }) => expPlus],
+    ],
+    expPlus: [
+      [
+        'expMult',
+        'MINUS',
+        'expPlus',
+        ({ expMult, expPlus }) => new DecimalOperator(expMult, '-', expPlus),
+      ],
+      [
+        'expMult',
+        'PLUS',
+        'expPlus',
+        ({ expMult, expPlus }) => new DecimalOperator(expMult, '+', expPlus),
+      ],
+      ['expMult', ({ expMult }) => expMult],
+    ],
+    expMult: [
+      [
+        'term',
+        'TIMES',
+        'expMult',
+        ({ term, expMult }) => new DecimalOperator(term, '*', expMult),
+      ],
+      [
+        'term',
+        'DIVIDE',
+        'expMult',
+        ({ term, expMult }) => new DecimalOperator(term, '/', expMult),
+      ],
       ['term', ({ term }) => term],
     ],
     assignExp: [

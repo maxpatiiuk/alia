@@ -111,9 +111,9 @@ export function namedParse(
         token.token.simplePosition
       );
       errors.push(
-        `[${lineNumber},${columnNumber}]-[${lineNumber},${
+        `FATAL [${lineNumber},${columnNumber}]-[${lineNumber},${
           columnNumber + idNode.print(printContext).length
-        }] ${error}`
+        }]: ${error}`
       );
     },
   });

@@ -5,7 +5,8 @@ import {
   removeUselessProductions,
 } from '../uselessRules.js';
 import { theories } from '../../../tests/utils.js';
-import {epsilon} from '../../../grammar/utils.js';
+import { epsilon } from '../../../grammar/utils.js';
+import { TypeListNode } from '../../../ast/definitions.js';
 
 theories(removeUselessProductions, [
   {
@@ -34,37 +35,53 @@ theories(findUnreachableRules, [
   },
 ]);
 
+const ast = () => new TypeListNode([]);
+
 describe('checkValidity', () => {
   test('unreachable rule', () =>
     expect(() =>
       checkValidity({
-        a: [['c']],
-        c: [['c']],
-        b: [['b'], ['a']],
+        a: [['c', ast]],
+        c: [['c', ast]],
+        b: [
+          ['b', ast],
+          ['a', ast],
+        ],
       })
     ).toThrow(/Unreachable rule/u));
 
   test('infinite recursion', () =>
-    expect(() => checkValidity({ a: [['a']] })).toThrow(
+    expect(() => checkValidity({ a: [['a', ast]] })).toThrow(
       /is recursive with no epsilon condition/u
     ));
 
   const finiteRecursion = {
-    a: [['a'], ['b']],
-    b: [epsilon, ['a']],
-    [epsilon[0]]: [['b']],
+    a: [
+      ['a', ast],
+      ['b', ast],
+    ],
+    b: [
+      [...epsilon, ast],
+      ['a', ast],
+    ],
+    [epsilon[0]]: [['b', ast]],
   };
   test('recursive rule with indirect epsilon', () =>
     expect(checkValidity(finiteRecursion)).toEqual(finiteRecursion));
 
   test('name with underscore', () =>
-    expect(() => checkValidity({ a_a: [['a_a'], []] })).toThrow(
+    expect(() => checkValidity({ a_a: [['a_a', ast], []] })).toThrow(
       /must not contain underscores/u
     ));
 
   test('name with spaces', () =>
-    expect(() => checkValidity({ 'a a': [['a a'], []] })).toThrow(
+    expect(() => checkValidity({ 'a a': [['a a', ast], [ast]] })).toThrow(
       /must not contain spaces/u
+    ));
+
+  test('missing Syntax-Directed-Translation function', () =>
+    expect(() => checkValidity({ a: [['b']], b: [['a'], []] })).toThrow(
+      /needed for Syntax Directed Translation/u
     ));
 });
 

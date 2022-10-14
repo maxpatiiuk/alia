@@ -3,7 +3,9 @@ int b(int);
 bool c(bool);
 bool d(bool);
 int bar(int,int->int)(int b(int), int _3d(int)){
+    a(int)();
     int a(int);
+    a(int)();
 }
 void baz(->void)(){
     int a(int);
@@ -58,12 +60,12 @@ fn (int, fn ()->fn ()->void)->void biz(->int,->->void->void)(){
     output 10;
     input des(int);
     output 10 * 4;
-    if (((10 != true) or 10) <= 4){
+    if ((10 != true) or (10 <= 4)){
     }
     output 10 < 4;
     bool FALSE(bool);
-    baz(void)();
-    bar(int)(val(int), 10 - 4);
+    baz(->void)();
+    bar(int,int->int)(val(int), 10 - 4);
     output FALSE(bool);
     output 10;
     output "Test\n\t";

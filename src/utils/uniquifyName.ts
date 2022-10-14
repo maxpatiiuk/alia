@@ -12,7 +12,7 @@ export function getUniqueName(name: string, usedNames: RA<string>): string {
   const suffix = / \((\d+)\)$/u.exec(name);
   const [{ length }, indexString] = suffix ?? ([[], '0'] as const);
   const strippedName = length > 0 ? name.slice(0, -1 * length) : name;
-  const indexRegex = new RegExp(`^${escapeRegExp(strippedName)}\\d+$`, 'u');
+  const indexRegex = new RegExp(`^${escapeRegExp(strippedName)}(\\d+)$`, 'u');
   const newIndex =
     Math.max(
       ...filterArray([

@@ -8,12 +8,6 @@ program.name('dgc').description('The ultimate Drewgon compiler');
 
 let input = '';
 
-/*
- * FIXME: re-read the error reporting guidelines
- * FIXME: enforce operator precedence
- * FIXME: re-read the project spec just in case
- */
-
 program
   .argument('<input>', 'path to input file')
   .action((inputString: string) => {

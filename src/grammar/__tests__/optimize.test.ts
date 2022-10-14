@@ -1,19 +1,25 @@
 import { theories } from '../../tests/utils.js';
 import { optimizeGrammar, removeTypeFixes } from '../optimize.js';
-import {epsilon} from '../utils.js';
+import { epsilon } from '../utils.js';
+import { TypeListNode } from '../../ast/definitions.js';
+
+const ast = () => new TypeListNode([]);
 
 theories(optimizeGrammar, {
   'calls removeTypeFixes': {
     in: [
       {
-        a: [['a', 'b'], epsilon],
-        b: [['a']],
-        [epsilon[0]]: [['a', epsilon[0]]],
+        a: [
+          ['a', 'b', ast],
+          [...epsilon, ast],
+        ],
+        b: [['a', ast]],
+        [epsilon[0]]: [['a', epsilon[0], ast]],
       },
     ],
     out: {
-      a: [['a', 'b'], []],
-      b: [['a']],
+      a: [['a', 'b', ast], [ast]],
+      b: [['a', ast]],
     },
   },
 });

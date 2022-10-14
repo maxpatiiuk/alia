@@ -5,7 +5,9 @@ bool c;
 bool d;
 
 int bar(int b, int _3d){
+ a();
  int a;
+ a();
 }
 
 void baz(){

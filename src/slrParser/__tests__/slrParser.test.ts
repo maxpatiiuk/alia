@@ -1,10 +1,16 @@
 import { slrParser } from '../index.js';
-import {PureGrammar} from '../../grammar/utils.js';
+import { AbstractGrammar } from '../../grammar/utils.js';
+import { TypeListNode } from '../../ast/definitions.js';
 
-const abstractGrammar: PureGrammar<'L' | 'P' | 'S'> = {
-  S: [['MAYHEM', 'P', 'MAYHEM']],
-  P: [['LPAREN', 'L', 'RPAREN']],
-  L: [['ID'], ['L', 'ID']],
+const ast = () => new TypeListNode([]);
+
+const abstractGrammar: AbstractGrammar<'L' | 'P' | 'S'> = {
+  S: [['MAYHEM', 'P', 'MAYHEM', ast]],
+  P: [['LPAREN', 'L', 'RPAREN', ast]],
+  L: [
+    ['ID', ast],
+    ['L', 'ID', ast],
+  ],
 };
 
 describe('slrParser', () => {
@@ -41,7 +47,11 @@ describe('slrParser', () => {
                   type: 'ID',
                 },
               ],
-              token: 'L',
+              closure: {
+                index: 0,
+                nonTerminal: 'L',
+                position: 1,
+              },
             },
             {
               data: {},
@@ -49,7 +59,11 @@ describe('slrParser', () => {
               type: 'RPAREN',
             },
           ],
-          token: 'P',
+          closure: {
+            index: 0,
+            nonTerminal: 'P',
+            position: 3,
+          },
         },
         {
           data: {},
@@ -57,6 +71,9 @@ describe('slrParser', () => {
           type: 'MAYHEM',
         },
       ],
-      token: 'S',
+      closure: {
+        index: 0,
+        nonTerminal: 'S',
+      },
     }));
 });
