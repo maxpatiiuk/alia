@@ -21,7 +21,7 @@ export abstract class AstNode {
     this.context = {
       symbolTable: [],
       isDeclaration: false,
-      reportError: (_token, error) => {
+      reportError: (_idNode, _token, error) => {
         throw new Error(error);
       },
     };
@@ -36,16 +36,18 @@ export abstract class AstNode {
   public createScope(): Scope {
     return {
       items: this.items,
-      addItem: (item) => {
+      addItem: (item, dry) => {
         const itemName = item.id.getName();
-        this.items.forEach((declaration) => {
-          if (declaration.id.getName() === itemName)
-            this.context.reportError(
-              item.id.token,
-              'Multiply declared identifier'
-            );
-        });
-        this.items.push(item);
+        const duplicateIdentifier = this.items.find(
+          (declaration) => declaration.id.getName() === itemName
+        );
+        if (typeof duplicateIdentifier === 'object')
+          this.context.reportError(
+            item.id,
+            item.id.token,
+            'Multiply declared identifier'
+          );
+        else if (dry !== true) this.items.push(item);
       },
     };
   }
@@ -71,12 +73,19 @@ export type Context = {
   readonly symbolTable: RA<Scope>;
   // If IdNode is used inside a declaration, supress undefined identifier errors
   readonly isDeclaration: boolean;
-  readonly reportError: (token: TokenNode, message: string) => void;
+  readonly reportError: (
+    idNode: IdNode,
+    token: TokenNode,
+    message: string
+  ) => void;
 };
 
 type Scope = {
   readonly items: RA<FunctionDecl | VariableDeclaration>;
-  readonly addItem: (item: FunctionDecl | VariableDeclaration) => void;
+  readonly addItem: (
+    item: FunctionDecl | VariableDeclaration,
+    dry?: boolean
+  ) => void;
 };
 
 export type PrintContext = {
@@ -134,12 +143,17 @@ export class VariableDeclaration extends Statement {
 
   public nameAnalysis(context: Context) {
     super.nameAnalysis({ ...context, isDeclaration: true });
-    getScope(this).addItem(this);
     if (
       this.type instanceof PrimaryTypeNode &&
       this.type.token.token.type === 'VOID'
-    )
-      this.context.reportError(this.type.token, 'Invalid type in declaration');
+    ) {
+      this.context.reportError(
+        this.id,
+        this.id.token,
+        'Invalid type in declaration'
+      );
+      getScope(this).addItem(this, true);
+    } else getScope(this).addItem(this);
   }
 
   public pretty(printContext: PrintContext) {
@@ -176,7 +190,7 @@ export class IdNode extends Term {
     super.nameAnalysis(context);
     if (context.isDeclaration) return;
     if (this.getDeclaration() === undefined)
-      this.context.reportError(this.token, 'Undeclared identifier');
+      this.context.reportError(this, this.token, 'Undeclared identifier');
   }
 
   private getDeclaration(): FunctionDecl | VariableDeclaration | undefined {
