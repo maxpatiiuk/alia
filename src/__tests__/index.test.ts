@@ -9,7 +9,7 @@ async function nameAnalysis(
   if (ast === undefined) return undefined;
   const printContext: PrintContext = {
     indent: 0,
-    mode: 'pretty',
+    mode: 'nameAnalysis',
     debug: false,
     needWrapping: false,
   };

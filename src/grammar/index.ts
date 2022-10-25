@@ -34,7 +34,7 @@ import {
   TypeListNode,
   TypeNode,
   VariableDeclaration,
-  WhileNode,
+  WhileNode, EqualityOperator,
 } from '../ast/definitions.js';
 import type { RA } from '../utils/types.js';
 import { store } from '../utils/utils.js';
@@ -330,7 +330,7 @@ export const grammar = store(() =>
         'expAnd',
         'OR',
         'expOr',
-        ({ expAnd, expOr }) => new BooleanOperator(expAnd, 'or', expOr),
+        ({ expAnd, OR, expOr }) => new BooleanOperator(expAnd, type(OR, TokenNode), expOr),
       ],
       ['expAnd', ({ expAnd }) => expAnd],
     ],
@@ -339,8 +339,8 @@ export const grammar = store(() =>
         'expCompare',
         'AND',
         'expAnd',
-        ({ expCompare, expAnd }) =>
-          new BooleanOperator(expCompare, 'and', expAnd),
+        ({ expCompare, AND, expAnd }) =>
+          new BooleanOperator(expCompare, type(AND, TokenNode), expAnd),
       ],
       ['expCompare', ({ expCompare }) => expCompare],
     ],
@@ -349,43 +349,43 @@ export const grammar = store(() =>
         'expPlus',
         'EQUALS',
         'expCompare',
-        ({ expPlus, expCompare }) =>
-          new ComparisonOperator(expPlus, '==', expCompare),
+        ({ expPlus, EQUALS, expCompare }) =>
+          new EqualityOperator(expPlus, type(EQUALS, TokenNode), expCompare),
       ],
       [
         'expPlus',
         'NOTEQUALS',
         'expCompare',
-        ({ expPlus, expCompare }) =>
-          new ComparisonOperator(expPlus, '!=', expCompare),
+        ({ expPlus, NOTEQUALS, expCompare }) =>
+          new EqualityOperator(expPlus, type(NOTEQUALS, TokenNode), expCompare),
       ],
       [
         'expPlus',
         'GREATER',
         'expCompare',
-        ({ expPlus, expCompare }) =>
-          new ComparisonOperator(expPlus, '>', expCompare),
+        ({ expPlus, GREATER, expCompare }) =>
+          new ComparisonOperator(expPlus, type(GREATER, TokenNode), expCompare),
       ],
       [
         'expPlus',
         'GREATEREQ',
         'expCompare',
-        ({ expPlus, expCompare }) =>
-          new ComparisonOperator(expPlus, '>=', expCompare),
+        ({ expPlus, GREATEREQ, expCompare }) =>
+          new ComparisonOperator(expPlus, type(GREATEREQ, TokenNode), expCompare),
       ],
       [
         'expPlus',
         'LESS',
         'expCompare',
-        ({ expPlus, expCompare }) =>
-          new ComparisonOperator(expPlus, '<', expCompare),
+        ({ expPlus, LESS, expCompare }) =>
+          new ComparisonOperator(expPlus, type(LESS, TokenNode), expCompare),
       ],
       [
         'expPlus',
         'LESSEQ',
         'expCompare',
-        ({ expPlus, expCompare }) =>
-          new ComparisonOperator(expPlus, '<=', expCompare),
+        ({ expPlus, LESSEQ, expCompare }) =>
+          new ComparisonOperator(expPlus, type(LESSEQ, TokenNode), expCompare),
       ],
       ['expPlus', ({ expPlus }) => expPlus],
     ],
@@ -394,13 +394,13 @@ export const grammar = store(() =>
         'expMult',
         'MINUS',
         'expPlus',
-        ({ expMult, expPlus }) => new DecimalOperator(expMult, '-', expPlus),
+        ({ expMult, MINUS, expPlus }) => new DecimalOperator(expMult, type(MINUS,TokenNode), expPlus),
       ],
       [
         'expMult',
         'PLUS',
         'expPlus',
-        ({ expMult, expPlus }) => new DecimalOperator(expMult, '+', expPlus),
+        ({ expMult, PLUS, expPlus }) => new DecimalOperator(expMult, type(PLUS,TokenNode), expPlus),
       ],
       ['expMult', ({ expMult }) => expMult],
     ],
@@ -409,13 +409,13 @@ export const grammar = store(() =>
         'term',
         'TIMES',
         'expMult',
-        ({ term, expMult }) => new DecimalOperator(term, '*', expMult),
+        ({ term, TIMES, expMult }) => new DecimalOperator(term, type(TIMES,TokenNode), expMult),
       ],
       [
         'term',
         'DIVIDE',
         'expMult',
-        ({ term, expMult }) => new DecimalOperator(term, '/', expMult),
+        ({ term, DIVIDE, expMult }) => new DecimalOperator(term, type(DIVIDE,TokenNode), expMult),
       ],
       ['term', ({ term }) => term],
     ],
@@ -424,7 +424,7 @@ export const grammar = store(() =>
         'id',
         'ASSIGN',
         'exp',
-        ({ id, exp }) => new AssignmentExpression(type(id, IdNode), exp),
+        ({ id, ASSIGN, exp }) => new AssignmentExpression(type(id, IdNode), type(ASSIGN,TokenNode), exp),
       ],
     ],
     callExp: [

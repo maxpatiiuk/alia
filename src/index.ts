@@ -1,10 +1,11 @@
-import { program } from 'commander';
+import {program} from 'commander';
 import fs from 'node:fs';
 
-import type { PrintContext } from './ast/definitions.js';
-import { namedParse, run } from './process.js';
+import {namedParse, run, typeCheckAst} from './process.js';
 
 program.name('dgc').description('The ultimate Drewgon compiler');
+
+// TODO: https://piazza.com/class/l744ubbynrb4xq/post/139
 
 let input = '';
 
@@ -29,6 +30,11 @@ program
     'the file to which the augmented unparse output will be written. Ignored if unparseMode is not "ast"',
     'parseTree'
   )
+  .option(
+    '-c, --typeCheck',
+    'run a type checker and print errors to stderr',
+    false
+  )
   .option('-d, --debug', 'output debug information', false)
   .option(
     '-u, --unparse <string>',
@@ -41,6 +47,7 @@ const {
   tokensOutput,
   parser: rawParser,
   unparse: unparseOutput,
+  typeCheck,
   debug,
   namedUnparse,
   unparseMode = 'parseTree',
@@ -49,6 +56,7 @@ const {
   readonly parser: string;
   readonly unparse?: string;
   readonly debug: boolean;
+  readonly typeCheck: boolean;
   readonly namedUnparse?: string;
   readonly unparseMode: string;
 }>();
@@ -77,22 +85,22 @@ readFile()
       unparseMode
     );
 
-    if (typeof namedUnparse === 'string' && typeof ast === 'object') {
-      const printContext: PrintContext = {
-        indent: 0,
-        mode: 'pretty',
-        debug,
-        needWrapping: false,
-      };
+    if (ast === undefined) return;
 
-      const namedUnparseResults = namedParse(rawText, ast, printContext);
-      if (namedUnparseResults === undefined) return;
-      if (Array.isArray(namedUnparseResults)) {
-        namedUnparseResults.forEach((errorMessage) =>
+    const namedUnparseResults = namedParse(rawText, ast, debug);
+    if (namedUnparseResults === undefined) return;
+    if (Array.isArray(namedUnparseResults)) {
+      namedUnparseResults.forEach((errorMessage) =>
+        console.error(errorMessage)
+      );
+      console.error('Name Analysis Failed');
+      return;
+    } else if (typeof namedUnparse === 'string')
+      await fs.promises.writeFile(namedUnparse, namedUnparseResults);
+
+    if(typeCheck)
+        typeCheckAst(rawText, ast).forEach((errorMessage) =>
           console.error(errorMessage)
         );
-        console.error('Name Analysis Failed');
-      } else await fs.promises.writeFile(namedUnparse, namedUnparseResults);
-    }
   })
   .catch(console.error);

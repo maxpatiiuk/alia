@@ -1,25 +1,27 @@
 import fs from 'node:fs';
 
-import type { AstNode, PrintContext } from './ast/definitions.js';
-import { parseTreeToAst } from './ast/index.js';
-import { removeNullProductions } from './cykParser/chomsky/removeNullProductions.js';
-import { cykParser } from './cykParser/index.js';
-import { formatErrors } from './formatErrors.js';
-import { formatTokens } from './formatTokens.js';
-import { grammar } from './grammar/index.js';
-import { slrParser } from './slrParser/index.js';
-import { tokenize } from './tokenize/index.js';
-import type { Token } from './tokenize/types.js';
-import { unparseParseTree } from './unparseParseTree/index.js';
-import { cretePositionResolver } from './utils/resolvePosition.js';
-import type { RA, WritableArray } from './utils/types.js';
+import type {AstNode, PrintContext} from './ast/definitions.js';
+import {parseTreeToAst} from './ast/index.js';
+import {
+  removeNullProductions
+} from './cykParser/chomsky/removeNullProductions.js';
+import {cykParser} from './cykParser/index.js';
+import {formatErrors} from './formatErrors.js';
+import {formatTokens} from './formatTokens.js';
+import {grammar} from './grammar/index.js';
+import {slrParser} from './slrParser/index.js';
+import {tokenize} from './tokenize/index.js';
+import type {Token} from './tokenize/types.js';
+import {unparseParseTree} from './unparseParseTree/index.js';
+import {cretePositionResolver} from './utils/resolvePosition.js';
+import type {RA, WritableArray} from './utils/types.js';
 
 export function processInput(rawText: string): {
   readonly formattedErrors: string;
   readonly formattedTokens: string;
   readonly tokens: RA<Token>;
 } {
-  const { tokens, syntaxErrors } = tokenize(rawText, 0);
+  const {tokens, syntaxErrors} = tokenize(rawText, 0);
 
   const positionResolver = cretePositionResolver(rawText);
 
@@ -34,7 +36,7 @@ async function printTokens(
   rawText: string,
   tokensOutput: string | undefined
 ): Promise<RA<Token> | undefined> {
-  const { formattedErrors, formattedTokens, tokens } = processInput(rawText);
+  const {formattedErrors, formattedTokens, tokens} = processInput(rawText);
 
   if (typeof tokensOutput === 'string')
     await fs.promises.writeFile(tokensOutput, formattedTokens);
@@ -99,28 +101,60 @@ export async function run(
 export function namedParse(
   rawText: string,
   ast: AstNode,
-  printContext: PrintContext
+  debug: boolean
 ): RA<string> | string {
   const positionResolver = cretePositionResolver(rawText);
   const errors: WritableArray<string> = [];
   ast.nameAnalysis({
     symbolTable: [ast.createScope()],
     isDeclaration: false,
-    reportError(idNode, token, error) {
-      const { lineNumber, columnNumber } = positionResolver(
-        token.token.simplePosition
+    reportError(idNode, error) {
+      const {lineNumber, columnNumber} = positionResolver(
+        idNode.getToken().simplePosition
       );
       errors.push(
         `FATAL [${lineNumber},${columnNumber}]-[${lineNumber},${
-          columnNumber + idNode.print(printContext).length
+          columnNumber + idNode.getName().length
         }]: ${error}`
       );
     },
   });
   if (errors.length > 0) return errors;
-  const output = ast.pretty({
-    ...printContext,
+
+  const printContext: PrintContext = {
+    indent: 0,
     mode: 'nameAnalysis',
-  });
+    debug,
+    needWrapping: false,
+  };
+
+  const output = ast.pretty(printContext);
   return Array.isArray(output) ? output.join('') : output;
+}
+
+export function typeCheckAst(
+  rawText: string,
+  ast: AstNode
+): RA<string> {
+  const positionResolver = cretePositionResolver(rawText);
+  const errors: WritableArray<string> = [];
+  ast.typeCheck({
+    reportError(node, error) {
+      const {lineNumber, columnNumber} = positionResolver(
+        node.getToken().simplePosition
+      );
+      errors.push(
+        `FATAL [${lineNumber},${columnNumber}]-[${lineNumber},${
+          // TODO: check if this is correct
+          columnNumber + node.print({
+            indent: 0,
+            mode: 'pretty',
+            debug: false,
+            needWrapping: false,
+          }).length
+        }]: ${error}`
+      );
+    },
+  });
+  return errors;
 }
