@@ -1,11 +1,9 @@
-import {program} from 'commander';
+import { program } from 'commander';
 import fs from 'node:fs';
 
-import {namedParse, run, typeCheckAst} from './process.js';
+import { namedParse, run, typeCheckAst } from './process.js';
 
 program.name('dgc').description('The ultimate Drewgon compiler');
-
-// TODO: https://piazza.com/class/l744ubbynrb4xq/post/139
 
 let input = '';
 
@@ -98,9 +96,10 @@ readFile()
     } else if (typeof namedUnparse === 'string')
       await fs.promises.writeFile(namedUnparse, namedUnparseResults);
 
-    if(typeCheck)
-        typeCheckAst(rawText, ast).forEach((errorMessage) =>
-          console.error(errorMessage)
-        );
+    if (typeCheck) {
+      const errors = typeCheckAst(rawText, ast);
+      errors.forEach((errorMessage) => console.error(errorMessage));
+      if (errors.length > 0) console.error('Type Analysis Failed');
+    }
   })
   .catch(console.error);

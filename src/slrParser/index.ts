@@ -2,7 +2,7 @@ import { getGrammarRoot } from '../cykParser/chomsky/uselessRules.js';
 import type { AbstractGrammar } from '../grammar/utils.js';
 import { toPureGrammar } from '../grammar/utils.js';
 import type { Tokens } from '../tokenize/tokens.js';
-import type { Token } from '../tokenize/types.js';
+import type { Position, Token } from '../tokenize/types.js';
 import type { RA, WritableArray } from '../utils/types.js';
 import { getTable } from './buildTable.js';
 import type { Closure } from './closure.js';
@@ -30,7 +30,8 @@ export function slrParser<
   NON_TERMINALS extends string
 >(
   grammar: AbstractGrammar<NON_TERMINALS>,
-  tokens: RA<Token<TERMINALS>>
+  tokens: RA<Token<TERMINALS>>,
+  positionResolver: (position: number) => Position
 ): ParseTreeNode<TERMINALS, NON_TERMINALS> {
   const table = getTable(toPureGrammar(grammar));
   let stack: WritableArray<StackItem<TERMINALS, NON_TERMINALS>> = [
@@ -45,13 +46,14 @@ export function slrParser<
     const state = stack.at(-1)!;
     const lookahead = tokens[tokenIndex]?.type;
     const cell = table[state.state][lookahead ?? ''];
-    if (cell === undefined)
-      throw new Error(
-        `Unexpected token ${lookahead} at position ${tokenIndex + 1}/${
-          tokens.length
-        }`
+    if (cell === undefined) {
+      const { lineNumber, columnNumber } = positionResolver(
+        tokens[tokenIndex].simplePosition
       );
-    else if (cell.type === 'Move') {
+      throw new Error(
+        `Unexpected token ${lookahead} at (${lineNumber},${columnNumber})`
+      );
+    } else if (cell.type === 'Move') {
       stack.push({
         state: cell.to,
         item: tokens[tokenIndex],

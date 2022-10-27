@@ -1,27 +1,27 @@
 import fs from 'node:fs';
 
-import type {AstNode, PrintContext} from './ast/definitions.js';
-import {parseTreeToAst} from './ast/index.js';
-import {
-  removeNullProductions
-} from './cykParser/chomsky/removeNullProductions.js';
-import {cykParser} from './cykParser/index.js';
-import {formatErrors} from './formatErrors.js';
-import {formatTokens} from './formatTokens.js';
-import {grammar} from './grammar/index.js';
-import {slrParser} from './slrParser/index.js';
-import {tokenize} from './tokenize/index.js';
-import type {Token} from './tokenize/types.js';
-import {unparseParseTree} from './unparseParseTree/index.js';
-import {cretePositionResolver} from './utils/resolvePosition.js';
-import type {RA, WritableArray} from './utils/types.js';
+import type { AstNode, PrintContext } from './ast/definitions.js';
+import { parseTreeToAst } from './ast/index.js';
+import { removeNullProductions } from './cykParser/chomsky/removeNullProductions.js';
+import { cykParser } from './cykParser/index.js';
+import { formatErrors } from './formatErrors.js';
+import { formatTokens } from './formatTokens.js';
+import { grammar } from './grammar/index.js';
+import { slrParser } from './slrParser/index.js';
+import { tokenize } from './tokenize/index.js';
+import type { Token } from './tokenize/types.js';
+import { unparseParseTree } from './unparseParseTree/index.js';
+import { cretePositionResolver } from './utils/resolvePosition.js';
+import type { RA, WritableArray } from './utils/types.js';
+import { ErrorType, typeErrors } from './ast/typing.js';
+import { createScope, GlobalsNode } from './ast/definitions.js';
 
 export function processInput(rawText: string): {
   readonly formattedErrors: string;
   readonly formattedTokens: string;
   readonly tokens: RA<Token>;
 } {
-  const {tokens, syntaxErrors} = tokenize(rawText, 0);
+  const { tokens, syntaxErrors } = tokenize(rawText, 0);
 
   const positionResolver = cretePositionResolver(rawText);
 
@@ -36,7 +36,7 @@ async function printTokens(
   rawText: string,
   tokensOutput: string | undefined
 ): Promise<RA<Token> | undefined> {
-  const {formattedErrors, formattedTokens, tokens} = processInput(rawText);
+  const { formattedErrors, formattedTokens, tokens } = processInput(rawText);
 
   if (typeof tokensOutput === 'string')
     await fs.promises.writeFile(tokensOutput, formattedTokens);
@@ -69,8 +69,9 @@ export async function run(
     return undefined;
   }
 
+  const positionResolver = cretePositionResolver(rawText);
   const nullFreeGrammar = removeNullProductions(grammar());
-  const parseTree = slrParser(nullFreeGrammar, trimmedStream);
+  const parseTree = slrParser(nullFreeGrammar, trimmedStream, positionResolver);
   if (parseTree === undefined) {
     console.error('syntax error\nParse failed');
     process.exitCode = 1;
@@ -105,11 +106,15 @@ export function namedParse(
 ): RA<string> | string {
   const positionResolver = cretePositionResolver(rawText);
   const errors: WritableArray<string> = [];
+  if (!(ast instanceof GlobalsNode))
+    throw new Error(
+      `Root node must be GlobalsNode, Found ${ast.constructor.name}`
+    );
   ast.nameAnalysis({
-    symbolTable: [ast.createScope()],
+    symbolTable: [createScope(ast)],
     isDeclaration: false,
     reportError(idNode, error) {
-      const {lineNumber, columnNumber} = positionResolver(
+      const { lineNumber, columnNumber } = positionResolver(
         idNode.getToken().simplePosition
       );
       errors.push(
@@ -132,28 +137,27 @@ export function namedParse(
   return Array.isArray(output) ? output.join('') : output;
 }
 
-export function typeCheckAst(
-  rawText: string,
-  ast: AstNode
-): RA<string> {
+export function typeCheckAst(rawText: string, ast: AstNode): RA<string> {
   const positionResolver = cretePositionResolver(rawText);
   const errors: WritableArray<string> = [];
   ast.typeCheck({
-    reportError(node, error) {
-      const {lineNumber, columnNumber} = positionResolver(
+    reportError(node, errorCode) {
+      const { lineNumber, columnNumber } = positionResolver(
         node.getToken().simplePosition
       );
       errors.push(
         `FATAL [${lineNumber},${columnNumber}]-[${lineNumber},${
           // TODO: check if this is correct
-          columnNumber + node.print({
+          columnNumber +
+          node.print({
             indent: 0,
             mode: 'pretty',
             debug: false,
             needWrapping: false,
           }).length
-        }]: ${error}`
+        }]: ${typeErrors[errorCode]}`
       );
+      return new ErrorType();
     },
   });
   return errors;

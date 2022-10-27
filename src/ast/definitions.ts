@@ -1,14 +1,25 @@
-import {simpleTokens} from '../tokenize/definitions.js';
-import type {Tokens} from '../tokenize/tokens.js';
-import type {Token} from '../tokenize/types.js';
-import {indentation} from '../unparseParseTree/index.js';
-import type {RA, WritableArray} from '../utils/types.js';
-import type {LanguageType} from './typing.js';
-import {assertType, cascadeError, typeErrors} from './typing.js';
+import { simpleTokens } from '../tokenize/definitions.js';
+import type { Tokens } from '../tokenize/tokens.js';
+import type { Token } from '../tokenize/types.js';
+import { indentation } from '../unparseParseTree/index.js';
+import type { RA, WritableArray } from '../utils/types.js';
+import type { LanguageType, typeErrors } from './typing.js';
+import {
+  assertType,
+  BoolType,
+  cascadeError,
+  ErrorType,
+  FunctionType,
+  IntType,
+  StringType,
+  VoidType,
+} from './typing.js';
 
+/* eslint-disable class-methods-use-this */
 /* eslint-disable functional/no-class */
 /* eslint-disable functional/no-this-expression */
 /* eslint-disable functional/prefer-readonly-type */
+/* eslint-disable @typescript-eslint/member-ordering */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable functional/no-throw-statement */
 
@@ -16,10 +27,12 @@ import {assertType, cascadeError, typeErrors} from './typing.js';
 export abstract class AstNode {
   public nameAnalysisContext: NameAnalysisContext;
 
-  private readonly items: WritableArray<FunctionDecl | VariableDeclaration>;
+  public readonly declarations: WritableArray<
+    FunctionDecl | VariableDeclaration
+  >;
 
   public constructor(public readonly children: RA<AstNode>) {
-    this.items = [];
+    this.declarations = [];
     this.nameAnalysisContext = {
       symbolTable: [],
       isDeclaration: false,
@@ -42,30 +55,8 @@ export abstract class AstNode {
    * Traverse the AST and return the type of each node while also reporting
    * any type errors found in the process
    */
-  public typeCheck(context: TypeCheckContext): LanguageType {
-    this.children.forEach((child) => child.typeCheck(context));
-    return 'void';
-  }
-
-  /**
-   * Call this to receive a new scope that can be added to the SymbolTable.
-   */
-  public createScope(): Scope {
-    return {
-      items: this.items,
-      addItem: (item, dry) => {
-        const itemName = item.id.getName();
-        const duplicateIdentifier = this.items.find(
-          (declaration) => declaration.id.getName() === itemName
-        );
-        if (typeof duplicateIdentifier === 'object')
-          this.nameAnalysisContext.reportError(
-            item.id,
-            'Multiply declared identifier'
-          );
-        else if (dry !== true) this.items.push(item);
-      },
-    };
+  public typeCheck(_context: TypeCheckContext): LanguageType {
+    throw new Error('TypeChecker is not declared');
   }
 
   /**
@@ -105,21 +96,19 @@ export type NameAnalysisContext = {
   readonly symbolTable: RA<Scope>;
   // If IdNode is used inside a declaration, supress undefined identifier errors
   readonly isDeclaration: boolean;
-  readonly reportError: (
-    idNode: IdNode,
-    message: string
-  ) => void;
+  readonly reportError: (idNode: IdNode, message: string) => void;
 };
 
 export type TypeCheckContext = {
   readonly reportError: (
     node: AstNode,
-    message: string
-  ) => void;
+    message: keyof typeof typeErrors
+  ) => ErrorType;
 };
 
 type Scope = {
   readonly items: RA<FunctionDecl | VariableDeclaration>;
+  readonly node: ForNode | FunctionDecl | GlobalsNode | IfNode | WhileNode;
   readonly addItem: (
     item: FunctionDecl | VariableDeclaration,
     dry?: boolean
@@ -158,16 +147,20 @@ export class GlobalsNode extends AstNode {
   }
 
   public pretty(printContext: PrintContext) {
-    return this.children.flatMap((child, index, {length}) => [
+    return this.children.flatMap((child, index, { length }) => [
       child.print(printContext),
       child instanceof FunctionDecl ? '' : `${token('SEMICOL')}`,
       index + 1 === length ? '' : '\n',
     ]);
   }
+
+  public typeCheck(context: TypeCheckContext): LanguageType {
+    this.children.forEach((child) => child.typeCheck(context));
+    return new VoidType();
+  }
 }
 
-export class Statement extends AstNode {
-}
+export class Statement extends AstNode {}
 
 function getScope(node: AstNode) {
   const currentScope = node.nameAnalysisContext.symbolTable.at(-1);
@@ -185,7 +178,7 @@ export class VariableDeclaration extends Statement {
   }
 
   public nameAnalysis(context: NameAnalysisContext) {
-    super.nameAnalysis({...context, isDeclaration: true});
+    super.nameAnalysis({ ...context, isDeclaration: true });
     if (
       this.type instanceof PrimaryTypeNode &&
       this.type.token.token.type === 'VOID'
@@ -209,10 +202,13 @@ export class VariableDeclaration extends Statement {
   public printType(printContext: PrintContext) {
     return this.id.printType(printContext);
   }
+
+  public typeCheck(_context: TypeCheckContext): LanguageType {
+    return new VoidType();
+  }
 }
 
-export class TypeNode extends AstNode {
-}
+export class TypeNode extends AstNode {}
 
 export class PrimaryTypeNode extends TypeNode {
   public constructor(public readonly token: TokenNode) {
@@ -222,13 +218,19 @@ export class PrimaryTypeNode extends TypeNode {
   public printType(printContext: PrintContext) {
     return this.print(printContext);
   }
+
+  public typeCheck(_context: TypeCheckContext): LanguageType {
+    const type = this.token.token.type;
+    if (type === 'INT') return new IntType();
+    else if (type === 'BOOL') return new BoolType();
+    else if (type === 'VOID') return new VoidType();
+    else throw new Error(`Unexpected type ${type} detected`);
+  }
 }
 
-export class Expression extends AstNode {
-}
+export class Expression extends AstNode {}
 
-export class Term extends Expression {
-}
+export class Term extends Expression {}
 
 const findDeclaration = (
   name: string,
@@ -236,7 +238,7 @@ const findDeclaration = (
 ): FunctionDecl | VariableDeclaration | undefined =>
   Array.from(context.symbolTable)
     .reverse()
-    .flatMap(({items}) => items)
+    .flatMap(({ items }) => items)
     .find((item) => item.id.getName() === name);
 
 export class IdNode extends Term {
@@ -252,15 +254,19 @@ export class IdNode extends Term {
     return this.token.getToken();
   }
 
-  public getType(): LanguageType {
+  public typeCheck(_context: TypeCheckContext) {
     const declaration = this.getDeclaration();
-    if (declaration === undefined) throw new Error(`Unable to find ${this.getName()} variable declaration`);
-    else if (declaration instanceof FunctionDecl || declaration.type instanceof FunctionTypeNode) return 'function';
+    if (declaration === undefined)
+      throw new Error(`Unable to find ${this.getName()} variable declaration`);
+    else if (declaration instanceof FunctionDecl) return declaration.typeNode;
+    else if (declaration.type instanceof FunctionTypeNode)
+      return declaration.type.typeNode;
     else if (declaration.type instanceof PrimaryTypeNode) {
       const type = declaration.type.token.token.type;
-      if (type === 'INT') return 'int';
-      else if (type === 'BOOL') return 'bool';
-      else throw new Error(`Variable ${this.getType()} has invalid type ${type}`);
+      if (type === 'INT') return new IntType();
+      else if (type === 'BOOL') return new BoolType();
+      else
+        throw new Error(`Variable ${this.getName()} has invalid type ${type}`);
     } else throw new Error(`Variable ${this.getName()} has unknown type`);
   }
 
@@ -294,11 +300,14 @@ export class IdNode extends Term {
 const token = (token: keyof Tokens) => indexedSimpleTokens[token];
 
 export class FunctionTypeNode extends TypeNode {
+  public readonly typeNode: FunctionType;
+
   public constructor(
-    private readonly typeList: TypeListNode,
+    public readonly typeList: TypeListNode,
     private readonly returnType: TypeNode
   ) {
     super([typeList, returnType]);
+    this.typeNode = new FunctionType(this);
   }
 
   public pretty(printContext: PrintContext) {
@@ -320,6 +329,10 @@ export class FunctionTypeNode extends TypeNode {
       this.returnType.printType(printContext),
     ].join('');
   }
+
+  public typeCheck(_context: TypeCheckContext): LanguageType {
+    return this.typeNode;
+  }
 }
 
 export class TypeListNode extends TypeNode {
@@ -328,20 +341,23 @@ export class TypeListNode extends TypeNode {
   }
 
   public pretty(printContext: PrintContext) {
+    return this.printType(printContext);
+  }
+
+  public printType(printContext: PrintContext): string {
     return this.children
       .map((child) => child.print(printContext))
       .join(`${token('COMMA')} `);
   }
 
-  public printType(printContext: PrintContext): string {
-    return this.children
-      .map((child) => child.printType(printContext))
-      .join(',');
+  public typeCheck(context: TypeCheckContext): LanguageType {
+    this.children.forEach((child) => child.typeCheck(context));
+    return new VoidType();
   }
 }
 
 function indent(printContext: PrintContext, node: AstNode): string {
-  const newContext = {...printContext, indent: printContext.indent + 1};
+  const newContext = { ...printContext, indent: printContext.indent + 1 };
   const content = node.print(newContext);
   return [
     token('LCURLY'),
@@ -353,7 +369,33 @@ function indent(printContext: PrintContext, node: AstNode): string {
   ].join('');
 }
 
+/**
+ * Call this to receive a new scope that can be added to the SymbolTable.
+ */
+export const createScope = (
+  node: ForNode | FunctionDecl | GlobalsNode | IfNode | WhileNode
+): Scope => ({
+  items: node.declarations,
+  node,
+  addItem: (item, dry) => {
+    const itemName = item.id.getName();
+    const duplicateIdentifier = node.declarations.find(
+      (declaration) => declaration.id.getName() === itemName
+    );
+    if (typeof duplicateIdentifier === 'object')
+      node.nameAnalysisContext.reportError(
+        item.id,
+        'Multiply declared identifier'
+      );
+    else if (dry !== true) node.declarations.push(item);
+  },
+});
+
 export class FunctionDecl extends AstNode {
+  public readonly typeNode: FunctionType;
+
+  public returnType: LanguageType;
+
   public constructor(
     public readonly type: TypeNode,
     public readonly id: IdNode,
@@ -361,26 +403,44 @@ export class FunctionDecl extends AstNode {
     private readonly statements: StatementList
   ) {
     super([type, id, formals, statements]);
+    this.typeNode = new FunctionType(
+      new FunctionTypeNode(
+        new TypeListNode(this.formals.children.map(({ type }) => type)),
+        this.type
+      )
+    );
+    this.returnType = new ErrorType();
   }
 
   public nameAnalysis(context: NameAnalysisContext) {
     this.nameAnalysisContext = context;
     getScope(this).addItem(this);
     this.type.nameAnalysis(context);
-    this.id.nameAnalysis({...context, isDeclaration: true});
+    this.id.nameAnalysis({ ...context, isDeclaration: true });
     const newScope = {
       ...context,
-      symbolTable: [...context.symbolTable, this.createScope()],
+      symbolTable: [...context.symbolTable, createScope(this)],
     };
     this.formals.nameAnalysis(newScope);
     this.statements.nameAnalysis(newScope);
+  }
+
+  public typeCheck(context: TypeCheckContext) {
+    this.returnType = this.type.typeCheck(context);
+    const cascadeType = cascadeError(
+      this.returnType,
+      this.id.typeCheck(context),
+      this.formals.typeCheck(context),
+      this.statements.typeCheck(context)
+    );
+    return cascadeType instanceof Error ? cascadeType : this.typeNode;
   }
 
   public pretty(printContext: PrintContext) {
     return [
       this.type.print(printContext),
       ' ',
-      this.id.print({...printContext, mode: 'pretty'}),
+      this.id.print({ ...printContext, mode: 'pretty' }),
       printContext.mode === 'nameAnalysis' ? this.printType(printContext) : '',
       token('LPAREN'),
       this.formals.print(printContext),
@@ -420,10 +480,13 @@ export class FormalsDeclNode extends AstNode {
       .map((child) => child.type.printType(printContext))
       .join(',');
   }
+
+  public typeCheck(_context: TypeCheckContext): LanguageType {
+    return new VoidType();
+  }
 }
 
-export class FormalDeclNode extends VariableDeclaration {
-}
+export class FormalDeclNode extends VariableDeclaration {}
 
 export class StatementList extends AstNode {
   public constructor(public readonly children: RA<Statement>) {
@@ -431,22 +494,23 @@ export class StatementList extends AstNode {
   }
 
   public pretty(printContext: PrintContext) {
-    return this.children.flatMap((child, index, {length}) => [
+    return this.children.flatMap((child, index, { length }) => [
       indentation.repeat(printContext.indent),
       child.print(printContext),
       child instanceof BlockStatement ? '' : token('SEMICOL'),
       index + 1 === length ? '' : '\n',
     ]);
   }
+
+  public typeCheck(context: TypeCheckContext): LanguageType {
+    this.children.forEach((child) => child.typeCheck(context));
+    return new VoidType();
+  }
 }
 
-export class BlockStatement extends Statement {
-}
+export class BlockStatement extends Statement {}
 
 /*
- * TEST: while(a=3)
- * TEST: read fun()
- * TODO: go over https://compilers.cool/language/#types
  * TODO: go over spec again
  * TODO: make sure CLI is updated
  * TODO: add type checker tests
@@ -454,6 +518,7 @@ export class BlockStatement extends Statement {
 
 export class WhileNode extends BlockStatement {
   public constructor(
+    private readonly token: TokenNode,
     public readonly condition: Expression,
     public readonly statements: StatementList
   ) {
@@ -465,14 +530,16 @@ export class WhileNode extends BlockStatement {
     this.condition.nameAnalysis(context);
     const newScope = {
       ...context,
-      symbolTable: [...context.symbolTable, this.createScope()],
+      symbolTable: [...context.symbolTable, createScope(this)],
     };
     this.statements.nameAnalysis(newScope);
   }
 
   public typeCheck(context: TypeCheckContext) {
-    return cascadeError(assertType(context, this.condition, 'nonBoolLoop', 'bool'),
-      this.statements.typeCheck(context));
+    return cascadeError(
+      assertType(context, this.condition, 'nonBoolLoop', 'bool'),
+      this.statements.typeCheck(context)
+    );
   }
 
   public pretty(printContext: PrintContext) {
@@ -485,10 +552,15 @@ export class WhileNode extends BlockStatement {
       indent(printContext, this.statements),
     ];
   }
+
+  public getToken() {
+    return this.token.token;
+  }
 }
 
 export class ForNode extends BlockStatement {
   public constructor(
+    private readonly token: TokenNode,
     public readonly declaration: Statement,
     public readonly condition: Expression,
     public readonly action: Statement,
@@ -501,7 +573,7 @@ export class ForNode extends BlockStatement {
     this.nameAnalysisContext = context;
     const newScope = {
       ...context,
-      symbolTable: [...context.symbolTable, this.createScope()],
+      symbolTable: [...context.symbolTable, createScope(this)],
     };
     this.declaration.nameAnalysis(newScope);
     this.condition.nameAnalysis(newScope);
@@ -513,10 +585,12 @@ export class ForNode extends BlockStatement {
   }
 
   public typeCheck(context: TypeCheckContext) {
-    return cascadeError(this.declaration.typeCheck(context),
+    return cascadeError(
+      this.declaration.typeCheck(context),
       assertType(context, this.condition, 'nonBoolLoop', 'bool'),
       this.action.typeCheck(context),
-      this.statements.typeCheck(context));
+      this.statements.typeCheck(context)
+    );
   }
 
   public pretty(printContext: PrintContext) {
@@ -535,10 +609,15 @@ export class ForNode extends BlockStatement {
       indent(printContext, this.statements),
     ];
   }
+
+  public getToken() {
+    return this.token.token;
+  }
 }
 
 export class IfNode extends BlockStatement {
   public constructor(
+    private readonly token: TokenNode,
     public readonly condition: Expression,
     public readonly statements: StatementList,
     public readonly elseStatements: StatementList | undefined
@@ -555,22 +634,24 @@ export class IfNode extends BlockStatement {
     this.condition.nameAnalysis(context);
     const newScope = {
       ...context,
-      symbolTable: [...context.symbolTable, this.createScope()],
+      symbolTable: [...context.symbolTable, createScope(this)],
     };
     this.statements.nameAnalysis(newScope);
     if (typeof this.elseStatements === 'object') {
       const newScope = {
         ...context,
-        symbolTable: [...context.symbolTable, this.createScope()],
+        symbolTable: [...context.symbolTable, createScope(this)],
       };
       this.elseStatements.nameAnalysis(newScope);
     }
   }
 
   public typeCheck(context: TypeCheckContext) {
-    return cascadeError(assertType(context, this.condition, 'nonBoolIf', 'bool'),
+    return cascadeError(
+      assertType(context, this.condition, 'nonBoolIf', 'bool'),
       this.statements.typeCheck(context),
-      this.elseStatements?.typeCheck(context));
+      this.elseStatements?.typeCheck(context)
+    );
   }
 
   public pretty(printContext: PrintContext) {
@@ -586,10 +667,13 @@ export class IfNode extends BlockStatement {
         : [' ', token('ELSE'), ' ', indent(printContext, this.elseStatements)]),
     ];
   }
+
+  public getToken() {
+    return this.token.token;
+  }
 }
 
-export class LineStatement extends Statement {
-}
+export class LineStatement extends Statement {}
 
 export class PostNode extends LineStatement {
   public constructor(
@@ -600,7 +684,7 @@ export class PostNode extends LineStatement {
   }
 
   public typeCheck(context: TypeCheckContext) {
-    return assertType(context, this.id, 'nonInt', 'int');
+    return assertType(context, this.id, 'nonIntArith', 'int');
   }
 
   public getToken() {
@@ -613,36 +697,82 @@ export class PostNode extends LineStatement {
 }
 
 export class InputNode extends LineStatement {
-  public constructor(public readonly id: IdNode) {
+  public constructor(
+    private readonly token: TokenNode,
+    public readonly id: IdNode
+  ) {
     super([id]);
   }
 
   public typeCheck(context: TypeCheckContext) {
-    return assertType(context, this.id, 'nonInt', 'int', 'bool');
+    return assertType(context, this.id, 'inputOnFunction', 'int', 'bool');
   }
 
   public pretty(printContext: PrintContext) {
     return [token('INPUT'), ' ', this.id.print(printContext)];
   }
+
+  public getToken() {
+    return this.token.token;
+  }
 }
 
 export class OutputNode extends LineStatement {
-  public constructor(public readonly expression: Expression) {
+  public constructor(
+    private readonly token: TokenNode,
+    public readonly expression: Expression
+  ) {
     super([expression]);
   }
 
   public typeCheck(context: TypeCheckContext) {
-    return assertType(context, this.expression, 'nonInt', 'int', 'bool', 'string');
+    return assertType(
+      context,
+      this.expression,
+      'outputOnFunction',
+      'int',
+      'bool',
+      'string'
+    );
   }
 
   public pretty(printContext: PrintContext) {
     return [token('OUTPUT'), ' ', this.expression.print(printContext)];
   }
+
+  public getToken() {
+    return this.token.token;
+  }
 }
 
 export class ReturnNode extends LineStatement {
-  public constructor(public readonly expression: Expression | undefined) {
+  public constructor(
+    private readonly token: TokenNode,
+    public readonly expression: Expression | undefined
+  ) {
     super(expression === undefined ? [] : [expression]);
+  }
+
+  public typeCheck(context: TypeCheckContext): LanguageType {
+    const functionDecl = Array.from(this.nameAnalysisContext.symbolTable)
+      .reverse()
+      .find(({ node }) => node instanceof FunctionDecl)?.node;
+    if (!(functionDecl instanceof FunctionDecl))
+      throw new Error('Return used outside of function');
+    const actualReturnType = this.expression?.typeCheck(context);
+    if (actualReturnType instanceof ErrorType) return actualReturnType;
+    const returnType = functionDecl.returnType;
+    if (actualReturnType === undefined) {
+      return returnType instanceof VoidType
+        ? returnType
+        : context.reportError(this, 'noReturn');
+    } else if (actualReturnType.toString() === returnType)
+      return actualReturnType;
+    else
+      return context.reportError(
+        this.expression ?? this,
+        returnType instanceof VoidType ? 'voidReturn' : 'wrongReturn'
+      );
   }
 
   public pretty(printContext: PrintContext) {
@@ -651,10 +781,14 @@ export class ReturnNode extends LineStatement {
       ...(this.expression ? [' ', this.expression.print(printContext)] : []),
     ];
   }
+
+  public getToken() {
+    return this.token.token;
+  }
 }
 
 const wrapChild = (printContext: PrintContext, node: AstNode) =>
-  node.print({...printContext, needWrapping: true});
+  node.print({ ...printContext, needWrapping: true });
 
 const wrap = (
   printContext: PrintContext,
@@ -664,15 +798,21 @@ const wrap = (
     ? [token('LPAREN'), ...output, token('RPAREN')]
     : output;
 
-function assertToken<TOKENS extends keyof Tokens, PRINT extends string>({token}: TokenNode, ...expected: RA<TOKENS>): PRINT {
+function assertToken<TOKENS extends keyof Tokens, PRINT extends string>(
+  { token }: TokenNode,
+  ...expected: RA<TOKENS>
+): PRINT {
   if (expected.includes(token.type as TOKENS))
     return indexedSimpleTokens[token.type] as PRINT;
   else
-    throw new Error(`Invalid token type ${token.type}. Expected one of ${expected.join(', ')}`);
+    throw new Error(
+      `Invalid token type ${token.type}. Expected one of ${expected.join(', ')}`
+    );
 }
 
 export class DecimalOperator extends Expression {
   public readonly operator: '-' | '*' | '/' | '+';
+
   public readonly token: TokenNode;
 
   public constructor(
@@ -686,7 +826,10 @@ export class DecimalOperator extends Expression {
   }
 
   public typeCheck(context: TypeCheckContext) {
-    return assertType(context, this.token, 'nonInt', 'int');
+    return cascadeError(
+      assertType(context, this.left, 'nonIntArith', 'int'),
+      assertType(context, this.right, 'nonIntArith', 'int')
+    );
   }
 
   public pretty(printContext: PrintContext) {
@@ -706,6 +849,7 @@ export class DecimalOperator extends Expression {
 
 export class BooleanOperator extends Expression {
   public readonly operator: 'and' | 'or';
+
   public readonly token: TokenNode;
 
   public constructor(
@@ -720,8 +864,8 @@ export class BooleanOperator extends Expression {
 
   public typeCheck(context: TypeCheckContext) {
     return cascadeError(
-      assertType(context, this.left, 'nonInt', 'bool'),
-      assertType(context, this.right, 'nonInt', 'bool'),
+      assertType(context, this.left, 'nonBoolLogic', 'bool'),
+      assertType(context, this.right, 'nonBoolLogic', 'bool')
     );
   }
 
@@ -740,8 +884,32 @@ export class BooleanOperator extends Expression {
   }
 }
 
+class SynteticToken extends AstNode {
+  constructor(
+    private readonly startNode: AstNode,
+    private readonly endNode: AstNode
+  ) {
+    super([startNode, endNode]);
+  }
+
+  public getToken(): Token {
+    return {
+      type: 'VOID',
+      data: {},
+      simplePosition: this.startNode.getToken().simplePosition,
+    };
+  }
+
+  public print(_printContext: PrintContext): string {
+    const start = this.startNode.getToken().simplePosition;
+    const end = this.endNode.getToken().simplePosition;
+    return ' '.repeat(end - start);
+  }
+}
+
 export class EqualityOperator extends Expression {
   public readonly operator: '!=' | '==';
+
   public readonly token: TokenNode;
 
   public constructor(
@@ -754,17 +922,26 @@ export class EqualityOperator extends Expression {
     this.token = token;
   }
 
-  public typeCheck(context: TypeCheckContext) {
-    const leftType = assertType(context, this.left, 'invalidEqOperand', 'int', 'bool');
-    const rightType = assertType(context, this.right, 'invalidEqOperand', 'int', 'bool');
-    if(leftType === 'error' || rightType === 'error')
-      return 'error' as const;
-    else if(leftType === rightType)
-      return leftType;
-    else {
-      context.reportError(this.token, typeErrors.invalidEqOperand);
-      return 'error' as const;
-    }
+  public typeCheck(context: TypeCheckContext): LanguageType {
+    const leftType = assertType(
+      context,
+      this.left,
+      'invalidEqOperand',
+      'int',
+      'bool'
+    );
+    const rightType = assertType(
+      context,
+      this.right,
+      'invalidEqOperand',
+      'int',
+      'bool'
+    );
+    const cascadeType = cascadeError(leftType, rightType);
+    return !(cascadeType instanceof ErrorType) &&
+      leftType.toString() !== rightType.toString()
+      ? context.reportError(this, 'invalidEqOperation')
+      : new BoolType();
   }
 
   public pretty(printContext: PrintContext) {
@@ -778,12 +955,13 @@ export class EqualityOperator extends Expression {
   }
 
   public getToken() {
-    return this.token.token;
+    return new SynteticToken(this.left, this.right).getToken();
   }
 }
 
 export class ComparisonOperator extends Expression {
   public readonly operator: '<' | '<=' | '>' | '>=';
+
   public readonly token: TokenNode;
 
   public constructor(
@@ -792,15 +970,22 @@ export class ComparisonOperator extends Expression {
     public readonly right: Expression
   ) {
     super([left, right]);
-    this.operator = assertToken(token, 'LESS', 'LESSEQ', 'GREATER', 'GREATEREQ');
+    this.operator = assertToken(
+      token,
+      'LESS',
+      'LESSEQ',
+      'GREATER',
+      'GREATEREQ'
+    );
     this.token = token;
   }
 
   public typeCheck(context: TypeCheckContext) {
-    return cascadeError(
+    const type = cascadeError(
       assertType(context, this.left, 'relationalInt', 'int'),
-      assertType(context, this.right, 'relationalInt', 'int'),
+      assertType(context, this.right, 'relationalInt', 'int')
     );
+    return type instanceof ErrorType ? new ErrorType() : new BoolType();
   }
 
   public pretty(printContext: PrintContext) {
@@ -819,22 +1004,44 @@ export class ComparisonOperator extends Expression {
 }
 
 export class NotNode extends Expression {
-  public constructor(public readonly expression: Expression) {
+  public constructor(
+    private readonly token: TokenNode,
+    public readonly expression: Expression
+  ) {
     super([expression]);
+  }
+
+  public typeCheck(context: TypeCheckContext) {
+    return assertType(context, this.expression, 'nonBoolLogic', 'bool');
   }
 
   public pretty(printContext: PrintContext) {
     return [token('NOT'), this.expression.print(printContext)];
   }
+
+  public getToken() {
+    return this.token.token;
+  }
 }
 
 export class MinusNode extends Expression {
-  public constructor(public readonly expression: Expression) {
+  public constructor(
+    private readonly token: TokenNode,
+    public readonly expression: Expression
+  ) {
     super([expression]);
+  }
+
+  public typeCheck(context: TypeCheckContext) {
+    return assertType(context, this.expression, 'nonIntArith', 'int');
   }
 
   public pretty(printContext: PrintContext) {
     return [token('MINUS'), this.expression.print(printContext)];
+  }
+
+  public getToken() {
+    return this.token.token;
   }
 }
 
@@ -846,14 +1053,45 @@ export class AssignmentStatement extends Statement {
   public pretty(printContext: PrintContext) {
     return this.expression.print(printContext);
   }
+
+  public getToken() {
+    return this.expression.getToken();
+  }
+
+  public typeCheck(context: TypeCheckContext) {
+    return this.expression.typeCheck(context);
+  }
 }
 
 export class AssignmentExpression extends Expression {
   public constructor(
     public readonly id: IdNode,
+    public readonly token: TokenNode,
     public readonly expression: Expression
   ) {
     super([id, expression]);
+  }
+
+  public typeCheck(context: TypeCheckContext) {
+    const leftType = assertType(
+      context,
+      this.expression,
+      'invalidOperand',
+      'int',
+      'bool'
+    );
+    const rightType = assertType(
+      context,
+      this.expression,
+      'invalidOperand',
+      'int',
+      'bool'
+    );
+    const cascadeType = cascadeError(leftType, rightType);
+    return !(cascadeType instanceof ErrorType) &&
+      leftType.toString() !== rightType.toString()
+      ? context.reportError(this.id, 'invalidAssign')
+      : cascadeType;
   }
 
   public pretty(printContext: PrintContext) {
@@ -865,6 +1103,10 @@ export class AssignmentExpression extends Expression {
       this.expression.print(printContext),
     ];
   }
+
+  public getToken() {
+    return this.token.token;
+  }
 }
 
 export class FunctionCallStatement extends Statement {
@@ -874,6 +1116,14 @@ export class FunctionCallStatement extends Statement {
 
   public pretty(printContext: PrintContext) {
     return [this.expression.print(printContext)];
+  }
+
+  public getToken() {
+    return this.expression.getToken();
+  }
+
+  public typeCheck(context: TypeCheckContext) {
+    return this.expression.typeCheck(context);
   }
 }
 
@@ -885,13 +1135,37 @@ export class FunctionCall extends Expression {
     super([id, actualsList]);
   }
 
+  public typeCheck(context: TypeCheckContext) {
+    const functionType = assertType(
+      context,
+      this.id,
+      'nonFuncCall',
+      'function'
+    ) as ErrorType | FunctionType;
+    if (functionType instanceof ErrorType) return functionType;
+
+    const actuals = this.actualsList.children;
+    const formals = functionType.type.typeList.children;
+    // TEST: if should do typeChecking if actuals.length !== formals.length
+    if (actuals.length === formals.length)
+      this.actualsList.children
+        .map((child) => child.typeCheck(context))
+        .forEach((type, index) => {
+          if (type.toString() !== formals[index].typeCheck(context).toString())
+            context.reportError(this.id, 'argType');
+        });
+    else context.reportError(this, 'argLength');
+
+    return functionType;
+  }
+
   public getToken() {
     return this.id.getToken();
   }
 
   public pretty(printContext: PrintContext) {
     return [
-      this.id.print({...printContext, mode: 'pretty'}),
+      this.id.print({ ...printContext, mode: 'pretty' }),
       printContext.mode === 'nameAnalysis' ? this.printType(printContext) : '',
       token('LPAREN'),
       this.actualsList.print(printContext),
@@ -900,7 +1174,10 @@ export class FunctionCall extends Expression {
   }
 
   public printType(printContext: PrintContext) {
-    const declaration = findDeclaration(this.id.getName(), this.nameAnalysisContext)!;
+    const declaration = findDeclaration(
+      this.id.getName(),
+      this.nameAnalysisContext
+    )!;
     return declaration.printType(printContext);
   }
 }
@@ -922,8 +1199,16 @@ export class IntLiteralNode extends Term {
     super([token]);
   }
 
+  public typeCheck() {
+    return new IntType();
+  }
+
   public pretty(): string {
     return (this.token.token.data as Tokens['INTLITERAL']).literal.toString();
+  }
+
+  public getToken() {
+    return this.token.token;
   }
 }
 
@@ -932,10 +1217,18 @@ export class StringLiteralNode extends Term {
     super([token]);
   }
 
+  public typeCheck() {
+    return new StringType();
+  }
+
   public pretty(): string {
     return (
       this.token.token.data as Tokens['STRINGLITERAL']
     ).literal.toString();
+  }
+
+  public getToken() {
+    return this.token.token;
   }
 }
 
@@ -943,11 +1236,27 @@ export class BooleanLiteralNode extends Term {
   public constructor(public readonly token: TokenNode) {
     super([token]);
   }
+
+  public typeCheck() {
+    return new BoolType();
+  }
+
+  public getToken() {
+    return this.token.token;
+  }
 }
 
 export class MayhemNode extends Term {
   public constructor(public readonly token: TokenNode) {
     super([token]);
+  }
+
+  public typeCheck() {
+    return new IntType();
+  }
+
+  public getToken() {
+    return this.token.token;
   }
 }
 
@@ -956,4 +1265,6 @@ export class MayhemNode extends Term {
 /* eslint-enable functional/prefer-readonly-type */
 /* eslint-enable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-enable functional/no-throw-statement */
+/* eslint-enable @typescript-eslint/member-ordering */
 /* eslint-enable @typescript-eslint/explicit-function-return-type */
+/* eslint-enable class-methods-use-this */

@@ -34,7 +34,8 @@ import {
   TypeListNode,
   TypeNode,
   VariableDeclaration,
-  WhileNode, EqualityOperator,
+  WhileNode,
+  EqualityOperator,
 } from '../ast/definitions.js';
 import type { RA } from '../utils/types.js';
 import { store } from '../utils/utils.js';
@@ -248,8 +249,12 @@ export const grammar = store(() =>
         'LCURLY',
         'stmtList',
         'RCURLY',
-        ({ exp, stmtList = new StatementList([]) }) =>
-          new WhileNode(exp, type(stmtList, StatementList)),
+        ({ WHILE, exp, stmtList = new StatementList([]) }) =>
+          new WhileNode(
+            type(WHILE, TokenNode),
+            exp,
+            type(stmtList, StatementList)
+          ),
       ],
       [
         'FOR',
@@ -263,8 +268,14 @@ export const grammar = store(() =>
         'LCURLY',
         'stmtList',
         'RCURLY',
-        ({ stmt, exp, stmt2, stmtList = new StatementList([]) }) =>
-          new ForNode(stmt, exp, stmt2, type(stmtList, StatementList)),
+        ({ FOR, stmt, exp, stmt2, stmtList = new StatementList([]) }) =>
+          new ForNode(
+            type(FOR, TokenNode),
+            stmt,
+            exp,
+            stmt2,
+            type(stmtList, StatementList)
+          ),
       ],
       [
         'IF',
@@ -274,8 +285,13 @@ export const grammar = store(() =>
         'LCURLY',
         'stmtList',
         'RCURLY',
-        ({ exp, stmtList = new StatementList([]) }) =>
-          new IfNode(exp, type(stmtList, StatementList), undefined),
+        ({ IF, exp, stmtList = new StatementList([]) }) =>
+          new IfNode(
+            type(IF, TokenNode),
+            exp,
+            type(stmtList, StatementList),
+            undefined
+          ),
       ],
       [
         'IF',
@@ -290,11 +306,13 @@ export const grammar = store(() =>
         'stmtList',
         'RCURLY',
         ({
+          IF,
           exp,
           stmtList = new StatementList([]),
           stmtList2 = new StatementList([]),
         }) =>
           new IfNode(
+            type(IF, TokenNode),
             exp,
             type(stmtList, StatementList),
             type(stmtList2, StatementList) as StatementList
@@ -310,10 +328,26 @@ export const grammar = store(() =>
       ],
       ['id', 'POSTDEC', ({ id }) => new PostNode(type(id, IdNode), '--')],
       ['id', 'POSTINC', ({ id }) => new PostNode(type(id, IdNode), '++')],
-      ['INPUT', 'id', ({ id }) => new InputNode(type(id, IdNode))],
-      ['OUTPUT', 'exp', ({ exp }) => new OutputNode(exp)],
-      ['RETURN', 'exp', ({ exp }) => new ReturnNode(exp)],
-      ['RETURN', () => new ReturnNode(undefined)],
+      [
+        'INPUT',
+        'id',
+        ({ INPUT, id }) =>
+          new InputNode(type(INPUT, TokenNode), type(id, IdNode)),
+      ],
+      [
+        'OUTPUT',
+        'exp',
+        ({ OUTPUT, exp }) => new OutputNode(type(OUTPUT, TokenNode), exp),
+      ],
+      [
+        'RETURN',
+        'exp',
+        ({ RETURN, exp }) => new ReturnNode(type(RETURN, TokenNode), exp),
+      ],
+      [
+        'RETURN',
+        ({ RETURN }) => new ReturnNode(type(RETURN, TokenNode), undefined),
+      ],
       [
         'callExp',
         ({ callExp }) => new FunctionCallStatement(type(callExp, FunctionCall)),
@@ -321,8 +355,12 @@ export const grammar = store(() =>
     ],
     exp: [
       ['assignExp', ({ assignExp }) => assignExp],
-      ['NOT', 'exp', ({ exp }) => new NotNode(exp)],
-      ['MINUS', 'term', ({ term }) => new MinusNode(term)],
+      ['NOT', 'exp', ({ NOT, exp }) => new NotNode(type(NOT, TokenNode), exp)],
+      [
+        'MINUS',
+        'term',
+        ({ MINUS, term }) => new MinusNode(type(MINUS, TokenNode), term),
+      ],
       ['expOr', ({ expOr }) => expOr],
     ],
     expOr: [
@@ -330,7 +368,8 @@ export const grammar = store(() =>
         'expAnd',
         'OR',
         'expOr',
-        ({ expAnd, OR, expOr }) => new BooleanOperator(expAnd, type(OR, TokenNode), expOr),
+        ({ expAnd, OR, expOr }) =>
+          new BooleanOperator(expAnd, type(OR, TokenNode), expOr),
       ],
       ['expAnd', ({ expAnd }) => expAnd],
     ],
@@ -371,7 +410,11 @@ export const grammar = store(() =>
         'GREATEREQ',
         'expCompare',
         ({ expPlus, GREATEREQ, expCompare }) =>
-          new ComparisonOperator(expPlus, type(GREATEREQ, TokenNode), expCompare),
+          new ComparisonOperator(
+            expPlus,
+            type(GREATEREQ, TokenNode),
+            expCompare
+          ),
       ],
       [
         'expPlus',
@@ -394,13 +437,15 @@ export const grammar = store(() =>
         'expMult',
         'MINUS',
         'expPlus',
-        ({ expMult, MINUS, expPlus }) => new DecimalOperator(expMult, type(MINUS,TokenNode), expPlus),
+        ({ expMult, MINUS, expPlus }) =>
+          new DecimalOperator(expMult, type(MINUS, TokenNode), expPlus),
       ],
       [
         'expMult',
         'PLUS',
         'expPlus',
-        ({ expMult, PLUS, expPlus }) => new DecimalOperator(expMult, type(PLUS,TokenNode), expPlus),
+        ({ expMult, PLUS, expPlus }) =>
+          new DecimalOperator(expMult, type(PLUS, TokenNode), expPlus),
       ],
       ['expMult', ({ expMult }) => expMult],
     ],
@@ -409,13 +454,15 @@ export const grammar = store(() =>
         'term',
         'TIMES',
         'expMult',
-        ({ term, TIMES, expMult }) => new DecimalOperator(term, type(TIMES,TokenNode), expMult),
+        ({ term, TIMES, expMult }) =>
+          new DecimalOperator(term, type(TIMES, TokenNode), expMult),
       ],
       [
         'term',
         'DIVIDE',
         'expMult',
-        ({ term, DIVIDE, expMult }) => new DecimalOperator(term, type(DIVIDE,TokenNode), expMult),
+        ({ term, DIVIDE, expMult }) =>
+          new DecimalOperator(term, type(DIVIDE, TokenNode), expMult),
       ],
       ['term', ({ term }) => term],
     ],
@@ -424,7 +471,12 @@ export const grammar = store(() =>
         'id',
         'ASSIGN',
         'exp',
-        ({ id, ASSIGN, exp }) => new AssignmentExpression(type(id, IdNode), type(ASSIGN,TokenNode), exp),
+        ({ id, ASSIGN, exp }) =>
+          new AssignmentExpression(
+            type(id, IdNode),
+            type(ASSIGN, TokenNode),
+            exp
+          ),
       ],
     ],
     callExp: [
