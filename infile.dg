@@ -67,3 +67,147 @@ fn(int, fn () -> fn () -> void) -> void biz() {
   output 10;
   output "Test\n\t";
 }
+
+void voidFunction() {
+  int a;
+  while(a=3) {}
+
+  bool b;
+  while(b=true) {}
+
+  output voidFunction();
+  output biz();
+  output bar();
+
+  //for(int a; a<7; i++) {
+  //  int i;
+  //}
+
+  return voidFunction();
+  return;
+  return voidFunction;
+  return a;
+}
+
+bool boolFunction() {
+  return;
+  return boolFunction();
+  return boolFunction;
+
+}
+
+fn()->void fnFnFn(fn()->void voidFunction, fn()->int intFunction) {
+  return voidFunction;
+  return;
+}
+
+int intFunction() {
+  return voidFunction();
+
+  int Int;
+  bool Bool;
+
+  if(Int == Int) {}
+  if(Int == Bool) {}
+  if(Int != Bool) {}
+  if(Bool != Bool) {}
+  if(intFunction() != Bool) {}
+  if(intFunction() != intFunction()) {}
+  if(voidFunction() != voidFunction()) {}
+  if(intFunction != intFunction) {}
+  Int = Int + 1;
+  Int = Int - 1;
+  Int = Int * 1;
+  Int = Int / 1;
+  Int++;
+  Int--;
+  Bool++;
+  Bool--;
+  Int = Bool;
+  Int = Bool + 1;
+  Int = Bool - 1;
+  Int = Bool * 1;
+  Int = Bool / 1;
+  Bool = Bool + 1;
+  Bool = Bool - 1;
+  Bool = Bool * 1;
+  Bool = Bool / 1;
+  if(Int > Int) {}
+  if(Int < Int) {}
+  if(Int <= Int) {}
+  if(Int >= Int) {}
+  if(Bool > Int) {}
+  if(Bool < Int) {}
+  if(Bool <= Int) {}
+  if(Bool >= Int) {}
+  if(Bool > Bool) {}
+  if(Bool < Bool) {}
+  if(Bool <= Bool) {}
+  if(Bool >= Bool) {}
+
+  if(intFunction >= Bool) {}
+  if(intFunction >= voidFunction()) {}
+  if(intFunction() >= Int) {}
+
+  if(intFunction or Bool) {}
+  if(intFunction and voidFunction()) {}
+  if(intFunction() or Int) {}
+
+  intFunction = Int;
+  intFunction = intFunction;
+  intFunction = intFunction();
+  voidFunction = Int;
+  voidFunction = voidFunction;
+  voidFunction = voidFunction();
+  if(Int = Bool) {}
+  if(Int = Int) {}
+  if(Bool = Bool) {}
+  input Int;
+  input Bool;
+  input voidFunction;
+  input intFunction;
+  output Int;
+  output intFunction;
+  output voidFunction;
+  output voidFunction();
+  output "abc";
+  Int();
+  Bool();
+  intFunction();
+
+  fn()->int intFunctionType;
+  fn()->void voidFunction;
+  intFunctionType = intFunction;
+  intFunctionType = voidFunction;
+  intFunctionType = intFunction();
+  intFunctionType = voidFunction();
+  if(boolFunction()) {}
+
+  fnFnFn();
+  fnFnFn(intFunction);
+  fnFnFn(intFunction, voidFunction);
+  fnFnFn(voidFunction, intFunction);
+  fnFnFn(Int, Bool);
+
+  Int = voidFunction() + 1;
+  Int = intFunction() + 1;
+
+  return;
+  return Int;
+  return Bool;
+
+  if(Int) {}
+  if(intFunction) {}
+  if(voidFunction()) {}
+
+  for(int a; intFunction(); a++) {}
+  for(int a; voidFunction(); a++) {}
+  for(int a; voidFunction; a++) {}
+
+  while(intFunction()) {}
+  while(voidFunction()) {}
+  while(voidFunction) {}
+  while("bar") {}
+  while(1) {}
+  while(Bool = Bool) {}
+}
