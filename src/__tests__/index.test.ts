@@ -1,4 +1,3 @@
-import type { PrintContext } from '../ast/definitions.js';
 import { namedParse, run } from '../process.js';
 import type { RA } from '../utils/types.js';
 
@@ -7,14 +6,7 @@ async function nameAnalysis(
 ): Promise<RA<string> | string | undefined> {
   const ast = await run(input, undefined, undefined, false, 'SLR', 'ast');
   if (ast === undefined) return undefined;
-  const printContext: PrintContext = {
-    indent: 0,
-    mode: 'nameAnalysis',
-    debug: false,
-    needWrapping: false,
-  };
-
-  return namedParse(input, ast, printContext);
+  return namedParse(ast, false);
 }
 
 describe('name analysis', () => {
@@ -248,8 +240,8 @@ fn (int, fn ()->fn ()->void)->void biz(->int,->->void->void)(){
     }
     output 10 < 4;
     bool FALSE(bool);
-    baz(void)();
-    bar(int)(val(int), 10 - 4);
+    baz(->void)();
+    bar(int,int->int)(val(int), 10 - 4);
     output FALSE(bool);
     output 10;
     output "Test\\n\\t";

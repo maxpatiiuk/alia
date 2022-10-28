@@ -1,8 +1,8 @@
 import { formatErrors, formatPosition } from '../formatErrors.js';
 import { theories } from '../tests/utils.js';
-import { cretePositionResolver } from '../utils/resolvePosition.js';
+import { createPositionResolver } from '../utils/resolvePosition.js';
 
-const positionResolver = cretePositionResolver(`
+const positionResolver = createPositionResolver(`
 Example
 Text
 Here

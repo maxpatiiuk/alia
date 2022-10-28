@@ -1,6 +1,6 @@
 import { simpleTokens } from '../tokenize/definitions.js';
 import type { Tokens } from '../tokenize/tokens.js';
-import type { Token } from '../tokenize/types.js';
+import type { Position, Token } from '../tokenize/types.js';
 import { indentation } from '../unparseParseTree/index.js';
 import type { RA, WritableArray } from '../utils/types.js';
 import type { LanguageType, typeErrors } from './typing.js';
@@ -28,7 +28,7 @@ export abstract class AstNode {
   public nameAnalysisContext: NameAnalysisContext;
 
   public readonly declarations: WritableArray<
-    FunctionDecl | VariableDeclaration
+    FunctionDeclaration | VariableDeclaration
   >;
 
   public constructor(public readonly children: RA<AstNode>) {
@@ -107,10 +107,15 @@ export type TypeCheckContext = {
 };
 
 type Scope = {
-  readonly items: RA<FunctionDecl | VariableDeclaration>;
-  readonly node: ForNode | FunctionDecl | GlobalsNode | IfNode | WhileNode;
+  readonly items: RA<FunctionDeclaration | VariableDeclaration>;
+  readonly node:
+    | ForNode
+    | FunctionDeclaration
+    | GlobalsNode
+    | IfNode
+    | WhileNode;
   readonly addItem: (
-    item: FunctionDecl | VariableDeclaration,
+    item: FunctionDeclaration | VariableDeclaration,
     dry?: boolean
   ) => void;
 };
@@ -121,6 +126,7 @@ export type PrintContext = {
   readonly debug: boolean;
   // Whether expression needs to be wrapped in parentheses just to be safe
   readonly needWrapping: boolean;
+  readonly reversePositionResolver: (position: Position) => number;
 };
 
 const indexedSimpleTokens = Object.fromEntries(simpleTokens);
@@ -141,7 +147,7 @@ export class TokenNode extends AstNode {
 
 export class GlobalsNode extends AstNode {
   public constructor(
-    public readonly children: RA<FunctionDecl | VariableDeclaration>
+    public readonly children: RA<FunctionDeclaration | VariableDeclaration>
   ) {
     super([]);
   }
@@ -149,7 +155,7 @@ export class GlobalsNode extends AstNode {
   public pretty(printContext: PrintContext) {
     return this.children.flatMap((child, index, { length }) => [
       child.print(printContext),
-      child instanceof FunctionDecl ? '' : `${token('SEMICOL')}`,
+      child instanceof FunctionDeclaration ? '' : `${token('SEMICOL')}`,
       index + 1 === length ? '' : '\n',
     ]);
   }
@@ -235,7 +241,7 @@ export class Term extends Expression {}
 const findDeclaration = (
   name: string,
   context: NameAnalysisContext
-): FunctionDecl | VariableDeclaration | undefined =>
+): FunctionDeclaration | VariableDeclaration | undefined =>
   Array.from(context.symbolTable)
     .reverse()
     .flatMap(({ items }) => items)
@@ -258,7 +264,8 @@ export class IdNode extends Term {
     const declaration = this.getDeclaration();
     if (declaration === undefined)
       throw new Error(`Unable to find ${this.getName()} variable declaration`);
-    else if (declaration instanceof FunctionDecl) return declaration.typeNode;
+    else if (declaration instanceof FunctionDeclaration)
+      return declaration.typeNode;
     else if (declaration.type instanceof FunctionTypeNode)
       return declaration.type.typeNode;
     else if (declaration.type instanceof PrimaryTypeNode) {
@@ -277,7 +284,10 @@ export class IdNode extends Term {
       this.nameAnalysisContext.reportError(this, 'Undeclared identifier');
   }
 
-  private getDeclaration(): FunctionDecl | VariableDeclaration | undefined {
+  private getDeclaration():
+    | FunctionDeclaration
+    | VariableDeclaration
+    | undefined {
     return findDeclaration(this.getName(), this.nameAnalysisContext);
   }
 
@@ -304,7 +314,7 @@ export class FunctionTypeNode extends TypeNode {
 
   public constructor(
     public readonly typeList: TypeListNode,
-    private readonly returnType: TypeNode
+    public readonly returnType: TypeNode
   ) {
     super([typeList, returnType]);
     this.typeNode = new FunctionType(this);
@@ -341,13 +351,15 @@ export class TypeListNode extends TypeNode {
   }
 
   public pretty(printContext: PrintContext) {
-    return this.printType(printContext);
+    return this.children
+      .map((child) => child.print(printContext))
+      .join(`${token('COMMA')} `);
   }
 
   public printType(printContext: PrintContext): string {
     return this.children
-      .map((child) => child.print(printContext))
-      .join(`${token('COMMA')} `);
+      .map((child) => child.printType(printContext))
+      .join(token('COMMA'));
   }
 
   public typeCheck(context: TypeCheckContext): LanguageType {
@@ -373,7 +385,7 @@ function indent(printContext: PrintContext, node: AstNode): string {
  * Call this to receive a new scope that can be added to the SymbolTable.
  */
 export const createScope = (
-  node: ForNode | FunctionDecl | GlobalsNode | IfNode | WhileNode
+  node: ForNode | FunctionDeclaration | GlobalsNode | IfNode | WhileNode
 ): Scope => ({
   items: node.declarations,
   node,
@@ -391,7 +403,7 @@ export const createScope = (
   },
 });
 
-export class FunctionDecl extends AstNode {
+export class FunctionDeclaration extends AstNode {
   public readonly typeNode: FunctionType;
 
   public returnType: LanguageType;
@@ -726,14 +738,12 @@ export class OutputNode extends LineStatement {
   }
 
   public typeCheck(context: TypeCheckContext) {
-    return assertType(
-      context,
-      this.expression,
-      'outputOnFunction',
-      'int',
-      'bool',
-      'string'
-    );
+    const type = this.expression.typeCheck(context);
+    if (type instanceof FunctionType)
+      return context.reportError(this.expression, 'outputOnFunction');
+    else if (type instanceof VoidType)
+      return context.reportError(this.expression, 'outputOnVoid');
+    else return type;
   }
 
   public pretty(printContext: PrintContext) {
@@ -756,8 +766,8 @@ export class ReturnNode extends LineStatement {
   public typeCheck(context: TypeCheckContext): LanguageType {
     const functionDecl = Array.from(this.nameAnalysisContext.symbolTable)
       .reverse()
-      .find(({ node }) => node instanceof FunctionDecl)?.node;
-    if (!(functionDecl instanceof FunctionDecl))
+      .find(({ node }) => node instanceof FunctionDeclaration)?.node;
+    if (!(functionDecl instanceof FunctionDeclaration))
       throw new Error('Return used outside of function');
     const actualReturnType = this.expression?.typeCheck(context);
     if (actualReturnType instanceof ErrorType) return actualReturnType;
@@ -896,13 +906,13 @@ class SynteticToken extends AstNode {
     return {
       type: 'VOID',
       data: {},
-      simplePosition: this.startNode.getToken().simplePosition,
+      position: this.startNode.getToken().position,
     };
   }
 
-  public print(_printContext: PrintContext): string {
-    const start = this.startNode.getToken().simplePosition;
-    const end = this.endNode.getToken().simplePosition;
+  public print({ reversePositionResolver }: PrintContext): string {
+    const start = reversePositionResolver(this.startNode.getToken().position);
+    const end = reversePositionResolver(this.endNode.getToken().position);
     return ' '.repeat(end - start);
   }
 }
@@ -1105,7 +1115,7 @@ export class AssignmentExpression extends Expression {
   }
 
   public getToken() {
-    return this.token.token;
+    return new SynteticToken(this.id, this.expression).getToken();
   }
 }
 
@@ -1156,7 +1166,7 @@ export class FunctionCall extends Expression {
         });
     else context.reportError(this, 'argLength');
 
-    return functionType;
+    return functionType.type.returnType.typeCheck(context);
   }
 
   public getToken() {

@@ -1,7 +1,9 @@
 import fs from 'node:fs';
 
 import type { AstNode, PrintContext } from './ast/definitions.js';
+import { createScope, GlobalsNode } from './ast/definitions.js';
 import { parseTreeToAst } from './ast/index.js';
+import { ErrorType, typeErrors } from './ast/typing.js';
 import { removeNullProductions } from './cykParser/chomsky/removeNullProductions.js';
 import { cykParser } from './cykParser/index.js';
 import { formatErrors } from './formatErrors.js';
@@ -9,25 +11,25 @@ import { formatTokens } from './formatTokens.js';
 import { grammar } from './grammar/index.js';
 import { slrParser } from './slrParser/index.js';
 import { tokenize } from './tokenize/index.js';
-import type { Token } from './tokenize/types.js';
+import type { Position, Token } from './tokenize/types.js';
 import { unparseParseTree } from './unparseParseTree/index.js';
-import { cretePositionResolver } from './utils/resolvePosition.js';
+import {
+  createPositionResolver,
+  createReversePositionResolver,
+} from './utils/resolvePosition.js';
 import type { RA, WritableArray } from './utils/types.js';
-import { ErrorType, typeErrors } from './ast/typing.js';
-import { createScope, GlobalsNode } from './ast/definitions.js';
 
 export function processInput(rawText: string): {
   readonly formattedErrors: string;
   readonly formattedTokens: string;
   readonly tokens: RA<Token>;
 } {
-  const { tokens, syntaxErrors } = tokenize(rawText, 0);
-
-  const positionResolver = cretePositionResolver(rawText);
+  const positionResolver = createPositionResolver(rawText);
+  const { tokens, syntaxErrors } = tokenize(rawText, 0, positionResolver);
 
   return {
     formattedErrors: formatErrors(syntaxErrors, positionResolver),
-    formattedTokens: formatTokens(tokens, positionResolver),
+    formattedTokens: formatTokens(tokens),
     tokens,
   };
 }
@@ -69,9 +71,8 @@ export async function run(
     return undefined;
   }
 
-  const positionResolver = cretePositionResolver(rawText);
   const nullFreeGrammar = removeNullProductions(grammar());
-  const parseTree = slrParser(nullFreeGrammar, trimmedStream, positionResolver);
+  const parseTree = slrParser(nullFreeGrammar, trimmedStream);
   if (parseTree === undefined) {
     console.error('syntax error\nParse failed');
     process.exitCode = 1;
@@ -90,6 +91,7 @@ export async function run(
     mode: 'pretty',
     debug,
     needWrapping: false,
+    reversePositionResolver: createReversePositionResolver(rawText),
   };
   if (typeof unparseOutput === 'string') {
     const pretty = ast.pretty(printContext);
@@ -99,12 +101,7 @@ export async function run(
   return ast;
 }
 
-export function namedParse(
-  rawText: string,
-  ast: AstNode,
-  debug: boolean
-): RA<string> | string {
-  const positionResolver = cretePositionResolver(rawText);
+export function namedParse(ast: AstNode, debug: boolean): RA<string> | string {
   const errors: WritableArray<string> = [];
   if (!(ast instanceof GlobalsNode))
     throw new Error(
@@ -114,9 +111,7 @@ export function namedParse(
     symbolTable: [createScope(ast)],
     isDeclaration: false,
     reportError(idNode, error) {
-      const { lineNumber, columnNumber } = positionResolver(
-        idNode.getToken().simplePosition
-      );
+      const { lineNumber, columnNumber } = idNode.getToken().position;
       errors.push(
         `FATAL [${lineNumber},${columnNumber}]-[${lineNumber},${
           columnNumber + idNode.getName().length
@@ -131,20 +126,21 @@ export function namedParse(
     mode: 'nameAnalysis',
     debug,
     needWrapping: false,
+    reversePositionResolver: () => 0,
   };
 
   const output = ast.pretty(printContext);
   return Array.isArray(output) ? output.join('') : output;
 }
 
-export function typeCheckAst(rawText: string, ast: AstNode): RA<string> {
-  const positionResolver = cretePositionResolver(rawText);
+export function typeCheckAst(
+  ast: AstNode,
+  reversePositionResolver: (position: Position) => number
+): RA<string> {
   const errors: WritableArray<string> = [];
   ast.typeCheck({
     reportError(node, errorCode) {
-      const { lineNumber, columnNumber } = positionResolver(
-        node.getToken().simplePosition
-      );
+      const { lineNumber, columnNumber } = node.getToken().position;
       errors.push(
         `FATAL [${lineNumber},${columnNumber}]-[${lineNumber},${
           // TODO: check if this is correct
@@ -154,6 +150,7 @@ export function typeCheckAst(rawText: string, ast: AstNode): RA<string> {
             mode: 'pretty',
             debug: false,
             needWrapping: false,
+            reversePositionResolver,
           }).length
         }]: ${typeErrors[errorCode]}`
       );

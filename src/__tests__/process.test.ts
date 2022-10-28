@@ -69,183 +69,183 @@ EOF [18,1]`,
           data: {
             literal: '"sup"',
           },
-          simplePosition: 0,
+          position: { columnNumber: 1, lineNumber: 1 },
           type: 'STRINGLITERAL',
         },
         {
           data: {},
-          simplePosition: 6,
+          position: { columnNumber: 7, lineNumber: 1 },
           type: 'AND',
         },
         {
           data: {
             literal: '"dope\\n"',
           },
-          simplePosition: 10,
+          position: { columnNumber: 1, lineNumber: 2 },
           type: 'STRINGLITERAL',
         },
         {
           data: {},
-          simplePosition: 19,
+          position: { columnNumber: 10, lineNumber: 2 },
           type: 'OR',
         },
         {
           data: {
             literal: 3,
           },
-          simplePosition: 42,
+          position: { columnNumber: 1, lineNumber: 7 },
           type: 'INTLITERAL',
         },
         {
           data: {},
-          simplePosition: 44,
+          position: { columnNumber: 1, lineNumber: 8 },
           type: 'MINUS',
         },
         {
           data: {
             literal: 1,
           },
-          simplePosition: 45,
+          position: { columnNumber: 2, lineNumber: 8 },
           type: 'INTLITERAL',
         },
         {
           data: {
             literal: 3,
           },
-          simplePosition: 47,
+          position: { columnNumber: 1, lineNumber: 9 },
           type: 'INTLITERAL',
         },
         {
           data: {
             literal: 2,
           },
-          simplePosition: 49,
+          position: { columnNumber: 3, lineNumber: 9 },
           type: 'INTLITERAL',
         },
         {
           data: {
             literal: 212,
           },
-          simplePosition: 51,
+          position: { columnNumber: 1, lineNumber: 10 },
           type: 'INTLITERAL',
         },
         {
           data: {},
-          simplePosition: 54,
+          position: { columnNumber: 4, lineNumber: 10 },
           type: 'COMMA',
         },
         {
           data: {
             literal: 312,
           },
-          simplePosition: 55,
+          position: { columnNumber: 5, lineNumber: 10 },
           type: 'INTLITERAL',
         },
         {
           data: {},
-          simplePosition: 58,
+          position: { columnNumber: 8, lineNumber: 10 },
           type: 'COMMA',
         },
         {
           data: {
             literal: 123,
           },
-          simplePosition: 59,
+          position: { columnNumber: 9, lineNumber: 10 },
           type: 'INTLITERAL',
         },
         {
           data: {
             literal: 0,
           },
-          simplePosition: 63,
+          position: { columnNumber: 13, lineNumber: 10 },
           type: 'INTLITERAL',
         },
         {
           data: {
             literal: 100,
           },
-          simplePosition: 66,
+          position: { columnNumber: 1, lineNumber: 11 },
           type: 'INTLITERAL',
         },
         {
           data: {
             literal: '_200',
           },
-          simplePosition: 69,
+          position: { columnNumber: 4, lineNumber: 11 },
           type: 'ID',
         },
         {
           data: {},
-          simplePosition: 74,
+          position: { columnNumber: 1, lineNumber: 12 },
           type: 'ARROW',
         },
         {
           data: {},
-          simplePosition: 76,
+          position: { columnNumber: 3, lineNumber: 12 },
           type: 'ASSIGN',
         },
         {
           data: {
             literal: 'mayhemor',
           },
-          simplePosition: 78,
+          position: { columnNumber: 1, lineNumber: 13 },
           type: 'ID',
         },
         {
           data: {
             literal: 'this',
           },
-          simplePosition: 87,
+          position: { columnNumber: 1, lineNumber: 14 },
           type: 'ID',
         },
         {
           data: {},
-          simplePosition: 95,
+          position: { columnNumber: 9, lineNumber: 14 },
           type: 'OR',
         },
         {
           data: {},
-          simplePosition: 101,
+          position: { columnNumber: 15, lineNumber: 14 },
           type: 'AND',
         },
         {
           data: {
             literal: 'do',
           },
-          simplePosition: 105,
+          position: { columnNumber: 19, lineNumber: 14 },
           type: 'ID',
         },
         {
           data: {
             literal: 'some',
           },
-          simplePosition: 108,
+          position: { columnNumber: 22, lineNumber: 14 },
           type: 'ID',
         },
         {
           data: {
             literal: 2147483646,
           },
-          simplePosition: 113,
+          position: { columnNumber: 1, lineNumber: 15 },
           type: 'INTLITERAL',
         },
         {
           data: {
             literal: 2147483647,
           },
-          simplePosition: 124,
+          position: { columnNumber: 1, lineNumber: 16 },
           type: 'INTLITERAL',
         },
         {
           data: {
             literal: 0,
           },
-          simplePosition: 135,
+          position: { columnNumber: 1, lineNumber: 17 },
           type: 'INTLITERAL',
         },
         {
           data: {},
-          simplePosition: 146,
+          position: { columnNumber: 1, lineNumber: 18 },
           type: 'END',
         },
       ],

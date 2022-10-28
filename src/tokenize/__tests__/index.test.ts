@@ -1,12 +1,21 @@
 import { theories } from '../../tests/utils.js';
-import { invalidToken, repositionErrors, tokenize } from '../index.js';
+import { createPositionResolver } from '../../utils/resolvePosition.js';
+import {
+  invalidToken,
+  repositionErrors,
+  tokenize as originalTokenize,
+} from '../index.js';
+
+function tokenize(rawText: string) {
+  const positionResolver = createPositionResolver(rawText);
+  return originalTokenize(rawText, 0, positionResolver);
+}
 
 theories(tokenize, [
   {
     in: [
       `"sup" and // d
 "dope\\n" or`,
-      0,
     ],
     out: {
       syntaxErrors: [],
@@ -15,29 +24,29 @@ theories(tokenize, [
           data: {
             literal: '"sup"',
           },
-          simplePosition: 0,
+          position: { columnNumber: 1, lineNumber: 1 },
           type: 'STRINGLITERAL',
         },
         {
           data: {},
-          simplePosition: 6,
+          position: { columnNumber: 7, lineNumber: 1 },
           type: 'AND',
         },
         {
           data: {
             literal: '"dope\\n"',
           },
-          simplePosition: 15,
+          position: { columnNumber: 1, lineNumber: 2 },
           type: 'STRINGLITERAL',
         },
         {
           data: {},
-          simplePosition: 24,
+          position: { columnNumber: 10, lineNumber: 2 },
           type: 'OR',
         },
         {
           data: {},
-          simplePosition: 26,
+          position: { columnNumber: 12, lineNumber: 2 },
           type: 'END',
         },
       ],
@@ -47,7 +56,6 @@ theories(tokenize, [
     in: [
       `"\\b \\" "
 "\\b"`,
-      0,
     ],
     out: {
       syntaxErrors: [
@@ -67,7 +75,7 @@ theories(tokenize, [
       tokens: [
         {
           data: {},
-          simplePosition: 13,
+          position: { columnNumber: 5, lineNumber: 2 },
           type: 'END',
         },
       ],
@@ -77,7 +85,6 @@ theories(tokenize, [
     in: [
       `"
 "\\b`,
-      0,
     ],
     out: {
       syntaxErrors: [
@@ -98,7 +105,7 @@ theories(tokenize, [
       tokens: [
         {
           data: {},
-          simplePosition: 5,
+          position: { columnNumber: 4, lineNumber: 2 },
           type: 'END',
         },
       ],
@@ -108,7 +115,6 @@ theories(tokenize, [
     in: [
       `3
 -1`,
-      0,
     ],
     out: {
       syntaxErrors: [],
@@ -117,24 +123,24 @@ theories(tokenize, [
           data: {
             literal: 3,
           },
-          simplePosition: 0,
+          position: { columnNumber: 1, lineNumber: 1 },
           type: 'INTLITERAL',
         },
         {
           data: {},
-          simplePosition: 2,
+          position: { columnNumber: 1, lineNumber: 2 },
           type: 'MINUS',
         },
         {
           data: {
             literal: 1,
           },
-          simplePosition: 3,
+          position: { columnNumber: 2, lineNumber: 2 },
           type: 'INTLITERAL',
         },
         {
           data: {},
-          simplePosition: 4,
+          position: { columnNumber: 3, lineNumber: 2 },
           type: 'END',
         },
       ],
@@ -144,7 +150,6 @@ theories(tokenize, [
     in: [
       `3.2
 212,312,123.00`,
-      0,
     ],
     out: {
       syntaxErrors: [
@@ -166,57 +171,57 @@ theories(tokenize, [
           data: {
             literal: 3,
           },
-          simplePosition: 0,
+          position: { columnNumber: 1, lineNumber: 1 },
           type: 'INTLITERAL',
         },
         {
           data: {
             literal: 2,
           },
-          simplePosition: 2,
+          position: { columnNumber: 3, lineNumber: 1 },
           type: 'INTLITERAL',
         },
         {
           data: {
             literal: 212,
           },
-          simplePosition: 4,
+          position: { columnNumber: 1, lineNumber: 2 },
           type: 'INTLITERAL',
         },
         {
           data: {},
-          simplePosition: 7,
+          position: { columnNumber: 4, lineNumber: 2 },
           type: 'COMMA',
         },
         {
           data: {
             literal: 312,
           },
-          simplePosition: 8,
+          position: { columnNumber: 5, lineNumber: 2 },
           type: 'INTLITERAL',
         },
         {
           data: {},
-          simplePosition: 11,
+          position: { columnNumber: 8, lineNumber: 2 },
           type: 'COMMA',
         },
         {
           data: {
             literal: 123,
           },
-          simplePosition: 12,
+          position: { columnNumber: 9, lineNumber: 2 },
           type: 'INTLITERAL',
         },
         {
           data: {
             literal: 0,
           },
-          simplePosition: 16,
+          position: { columnNumber: 13, lineNumber: 2 },
           type: 'INTLITERAL',
         },
         {
           data: {},
-          simplePosition: 18,
+          position: { columnNumber: 15, lineNumber: 2 },
           type: 'END',
         },
       ],
@@ -226,7 +231,6 @@ theories(tokenize, [
     in: [
       `100_200
 ->=`,
-      0,
     ],
     out: {
       syntaxErrors: [],
@@ -235,29 +239,29 @@ theories(tokenize, [
           data: {
             literal: 100,
           },
-          simplePosition: 0,
+          position: { columnNumber: 1, lineNumber: 1 },
           type: 'INTLITERAL',
         },
         {
           data: {
             literal: '_200',
           },
-          simplePosition: 3,
+          position: { columnNumber: 4, lineNumber: 1 },
           type: 'ID',
         },
         {
           data: {},
-          simplePosition: 8,
+          position: { columnNumber: 1, lineNumber: 2 },
           type: 'ARROW',
         },
         {
           data: {},
-          simplePosition: 10,
+          position: { columnNumber: 3, lineNumber: 2 },
           type: 'ASSIGN',
         },
         {
           data: {},
-          simplePosition: 11,
+          position: { columnNumber: 4, lineNumber: 2 },
           type: 'END',
         },
       ],
@@ -267,7 +271,6 @@ theories(tokenize, [
     in: [
       `mayhemor
 this || or && and do some`,
-      0,
     ],
     out: {
       syntaxErrors: [
@@ -301,43 +304,43 @@ this || or && and do some`,
           data: {
             literal: 'mayhemor',
           },
-          simplePosition: 0,
+          position: { columnNumber: 1, lineNumber: 1 },
           type: 'ID',
         },
         {
           data: {
             literal: 'this',
           },
-          simplePosition: 9,
+          position: { columnNumber: 1, lineNumber: 2 },
           type: 'ID',
         },
         {
           data: {},
-          simplePosition: 17,
+          position: { columnNumber: 9, lineNumber: 2 },
           type: 'OR',
         },
         {
           data: {},
-          simplePosition: 23,
+          position: { columnNumber: 15, lineNumber: 2 },
           type: 'AND',
         },
         {
           data: {
             literal: 'do',
           },
-          simplePosition: 27,
+          position: { columnNumber: 19, lineNumber: 2 },
           type: 'ID',
         },
         {
           data: {
             literal: 'some',
           },
-          simplePosition: 30,
+          position: { columnNumber: 22, lineNumber: 2 },
           type: 'ID',
         },
         {
           data: {},
-          simplePosition: 34,
+          position: { columnNumber: 26, lineNumber: 2 },
           type: 'END',
         },
       ],
@@ -348,7 +351,6 @@ this || or && and do some`,
       `2147483646
 2147483647
 2147483648`,
-      0,
     ],
     out: {
       syntaxErrors: [
@@ -364,122 +366,122 @@ this || or && and do some`,
           data: {
             literal: 2_147_483_646,
           },
-          simplePosition: 0,
+          position: { columnNumber: 1, lineNumber: 1 },
           type: 'INTLITERAL',
         },
         {
           data: {
             literal: 2_147_483_647,
           },
-          simplePosition: 11,
+          position: { columnNumber: 1, lineNumber: 2 },
           type: 'INTLITERAL',
         },
         {
           data: {
             literal: 0,
           },
-          simplePosition: 22,
+          position: { columnNumber: 1, lineNumber: 3 },
           type: 'INTLITERAL',
         },
         {
           data: {},
-          simplePosition: 32,
+          position: { columnNumber: 11, lineNumber: 3 },
           type: 'END',
         },
       ],
     },
   },
   {
-    in: [`4-- 5++ == 10; 4!=4; 10>=1`, 0],
+    in: [`4-- 5++ == 10; 4!=4; 10>=1`],
     out: {
       tokens: [
         {
           data: {
             literal: 4,
           },
-          simplePosition: 0,
+          position: { columnNumber: 1, lineNumber: 1 },
           type: 'INTLITERAL',
         },
         {
           data: {},
-          simplePosition: 1,
+          position: { columnNumber: 2, lineNumber: 1 },
           type: 'POSTDEC',
         },
         {
           data: {
             literal: 5,
           },
-          simplePosition: 4,
+          position: { columnNumber: 5, lineNumber: 1 },
           type: 'INTLITERAL',
         },
         {
           data: {},
-          simplePosition: 5,
+          position: { columnNumber: 6, lineNumber: 1 },
           type: 'POSTINC',
         },
         {
           data: {},
-          simplePosition: 8,
+          position: { columnNumber: 9, lineNumber: 1 },
           type: 'EQUALS',
         },
         {
           data: {
             literal: 10,
           },
-          simplePosition: 11,
+          position: { columnNumber: 12, lineNumber: 1 },
           type: 'INTLITERAL',
         },
         {
           data: {},
-          simplePosition: 13,
+          position: { columnNumber: 14, lineNumber: 1 },
           type: 'SEMICOL',
         },
         {
           data: {
             literal: 4,
           },
-          simplePosition: 15,
+          position: { columnNumber: 16, lineNumber: 1 },
           type: 'INTLITERAL',
         },
         {
           data: {},
-          simplePosition: 16,
+          position: { columnNumber: 17, lineNumber: 1 },
           type: 'NOTEQUALS',
         },
         {
           data: {
             literal: 4,
           },
-          simplePosition: 18,
+          position: { columnNumber: 19, lineNumber: 1 },
           type: 'INTLITERAL',
         },
         {
           data: {},
-          simplePosition: 19,
+          position: { columnNumber: 20, lineNumber: 1 },
           type: 'SEMICOL',
         },
         {
           data: {
             literal: 10,
           },
-          simplePosition: 21,
+          position: { columnNumber: 22, lineNumber: 1 },
           type: 'INTLITERAL',
         },
         {
           data: {},
-          simplePosition: 23,
+          position: { columnNumber: 24, lineNumber: 1 },
           type: 'GREATEREQ',
         },
         {
           data: {
             literal: 1,
           },
-          simplePosition: 25,
+          position: { columnNumber: 26, lineNumber: 1 },
           type: 'INTLITERAL',
         },
         {
           data: {},
-          simplePosition: 26,
+          position: { columnNumber: 27, lineNumber: 1 },
           type: 'END',
         },
       ],

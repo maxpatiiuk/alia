@@ -31,6 +31,7 @@ export class FunctionType extends LanguageType {
       mode: 'pretty',
       debug: false,
       needWrapping: false,
+      reversePositionResolver: () => 0,
     });
   }
 }
@@ -98,6 +99,7 @@ export const typeErrors = {
   nonBoolLogic: 'Logical operator applied to non-bool operand',
   nonIntArith: 'Arithmetic operator applied to invalid operand',
   inputOnFunction: 'Attempt to assign user input to function',
+  outputOnVoid: 'Attempt to output void',
   outputOnFunction: 'Attempt to output a function',
   invalidEqOperand: 'Invalid equality operand',
   invalidEqOperation: 'Invalid equality operation',

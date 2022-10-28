@@ -1,19 +1,14 @@
 import { formatPosition } from './formatErrors.js';
 import type { Tokens } from './tokenize/tokens.js';
 import { tokenLabels } from './tokenize/tokens.js';
-import type { Position, Token } from './tokenize/types.js';
+import type { Token } from './tokenize/types.js';
 import type { RA } from './utils/types.js';
 
-export const formatTokens = (
-  tokens: RA<Token>,
-  positionResolver: (simplePosition: number) => Position
-): string =>
+export const formatTokens = (tokens: RA<Token>): string =>
   tokens
     .map(
-      ({ type, data, simplePosition }) =>
-        `${formatName(type, data)} ${formatPosition(
-          positionResolver(simplePosition)
-        )}`
+      ({ type, data, position }) =>
+        `${formatName(type, data)} ${formatPosition(position)}`
     )
     .join('\n');
 

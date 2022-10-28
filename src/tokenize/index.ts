@@ -7,11 +7,12 @@ import {
   whitespaceMatcher,
 } from './matchers.js';
 import type { Tokens } from './tokens.js';
-import type { MatcherResult, SyntaxError, Token } from './types.js';
+import type { MatcherResult, Position, SyntaxError, Token } from './types.js';
 
 export function tokenize(
   input: string,
-  positionOffset: number
+  positionOffset: number,
+  positionResolver: (position: number) => Position
 ): {
   readonly tokens: RA<Token>;
   readonly syntaxErrors: RA<SyntaxError>;
@@ -32,14 +33,18 @@ export function tokenize(
           tokens: [],
           syntaxErrors: [],
         }
-      : tokenize(remainingInput, positionOffset + tokenLength);
+      : tokenize(
+          remainingInput,
+          positionOffset + tokenLength,
+          positionResolver
+        );
 
   const token: Token | undefined =
     typeof data === 'object' && typeof type === 'string'
       ? {
           type,
           data,
-          simplePosition: positionOffset,
+          position: positionResolver(positionOffset),
         }
       : undefined;
 

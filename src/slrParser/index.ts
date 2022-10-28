@@ -2,7 +2,7 @@ import { getGrammarRoot } from '../cykParser/chomsky/uselessRules.js';
 import type { AbstractGrammar } from '../grammar/utils.js';
 import { toPureGrammar } from '../grammar/utils.js';
 import type { Tokens } from '../tokenize/tokens.js';
-import type { Position, Token } from '../tokenize/types.js';
+import type { Token } from '../tokenize/types.js';
 import type { RA, WritableArray } from '../utils/types.js';
 import { getTable } from './buildTable.js';
 import type { Closure } from './closure.js';
@@ -30,8 +30,7 @@ export function slrParser<
   NON_TERMINALS extends string
 >(
   grammar: AbstractGrammar<NON_TERMINALS>,
-  tokens: RA<Token<TERMINALS>>,
-  positionResolver: (position: number) => Position
+  tokens: RA<Token<TERMINALS>>
 ): ParseTreeNode<TERMINALS, NON_TERMINALS> {
   const table = getTable(toPureGrammar(grammar));
   let stack: WritableArray<StackItem<TERMINALS, NON_TERMINALS>> = [
@@ -47,9 +46,7 @@ export function slrParser<
     const lookahead = tokens[tokenIndex]?.type;
     const cell = table[state.state][lookahead ?? ''];
     if (cell === undefined) {
-      const { lineNumber, columnNumber } = positionResolver(
-        tokens[tokenIndex].simplePosition
-      );
+      const { lineNumber, columnNumber } = tokens[tokenIndex].position;
       throw new Error(
         `Unexpected token ${lookahead} at (${lineNumber},${columnNumber})`
       );

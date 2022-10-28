@@ -6,7 +6,7 @@ import type { Tokens } from './tokens.js';
 export type Token<TERMINAL extends keyof Tokens = keyof Tokens> = {
   readonly type: TERMINAL;
   readonly data: Tokens[TERMINAL];
-  readonly simplePosition: number;
+  readonly position: Position;
 };
 
 export type Position = {

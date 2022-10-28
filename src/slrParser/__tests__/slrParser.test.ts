@@ -17,24 +17,44 @@ describe('slrParser', () => {
   test('simple grammar', () =>
     expect(
       slrParser(abstractGrammar, [
-        { type: 'MAYHEM', data: {}, simplePosition: 0 },
-        { type: 'LPAREN', data: {}, simplePosition: 0 },
-        { type: 'ID', data: { literal: 'a' }, simplePosition: 0 },
-        { type: 'RPAREN', data: {}, simplePosition: 0 },
-        { type: 'MAYHEM', data: {}, simplePosition: 0 },
+        {
+          type: 'MAYHEM',
+          data: {},
+          position: { lineNumber: 1, columnNumber: 1 },
+        },
+        {
+          type: 'LPAREN',
+          data: {},
+          position: { lineNumber: 1, columnNumber: 2 },
+        },
+        {
+          type: 'ID',
+          data: { literal: 'a' },
+          position: { lineNumber: 1, columnNumber: 3 },
+        },
+        {
+          type: 'RPAREN',
+          data: {},
+          position: { lineNumber: 1, columnNumber: 4 },
+        },
+        {
+          type: 'MAYHEM',
+          data: {},
+          position: { lineNumber: 1, columnNumber: 5 },
+        },
       ])
     ).toEqual({
       children: [
         {
           data: {},
-          simplePosition: 0,
+          position: { lineNumber: 1, columnNumber: 1 },
           type: 'MAYHEM',
         },
         {
           children: [
             {
               data: {},
-              simplePosition: 0,
+              position: { lineNumber: 1, columnNumber: 2 },
               type: 'LPAREN',
             },
             {
@@ -43,7 +63,7 @@ describe('slrParser', () => {
                   data: {
                     literal: 'a',
                   },
-                  simplePosition: 0,
+                  position: { lineNumber: 1, columnNumber: 3 },
                   type: 'ID',
                 },
               ],
@@ -55,7 +75,7 @@ describe('slrParser', () => {
             },
             {
               data: {},
-              simplePosition: 0,
+              position: { lineNumber: 1, columnNumber: 4 },
               type: 'RPAREN',
             },
           ],
@@ -67,7 +87,7 @@ describe('slrParser', () => {
         },
         {
           data: {},
-          simplePosition: 0,
+          position: { lineNumber: 1, columnNumber: 5 },
           type: 'MAYHEM',
         },
       ],

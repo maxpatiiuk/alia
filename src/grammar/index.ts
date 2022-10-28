@@ -14,7 +14,7 @@ import {
   ForNode,
   FunctionCall,
   FunctionCallStatement,
-  FunctionDecl,
+  FunctionDeclaration,
   GlobalsNode,
   IdNode,
   IfNode,
@@ -91,7 +91,7 @@ export const grammar = store(() =>
         ({ globals = new GlobalsNode([]), varDecl }) =>
           new GlobalsNode(
             [...(globals?.children ?? []), varDecl].map((node) =>
-              type(node, VariableDeclaration, FunctionDecl)
+              type(node, VariableDeclaration, FunctionDeclaration)
             )
           ),
       ],
@@ -101,7 +101,7 @@ export const grammar = store(() =>
         ({ globals = new GlobalsNode([]), fnDecl }) =>
           new GlobalsNode(
             [...(globals.children ?? []), fnDecl].map((node) =>
-              type(node, VariableDeclaration, FunctionDecl)
+              type(node, VariableDeclaration, FunctionDeclaration)
             )
           ),
       ],
@@ -165,7 +165,7 @@ export const grammar = store(() =>
         'stmtList',
         'RCURLY',
         ({ type: returnType, id, stmtList = new StatementList([]) }) =>
-          new FunctionDecl(
+          new FunctionDeclaration(
             type(returnType, TypeNode),
             type(id, IdNode),
             new FormalsDeclNode([]),
@@ -182,7 +182,7 @@ export const grammar = store(() =>
         'stmtList',
         'RCURLY',
         ({ type: returnType, id, formals, stmtList = new StatementList([]) }) =>
-          new FunctionDecl(
+          new FunctionDeclaration(
             returnType,
             type(id, IdNode),
             type(formals, FormalsDeclNode),

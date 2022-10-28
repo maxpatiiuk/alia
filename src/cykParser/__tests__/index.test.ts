@@ -4,6 +4,7 @@ import type { Token } from '../../tokenize/types.js';
 import { error } from '../../utils/assert.js';
 import type { RA } from '../../utils/types.js';
 import { cykParser, exportsForTests } from '../index.js';
+import { createPositionResolver } from '../../utils/resolvePosition.js';
 
 const {
   parser,
@@ -26,17 +27,17 @@ theories(cykParser, [
         {
           type: 'INT',
           data: {},
-          simplePosition: 0,
+          position: { lineNumber: 1, columnNumber: 1 },
         },
         {
           type: 'ID',
           data: {},
-          simplePosition: 5,
+          position: { lineNumber: 1, columnNumber: 2 },
         },
         {
           type: 'SEMICOL',
           data: {},
-          simplePosition: 7,
+          position: { lineNumber: 1, columnNumber: 3 },
         },
       ],
     ],
@@ -48,12 +49,12 @@ theories(cykParser, [
         {
           type: 'VOID',
           data: {},
-          simplePosition: 0,
+          position: { lineNumber: 1, columnNumber: 1 },
         },
         {
           type: 'INT',
           data: {},
-          simplePosition: 0,
+          position: { lineNumber: 1, columnNumber: 2 },
         },
       ],
     ],
@@ -122,26 +123,27 @@ fn(int, fn () -> fn () -> void) -> void bar() {
   output "Test\\n\\t";
 }
 `;
+const positionResolver = createPositionResolver(input);
 
 theories(parser, [
   {
     // Remove the END token
-    in: [tokenize(input, 0).tokens.slice(0, -1)],
+    in: [tokenize(input, 0, positionResolver).tokens.slice(0, -1)],
     out: true,
   },
   {
     in: [
       [
-        ...tokenize(input, 0).tokens.slice(0, -1),
+        ...tokenize(input, 0, positionResolver).tokens.slice(0, -1),
         {
           type: 'INT',
           data: {},
-          simplePosition: 0,
+          position: { lineNumber: 1, columnNumber: 1 },
         },
         {
           type: 'INT',
           data: {},
-          simplePosition: 0,
+          position: { lineNumber: 1, columnNumber: 2 },
         },
       ],
     ],
@@ -157,12 +159,12 @@ theories(tokensToString, [
         {
           type: 'INT',
           data: {},
-          simplePosition: 0,
+          position: { lineNumber: 1, columnNumber: 1 },
         },
         {
           type: 'ID',
           data: {},
-          simplePosition: 5,
+          position: { lineNumber: 1, columnNumber: 2 },
         },
       ],
     ],
@@ -177,12 +179,12 @@ theories(powerSetIterate, [
         {
           type: 'INT',
           data: {},
-          simplePosition: 0,
+          position: { lineNumber: 1, columnNumber: 1 },
         },
         {
           type: 'ID',
           data: {},
-          simplePosition: 5,
+          position: { lineNumber: 1, columnNumber: 2 },
         },
       ],
     ],
@@ -208,17 +210,17 @@ theories(powerSetIterate, [
         {
           type: 'INT',
           data: {},
-          simplePosition: 0,
+          position: { lineNumber: 1, columnNumber: 1 },
         },
         {
           type: 'ID',
           data: {},
-          simplePosition: 5,
+          position: { lineNumber: 1, columnNumber: 2 },
         },
         {
           type: 'SEMICOL',
           data: {},
-          simplePosition: 7,
+          position: { lineNumber: 1, columnNumber: 3 },
         },
       ],
     ],
@@ -256,7 +258,7 @@ theories(powerSetIteratorCallback, [
         {
           type: 'INT',
           data: {},
-          simplePosition: 0,
+          position: { lineNumber: 1, columnNumber: 1 },
         },
       ],
       () => error('should not be called'),
@@ -269,12 +271,12 @@ theories(powerSetIteratorCallback, [
         {
           type: 'INT',
           data: {},
-          simplePosition: 0,
+          position: { lineNumber: 1, columnNumber: 1 },
         },
         {
           type: 'ID',
           data: {},
-          simplePosition: 5,
+          position: { lineNumber: 1, columnNumber: 2 },
         },
       ],
       ([{ type }]: RA<Token>) =>

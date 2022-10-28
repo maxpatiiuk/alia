@@ -1,12 +1,5 @@
 import { formatName, formatTokens } from '../formatTokens.js';
 import { theories } from '../tests/utils.js';
-import { cretePositionResolver } from '../utils/resolvePosition.js';
-
-const positionResolver = cretePositionResolver(`
-Example
-Text
-Here
-`);
 
 theories(formatTokens, [
   {
@@ -15,10 +8,9 @@ theories(formatTokens, [
         {
           type: 'AND',
           data: {},
-          simplePosition: 0,
+          position: { lineNumber: 1, columnNumber: 1 },
         },
       ],
-      positionResolver,
     ],
     out: 'AND [1,1]',
   },
@@ -28,15 +20,14 @@ theories(formatTokens, [
         {
           type: 'STRINGLITERAL',
           data: { literal: 'Test' },
-          simplePosition: 0,
+          position: { lineNumber: 1, columnNumber: 1 },
         },
         {
           type: 'INTLITERAL',
           data: { literal: 10 },
-          simplePosition: 10,
+          position: { lineNumber: 3, columnNumber: 2 },
         },
       ],
-      positionResolver,
     ],
     out: 'STRINGLIT:Test [1,1]\nINTLIT:10 [3,2]',
   },
