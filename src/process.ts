@@ -91,7 +91,6 @@ export async function run(
     mode: 'pretty',
     debug,
     needWrapping: false,
-    reversePositionResolver: createReversePositionResolver(rawText),
   };
   if (typeof unparseOutput === 'string') {
     const pretty = ast.pretty(printContext);
@@ -111,7 +110,7 @@ export function namedParse(ast: AstNode, debug: boolean): RA<string> | string {
     symbolTable: [createScope(ast)],
     isDeclaration: false,
     reportError(idNode, error) {
-      const { lineNumber, columnNumber } = idNode.getToken().position;
+      const { lineNumber, columnNumber } = idNode.getToken().token.position;
       errors.push(
         `FATAL [${lineNumber},${columnNumber}]-[${lineNumber},${
           columnNumber + idNode.getName().length
@@ -126,36 +125,35 @@ export function namedParse(ast: AstNode, debug: boolean): RA<string> | string {
     mode: 'nameAnalysis',
     debug,
     needWrapping: false,
-    reversePositionResolver: () => 0,
   };
 
   const output = ast.pretty(printContext);
   return Array.isArray(output) ? output.join('') : output;
 }
 
-export function typeCheckAst(
-  ast: AstNode,
-  reversePositionResolver: (position: Position) => number
-): RA<string> {
+export function typeCheckAst(ast: AstNode, rawText: string): RA<string> {
   const errors: WritableArray<string> = [];
   ast.typeCheck({
     reportError(node, errorCode) {
-      const { lineNumber, columnNumber } = node.getToken().position;
+      const { lineNumber, columnNumber } = node.getToken().token.position;
+      const { lineNumber: endLineNumber, columnNumber: endColumnNumber } =
+        getEndPosition(node, rawText);
       errors.push(
-        `FATAL [${lineNumber},${columnNumber}]-[${lineNumber},${
-          // TODO: check if this is correct
-          columnNumber +
-          node.print({
-            indent: 0,
-            mode: 'pretty',
-            debug: false,
-            needWrapping: false,
-            reversePositionResolver,
-          }).length
-        }]: ${typeErrors[errorCode]}`
+        `FATAL [${lineNumber},${columnNumber}]-[${endLineNumber},${endColumnNumber}]: ${typeErrors[errorCode]}`
       );
       return new ErrorType();
     },
   });
   return errors;
+}
+
+function getEndPosition(node: AstNode, rawText: string): Position {
+  if (node.children.length > 0)
+    return getEndPosition(node.children.at(-1)!, rawText);
+  const token = node.getToken();
+  const simplePosition = createReversePositionResolver(rawText)(
+    token.token.position
+  );
+  const finalPosition = simplePosition + token.toString().length;
+  return createPositionResolver(rawText)(finalPosition);
 }

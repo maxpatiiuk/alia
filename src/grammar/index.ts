@@ -484,15 +484,24 @@ export const grammar = store(() =>
         'id',
         'LPAREN',
         'RPAREN',
-        ({ id }) => new FunctionCall(type(id, IdNode), new ActualsList([])),
+        ({ id, RPAREN }) =>
+          new FunctionCall(
+            type(id, IdNode),
+            new ActualsList([]),
+            type(RPAREN, TokenNode)
+          ),
       ],
       [
         'id',
         'LPAREN',
         'actualsList',
         'RPAREN',
-        ({ id, actualsList }) =>
-          new FunctionCall(type(id, IdNode), type(actualsList, ActualsList)),
+        ({ id, actualsList, RPAREN }) =>
+          new FunctionCall(
+            type(id, IdNode),
+            type(actualsList, ActualsList),
+            type(RPAREN, TokenNode)
+          ),
       ],
     ],
     actualsList: [

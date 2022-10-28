@@ -1,6 +1,6 @@
 import { simpleTokens } from '../tokenize/definitions.js';
 import type { Tokens } from '../tokenize/tokens.js';
-import type { Position, Token } from '../tokenize/types.js';
+import type { Token } from '../tokenize/types.js';
 import { indentation } from '../unparseParseTree/index.js';
 import type { RA, WritableArray } from '../utils/types.js';
 import type { LanguageType, typeErrors } from './typing.js';
@@ -87,7 +87,7 @@ export abstract class AstNode {
    * Get a token node. If any type error occurs in this AstNode, the error
    * would be reported at the position of this token.
    */
-  public getToken(): Token {
+  public getToken(): TokenNode {
     throw new Error('getToken is not implemented');
   }
 }
@@ -126,7 +126,6 @@ export type PrintContext = {
   readonly debug: boolean;
   // Whether expression needs to be wrapped in parentheses just to be safe
   readonly needWrapping: boolean;
-  readonly reversePositionResolver: (position: Position) => number;
 };
 
 const indexedSimpleTokens = Object.fromEntries(simpleTokens);
@@ -140,8 +139,18 @@ export class TokenNode extends AstNode {
     return indexedSimpleTokens[this.token.type];
   }
 
+  public toString() {
+    if (this.token.type === 'ID')
+      return (this.token.data as Tokens['ID']).literal.toString();
+    else if (this.token.type === 'INTLITERAL')
+      return (this.token.data as Tokens['INTLITERAL']).literal.toString();
+    else if (this.token.type === 'STRINGLITERAL')
+      return (this.token.data as Tokens['STRINGLITERAL']).literal.toString();
+    else return this.pretty();
+  }
+
   public getToken() {
-    return this.token;
+    return this;
   }
 }
 
@@ -566,7 +575,7 @@ export class WhileNode extends BlockStatement {
   }
 
   public getToken() {
-    return this.token.token;
+    return this.token;
   }
 }
 
@@ -623,7 +632,7 @@ export class ForNode extends BlockStatement {
   }
 
   public getToken() {
-    return this.token.token;
+    return this.token;
   }
 }
 
@@ -681,7 +690,7 @@ export class IfNode extends BlockStatement {
   }
 
   public getToken() {
-    return this.token.token;
+    return this.token;
   }
 }
 
@@ -725,7 +734,7 @@ export class InputNode extends LineStatement {
   }
 
   public getToken() {
-    return this.token.token;
+    return this.token;
   }
 }
 
@@ -751,7 +760,7 @@ export class OutputNode extends LineStatement {
   }
 
   public getToken() {
-    return this.token.token;
+    return this.token;
   }
 }
 
@@ -776,7 +785,10 @@ export class ReturnNode extends LineStatement {
       return returnType instanceof VoidType
         ? returnType
         : context.reportError(this, 'noReturn');
-    } else if (actualReturnType.toString() === returnType)
+    } else if (
+      actualReturnType.toString() === returnType.toString() &&
+      !(returnType instanceof VoidType)
+    )
       return actualReturnType;
     else
       return context.reportError(
@@ -793,7 +805,7 @@ export class ReturnNode extends LineStatement {
   }
 
   public getToken() {
-    return this.token.token;
+    return this.token;
   }
 }
 
@@ -853,7 +865,7 @@ export class DecimalOperator extends Expression {
   }
 
   public getToken() {
-    return this.token.token;
+    return this.token;
   }
 }
 
@@ -890,30 +902,17 @@ export class BooleanOperator extends Expression {
   }
 
   public getToken() {
-    return this.token.token;
+    return this.token;
   }
 }
 
-class SynteticToken extends AstNode {
-  constructor(
-    private readonly startNode: AstNode,
-    private readonly endNode: AstNode
-  ) {
-    super([startNode, endNode]);
-  }
-
-  public getToken(): Token {
-    return {
+class SynteticToken extends TokenNode {
+  public constructor(startNode: AstNode) {
+    super({
       type: 'VOID',
       data: {},
-      position: this.startNode.getToken().position,
-    };
-  }
-
-  public print({ reversePositionResolver }: PrintContext): string {
-    const start = reversePositionResolver(this.startNode.getToken().position);
-    const end = reversePositionResolver(this.endNode.getToken().position);
-    return ' '.repeat(end - start);
+      position: startNode.getToken().token.position,
+    });
   }
 }
 
@@ -965,7 +964,7 @@ export class EqualityOperator extends Expression {
   }
 
   public getToken() {
-    return new SynteticToken(this.left, this.right).getToken();
+    return new SynteticToken(this.left).getToken();
   }
 }
 
@@ -1009,7 +1008,7 @@ export class ComparisonOperator extends Expression {
   }
 
   public getToken() {
-    return this.token.token;
+    return this.token;
   }
 }
 
@@ -1030,7 +1029,7 @@ export class NotNode extends Expression {
   }
 
   public getToken() {
-    return this.token.token;
+    return this.token;
   }
 }
 
@@ -1051,7 +1050,7 @@ export class MinusNode extends Expression {
   }
 
   public getToken() {
-    return this.token.token;
+    return this.token;
   }
 }
 
@@ -1085,7 +1084,7 @@ export class AssignmentExpression extends Expression {
   public typeCheck(context: TypeCheckContext) {
     const leftType = assertType(
       context,
-      this.expression,
+      this.id,
       'invalidOperand',
       'int',
       'bool'
@@ -1100,7 +1099,7 @@ export class AssignmentExpression extends Expression {
     const cascadeType = cascadeError(leftType, rightType);
     return !(cascadeType instanceof ErrorType) &&
       leftType.toString() !== rightType.toString()
-      ? context.reportError(this.id, 'invalidAssign')
+      ? context.reportError(this, 'invalidAssign')
       : cascadeType;
   }
 
@@ -1115,7 +1114,7 @@ export class AssignmentExpression extends Expression {
   }
 
   public getToken() {
-    return new SynteticToken(this.id, this.expression).getToken();
+    return new SynteticToken(this.id).getToken();
   }
 }
 
@@ -1140,9 +1139,10 @@ export class FunctionCallStatement extends Statement {
 export class FunctionCall extends Expression {
   public constructor(
     public readonly id: IdNode,
-    public readonly actualsList: ActualsList
+    public readonly actualsList: ActualsList,
+    token: TokenNode
   ) {
-    super([id, actualsList]);
+    super([id, actualsList, token]);
   }
 
   public typeCheck(context: TypeCheckContext) {
@@ -1158,12 +1158,11 @@ export class FunctionCall extends Expression {
     const formals = functionType.type.typeList.children;
     // TEST: if should do typeChecking if actuals.length !== formals.length
     if (actuals.length === formals.length)
-      this.actualsList.children
-        .map((child) => child.typeCheck(context))
-        .forEach((type, index) => {
-          if (type.toString() !== formals[index].typeCheck(context).toString())
-            context.reportError(this.id, 'argType');
-        });
+      this.actualsList.children.forEach((child, index) => {
+        const type = child.typeCheck(context);
+        if (type.toString() !== formals[index].typeCheck(context).toString())
+          context.reportError(child, 'argType');
+      });
     else context.reportError(this, 'argLength');
 
     return functionType.type.returnType.typeCheck(context);
@@ -1218,7 +1217,7 @@ export class IntLiteralNode extends Term {
   }
 
   public getToken() {
-    return this.token.token;
+    return this.token;
   }
 }
 
@@ -1238,7 +1237,7 @@ export class StringLiteralNode extends Term {
   }
 
   public getToken() {
-    return this.token.token;
+    return this.token;
   }
 }
 
@@ -1252,7 +1251,7 @@ export class BooleanLiteralNode extends Term {
   }
 
   public getToken() {
-    return this.token.token;
+    return this.token;
   }
 }
 
@@ -1266,7 +1265,7 @@ export class MayhemNode extends Term {
   }
 
   public getToken() {
-    return this.token.token;
+    return this.token;
   }
 }
 

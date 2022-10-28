@@ -2,7 +2,6 @@ import { program } from 'commander';
 import fs from 'node:fs';
 
 import { namedParse, run, typeCheckAst } from './process.js';
-import { createReversePositionResolver } from './utils/resolvePosition.js';
 
 program.name('dgc').description('The ultimate Drewgon compiler');
 
@@ -98,8 +97,7 @@ readFile()
       await fs.promises.writeFile(namedUnparse, namedUnparseResults);
 
     if (typeCheck) {
-      const reversePositionResolver = createReversePositionResolver(rawText);
-      const errors = typeCheckAst(ast, reversePositionResolver);
+      const errors = typeCheckAst(ast, rawText);
       errors.forEach((errorMessage) => console.error(errorMessage));
       if (errors.length > 0) console.error('Type Analysis Failed');
     }
