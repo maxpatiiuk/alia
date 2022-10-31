@@ -1,10 +1,8 @@
-# dgc
+# dragoninterp
 
-The ultimate Drewgon compiler.
+The ultimate Drewgon interpreter.
 
 Written in TypeScript.
-
-> NOTE: at present this project only includes a tokenizer, parser and a formatter
 
 ## Prerequisites
 
@@ -21,16 +19,10 @@ make all
 
 ## Running
 
-To see available options, run the script with `--help` argument:
+Start the interpreter:
 
 ```sh
-./dgc --help
-```
-
-Example call:
-
-```sh
-./dgc infile.dg -c 2> errors.txt
+./dragoninterp
 ```
 
 ## Testing

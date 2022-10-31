@@ -1,29 +1,27 @@
-import { namedParse, run, typeCheckAst } from '../process.js';
+import { nameParse, run, typeCheckAst } from '../process.js';
 import type { RA } from '../utils/types.js';
 
-async function nameAnalysis(
-  input: string
-): Promise<RA<string> | string | undefined> {
-  const ast = await run(input, undefined, undefined, false, 'SLR', 'ast');
+function nameAnalysis(input: string): RA<string> | string | undefined {
+  const ast = run(input);
   if (ast === undefined) return undefined;
-  return namedParse(ast, false);
+  return nameParse(ast, false);
 }
 
 describe('name analysis', () => {
-  test('simple case without errors', async () =>
-    expect(nameAnalysis(`int a;`)).resolves.toBe('int a(int);'));
+  test('simple case without errors', () =>
+    expect(nameAnalysis(`int a;`)).toBe('int a(int);'));
 
-  test('simple case with errors', async () =>
+  test('simple case with errors', () =>
     expect(
       nameAnalysis(`int a;
 void a;
 `)
-    ).resolves.toEqual([
+    ).toEqual([
       'FATAL [2,6]-[2,7]: Invalid type in declaration',
       'FATAL [2,6]-[2,7]: Multiply declared identifier',
     ]));
 
-  test('advanced cases with errors', async () =>
+  test('advanced cases with errors', () =>
     expect(
       nameAnalysis(`int a;
 int b;
@@ -474,17 +472,15 @@ int intFunction() {
   while(Bool = Bool) {}
 }`;
 
-async function typeCheck(
-  input: string
-): Promise<RA<string> | string | undefined> {
-  const ast = await run(input, undefined, undefined, false, 'SLR', 'ast');
+function typeCheck(input: string): RA<string> | string | undefined {
+  const ast = run(input);
   if (ast === undefined) return undefined;
-  const nameErrors = namedParse(ast, false);
+  const nameErrors = nameParse(ast, false);
   return Array.isArray(nameErrors) ? nameErrors : typeCheckAst(ast, input);
 }
 
-test('typeCheckAst', async () =>
-  expect(typeCheck(input)).resolves.toEqual([
+test('typeCheckAst', () =>
+  expect(typeCheck(input)).toEqual([
     'FATAL [8,2]-[8,3]: Attempt to call a non-function',
     'FATAL [10,2]-[10,3]: Attempt to call a non-function',
     'FATAL [24,8]-[24,10]: Non-bool expression used as a loop condition',
