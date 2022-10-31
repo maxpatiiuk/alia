@@ -25,8 +25,7 @@ program
   )
   .option(
     '-n, --namedUnparse <string>',
-    'the file to which the augmented unparse output will be written. Ignored if unparseMode is not "ast"',
-    'parseTree'
+    'the file to which the augmented unparse output will be written. Ignored if unparseMode is not "ast"'
   )
   .option(
     '-c, --typeCheck',

@@ -531,10 +531,6 @@ export class StatementList extends AstNode {
 
 export class BlockStatement extends Statement {}
 
-/*
- * TODO: make sure CLI is updated
- */
-
 export class WhileNode extends BlockStatement {
   public constructor(
     private readonly token: TokenNode,
