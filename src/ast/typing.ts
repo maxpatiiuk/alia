@@ -31,7 +31,6 @@ export class FunctionType extends LanguageType {
       mode: 'pretty',
       debug: false,
       needWrapping: false,
-      reversePositionResolver: () => 0,
     });
   }
 }

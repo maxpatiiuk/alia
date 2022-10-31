@@ -532,9 +532,7 @@ export class StatementList extends AstNode {
 export class BlockStatement extends Statement {}
 
 /*
- * TODO: go over spec again
  * TODO: make sure CLI is updated
- * TODO: add type checker tests
  */
 
 export class WhileNode extends BlockStatement {
@@ -1156,7 +1154,6 @@ export class FunctionCall extends Expression {
 
     const actuals = this.actualsList.children;
     const formals = functionType.type.typeList.children;
-    // TEST: if should do typeChecking if actuals.length !== formals.length
     if (actuals.length === formals.length)
       this.actualsList.children.forEach((child, index) => {
         const type = child.typeCheck(context);
