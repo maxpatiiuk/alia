@@ -2,7 +2,7 @@ import { createInterface } from 'node:readline/promises';
 
 import type { AstNode } from './ast/definitions.js';
 import { GlobalsNode } from './ast/definitions.js';
-import { nameParse, run, typeCheckAst } from './process.js';
+import { handleInput, nameParse, run, typeCheckAst } from './process.js';
 
 const stream = createInterface({
   input: process.stdin,
@@ -49,6 +49,10 @@ async function program(): Promise<void> {
       continue;
     }
     bigAst = newAst;
+    ast.evaluate({
+      output: console.log,
+      input: handleInput(stream),
+    });
     input = '';
   }
 }

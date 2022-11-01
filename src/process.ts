@@ -1,3 +1,5 @@
+import type { Interface } from 'node:readline/promises';
+
 import type { AstNode, PrintContext } from './ast/definitions.js';
 import { createScope, GlobalsNode } from './ast/definitions.js';
 import { parseTreeToAst } from './ast/index.js';
@@ -105,3 +107,24 @@ function getEndPosition(node: AstNode, rawText: string): Position {
   const finalPosition = simplePosition + token.toString().length;
   return createPositionResolver(rawText)(finalPosition);
 }
+
+const falsyFields = new Set(['false', 'no', 'nan', 'null', '0']);
+export const handleInput =
+  (stream: Interface) =>
+  async <T extends 'bool' | 'int' | 'string'>(
+    type: T
+  ): Promise<
+    T extends 'bool' ? boolean : T extends 'int' ? number : string
+  > => {
+    let value: boolean | number | string = 0;
+    const line = await stream.question('');
+    if (type === 'string') value = line;
+    else if (type === 'bool')
+      value = !falsyFields.has(line.trim().toLowerCase());
+    else if (type === 'int') {
+      const number = Number.parseInt(line);
+      value = Number.isNaN(number) ? 0 : number;
+    }
+    // @ts-expect-error
+    return value;
+  };

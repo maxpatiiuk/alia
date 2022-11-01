@@ -1,3 +1,4 @@
+import type { handleInput } from '../process.js';
 import { simpleTokens } from '../tokenize/definitions.js';
 import type { Tokens } from '../tokenize/tokens.js';
 import type { Token } from '../tokenize/types.js';
@@ -19,7 +20,7 @@ import {
 /* eslint-disable functional/no-class */
 /* eslint-disable functional/no-this-expression */
 /* eslint-disable functional/prefer-readonly-type */
-/* eslint-disable @typescript-eslint/member-ordering */
+
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable functional/no-throw-statement */
 
@@ -96,6 +97,13 @@ export abstract class AstNode {
   public getToken(): TokenNode {
     throw new Error('getToken is not implemented');
   }
+
+  /**
+   * Evaluate the AST and return the result
+   */
+  public async evaluate(_context: EvalContext): Promise<Value> {
+    throw new Error('evaluate is not implemented');
+  }
 }
 
 export type NameAnalysisContext = {
@@ -110,6 +118,11 @@ export type TypeCheckContext = {
     node: AstNode,
     message: keyof typeof typeErrors
   ) => ErrorType;
+};
+
+export type EvalContext = {
+  readonly output: (message: string) => void;
+  readonly input: ReturnType<typeof handleInput>;
 };
 
 type Scope = {
@@ -181,6 +194,19 @@ export class GlobalsNode extends AstNode {
     this.children.forEach((child) => child.typeCheck(context));
     return new VoidType();
   }
+
+  public async evaluate(context: EvalContext) {
+    return evalList(context, this.children);
+  }
+}
+
+async function evalList(
+  context: EvalContext,
+  list: RA<Expression | StatementList>
+): Promise<Value> {
+  let value: Value = undefined;
+  for (const child of list) value = await child.evaluate(context);
+  return value;
 }
 
 export class Statement extends AstNode {}
@@ -192,8 +218,10 @@ function getScope(node: AstNode) {
   else return currentScope;
 }
 
+type Value = FunctionDeclaration | boolean | number | string | undefined;
+
 export class VariableDeclaration extends Statement {
-  public value: FunctionDeclaration | boolean | number | string | undefined;
+  public value: Value;
 
   public constructor(
     public readonly type: TypeNode,
@@ -234,6 +262,10 @@ export class VariableDeclaration extends Statement {
     else if (type instanceof BoolType) this.value = false;
     else if (type instanceof StringType) this.value = '';
     return new VoidType();
+  }
+
+  public async evaluate(_context: EvalContext) {
+    return this.value;
   }
 }
 
@@ -328,6 +360,20 @@ export class IdNode extends Term {
       token('RPAREN'),
     ].join('');
   }
+
+  public async evaluate(_context: EvalContext) {
+    const declaration = this.getDeclaration();
+    if (declaration === undefined) return undefined;
+    else if (declaration instanceof VariableDeclaration)
+      return declaration.value;
+    else
+      return declaration.printType({
+        indent: 0,
+        mode: 'nameAnalysis',
+        debug: false,
+        needWrapping: false,
+      });
+  }
 }
 
 const token = (token: keyof Tokens) => indexedSimpleTokens[token];
@@ -365,6 +411,15 @@ export class FunctionTypeNode extends TypeNode {
 
   public typeCheck(_context: TypeCheckContext): LanguageType {
     return this.typeNode;
+  }
+
+  public async evaluate(_context: EvalContext) {
+    return this.printType({
+      indent: 0,
+      mode: 'nameAnalysis',
+      debug: false,
+      needWrapping: false,
+    });
   }
 }
 
@@ -497,6 +552,15 @@ export class FunctionDeclaration extends AstNode {
       token('RPAREN'),
     ].join('');
   }
+
+  public async evaluate(_context: EvalContext) {
+    return this.printType({
+      indent: 0,
+      mode: 'nameAnalysis',
+      debug: false,
+      needWrapping: false,
+    });
+  }
 }
 
 export class FormalsDeclNode extends AstNode {
@@ -540,6 +604,10 @@ export class StatementList extends AstNode {
   public typeCheck(context: TypeCheckContext): LanguageType {
     this.children.forEach((child) => child.typeCheck(context));
     return new VoidType();
+  }
+
+  public async evaluate(context: EvalContext) {
+    return evalList(context, this.children);
   }
 }
 
@@ -585,6 +653,8 @@ export class WhileNode extends BlockStatement {
   public getToken() {
     return this.token;
   }
+
+  // TODO: Implement evaluate
 }
 
 export class ForNode extends BlockStatement {
@@ -642,6 +712,8 @@ export class ForNode extends BlockStatement {
   public getToken() {
     return this.token;
   }
+
+  // TODO: Implement evaluate
 }
 
 export class IfNode extends BlockStatement {
@@ -700,6 +772,13 @@ export class IfNode extends BlockStatement {
   public getToken() {
     return this.token;
   }
+
+  public async evaluate(context: EvalContext) {
+    const condition = this.condition.evaluate(context);
+    return Boolean(condition)
+      ? this.statements.evaluate(context)
+      : this.elseStatements?.evaluate(context);
+  }
 }
 
 export class LineStatement extends Statement {}
@@ -723,6 +802,17 @@ export class PostNode extends LineStatement {
   public pretty(printContext: PrintContext) {
     return [this.id.print(printContext), this.type];
   }
+
+  public async evaluate(_context: EvalContext) {
+    const declaration = this.id.getDeclaration();
+    if (!(declaration instanceof VariableDeclaration))
+      throw new Error('Cannot increment non-variable');
+    const value = declaration.value;
+    if (typeof value !== 'number')
+      throw new Error('Cannot increment non-numeric variable');
+    declaration.value = value + (this.type === '++' ? 1 : -1);
+    return value;
+  }
 }
 
 export class InputNode extends LineStatement {
@@ -743,6 +833,18 @@ export class InputNode extends LineStatement {
 
   public getToken() {
     return this.token;
+  }
+
+  public async evaluate(context: EvalContext) {
+    const declaration = this.id.getDeclaration();
+    if (!(declaration instanceof VariableDeclaration))
+      throw new Error('Cannot input a non-literal value');
+    const typeNode = declaration.type;
+    if (!(typeNode instanceof PrimaryTypeNode))
+      throw new Error('Cannot input a non-literal value');
+    const type = typeNode.token.token.type === 'INT' ? 'int' : 'bool';
+    declaration.value = await context.input(type);
+    return declaration.value;
   }
 }
 
@@ -770,6 +872,21 @@ export class OutputNode extends LineStatement {
   public getToken() {
     return this.token;
   }
+
+  public async evaluate(context: EvalContext) {
+    const value = await this.expression.evaluate(context);
+    context.output(
+      value instanceof FunctionDeclaration
+        ? value.printType({
+            indent: 0,
+            mode: 'nameAnalysis',
+            debug: false,
+            needWrapping: false,
+          })
+        : value?.toString() ?? 'undefined'
+    );
+    return undefined;
+  }
 }
 
 export class ReturnNode extends LineStatement {
@@ -785,6 +902,7 @@ export class ReturnNode extends LineStatement {
       .reverse()
       .find(({ node }) => node instanceof FunctionDeclaration)?.node;
     if (!(functionDecl instanceof FunctionDeclaration))
+      // TODO: exit program with this exit code
       throw new Error('Return used outside of function');
     const actualReturnType = this.expression?.typeCheck(context);
     if (actualReturnType instanceof ErrorType) return actualReturnType;
@@ -814,6 +932,10 @@ export class ReturnNode extends LineStatement {
 
   public getToken() {
     return this.token;
+  }
+
+  public async evaluate(context: EvalContext) {
+    return this.expression?.evaluate(context);
   }
 }
 
@@ -875,6 +997,21 @@ export class DecimalOperator extends Expression {
   public getToken() {
     return this.token;
   }
+
+  public async evaluate(context: EvalContext) {
+    const left = await this.left.evaluate(context);
+    const right = await this.left.evaluate(context);
+    if (typeof left !== 'number' || typeof right !== 'number')
+      throw new Error('Cannot perform arithmetic on non-numbers');
+    else if (this.operator === '+') return left + right;
+    else if (this.operator === '-') return left - right;
+    else if (this.operator === '*') return left * right;
+    else if (this.operator === '/') {
+      if (right === 0) throw new Error('Cannot divide by zero');
+      return left / right;
+    }
+    return undefined;
+  }
 }
 
 export class BooleanOperator extends Expression {
@@ -911,6 +1048,15 @@ export class BooleanOperator extends Expression {
 
   public getToken() {
     return this.token;
+  }
+
+  public async evaluate(context: EvalContext) {
+    const left = await this.left.evaluate(context);
+    const right = await this.left.evaluate(context);
+    if (typeof left !== 'boolean' || typeof right !== 'boolean')
+      throw new Error('Cannot perform logic on non-booleans');
+    else if (this.operator === 'and') return left && right;
+    else return left || right;
   }
 }
 
@@ -974,6 +1120,15 @@ export class EqualityOperator extends Expression {
   public getToken() {
     return new SynteticToken(this.left).getToken();
   }
+
+  public async evaluate(context: EvalContext) {
+    const left = await this.left.evaluate(context);
+    const right = await this.left.evaluate(context);
+    if (typeof left !== 'boolean' || typeof right !== 'boolean')
+      throw new Error('Cannot perform logic on non-booleans');
+    const equal = left === right;
+    return (this.operator === '==') === equal;
+  }
 }
 
 export class ComparisonOperator extends Expression {
@@ -1018,6 +1173,17 @@ export class ComparisonOperator extends Expression {
   public getToken() {
     return this.token;
   }
+
+  public async evaluate(context: EvalContext) {
+    const left = await this.left.evaluate(context);
+    const right = await this.left.evaluate(context);
+    if (typeof left !== 'number' || typeof right !== 'number')
+      throw new Error('Cannot perform comparison on non-numbers');
+    else if (this.operator === '<') return left < right;
+    else if (this.operator === '<=') return left <= right;
+    else if (this.operator === '>') return left > right;
+    else return left >= right;
+  }
 }
 
 export class NotNode extends Expression {
@@ -1038,6 +1204,13 @@ export class NotNode extends Expression {
 
   public getToken() {
     return this.token;
+  }
+
+  public async evaluate(context: EvalContext) {
+    const expression = await this.expression.evaluate(context);
+    if (typeof expression !== 'boolean')
+      throw new Error('Cannot perform negation on non-boolean');
+    return !expression;
   }
 }
 
@@ -1060,6 +1233,13 @@ export class MinusNode extends Expression {
   public getToken() {
     return this.token;
   }
+
+  public async evaluate(context: EvalContext) {
+    const expression = await this.expression.evaluate(context);
+    if (typeof expression !== 'number')
+      throw new Error('Cannot negate a non-number');
+    return -expression;
+  }
 }
 
 export class AssignmentStatement extends Statement {
@@ -1077,6 +1257,10 @@ export class AssignmentStatement extends Statement {
 
   public typeCheck(context: TypeCheckContext) {
     return this.expression.typeCheck(context);
+  }
+
+  public async evaluate(context: EvalContext) {
+    return this.expression.evaluate(context);
   }
 }
 
@@ -1124,6 +1308,15 @@ export class AssignmentExpression extends Expression {
   public getToken() {
     return new SynteticToken(this.id).getToken();
   }
+
+  public async evaluate(context: EvalContext) {
+    const expression = await this.expression.evaluate(context);
+    const declaration = this.id.getDeclaration();
+    if (!(declaration instanceof VariableDeclaration))
+      throw new Error('Cannot assign to non-variable');
+    declaration.value = expression;
+    return expression;
+  }
 }
 
 export class FunctionCallStatement extends Statement {
@@ -1141,6 +1334,10 @@ export class FunctionCallStatement extends Statement {
 
   public typeCheck(context: TypeCheckContext) {
     return this.expression.typeCheck(context);
+  }
+
+  public async evaluate(context: EvalContext) {
+    return this.expression.evaluate(context);
   }
 }
 
@@ -1196,6 +1393,8 @@ export class FunctionCall extends Expression {
     )!;
     return declaration.printType(printContext);
   }
+
+  // TODO: function call
 }
 
 export class ActualsList extends AstNode {
@@ -1226,6 +1425,10 @@ export class IntLiteralNode extends Term {
   public getToken() {
     return this.token;
   }
+
+  public async evaluate(_context: EvalContext) {
+    return (this.token.token.data as Tokens['INTLITERAL']).literal;
+  }
 }
 
 export class StringLiteralNode extends Term {
@@ -1246,6 +1449,10 @@ export class StringLiteralNode extends Term {
   public getToken() {
     return this.token;
   }
+
+  public async evaluate(_context: EvalContext) {
+    return (this.token.token.data as Tokens['STRINGLITERAL']).literal;
+  }
 }
 
 export class BooleanLiteralNode extends Term {
@@ -1260,6 +1467,10 @@ export class BooleanLiteralNode extends Term {
   public getToken() {
     return this.token;
   }
+
+  public async evaluate(_context: EvalContext) {
+    return this.token.token.type === 'TRUE';
+  }
 }
 
 export class MayhemNode extends Term {
@@ -1273,6 +1484,10 @@ export class MayhemNode extends Term {
 
   public getToken() {
     return this.token;
+  }
+
+  public async evaluate(_context: EvalContext) {
+    return Math.random() * 1024;
   }
 }
 
