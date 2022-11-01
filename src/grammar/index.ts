@@ -67,7 +67,6 @@ export const grammar = store(() =>
       [
         'globals',
         'varDecl',
-        'SEMICOL',
         ({ globals = new GlobalsNode([]), varDecl }) =>
           new GlobalsNode(
             [...(globals?.children ?? []), varDecl].map((node) =>
@@ -119,6 +118,22 @@ export const grammar = store(() =>
         ({ globals = new GlobalsNode([]), exp }) =>
           new GlobalsNode(
             [...(globals.children ?? []), exp].map((node) =>
+              type(
+                node,
+                VariableDeclaration,
+                FunctionDeclaration,
+                StatementList,
+                Expression
+              )
+            )
+          ),
+      ],
+      [
+        'globals',
+        'SEMICOL',
+        ({ globals = new GlobalsNode([]) }) =>
+          new GlobalsNode(
+            (globals?.children ?? []).map((node) =>
               type(
                 node,
                 VariableDeclaration,
@@ -374,6 +389,17 @@ export const grammar = store(() =>
           new AssignmentStatement(type(assignExp, AssignmentExpression)),
       ],
       [
+        'callExp',
+        ({ callExp }) => new FunctionCallStatement(type(callExp, FunctionCall)),
+      ],
+      ['freeStmt', ({ freeStmt }) => freeStmt],
+    ],
+    // TODO: check if this is even necessary
+    freeStmt: [
+      ['varDecl', ({ varDecl }) => varDecl],
+      ['id', 'POSTDEC', ({ id }) => new PostNode(type(id, IdNode), '--')],
+      ['id', 'POSTINC', ({ id }) => new PostNode(type(id, IdNode), '++')],
+      [
         'RETURN',
         'exp',
         ({ RETURN, exp }) => new ReturnNode(type(RETURN, TokenNode), exp),
@@ -382,16 +408,6 @@ export const grammar = store(() =>
         'RETURN',
         ({ RETURN }) => new ReturnNode(type(RETURN, TokenNode), undefined),
       ],
-      [
-        'callExp',
-        ({ callExp }) => new FunctionCallStatement(type(callExp, FunctionCall)),
-      ],
-      ['freeStmt', ({ freeStmt }) => freeStmt],
-    ],
-    freeStmt: [
-      ['varDecl', ({ varDecl }) => varDecl],
-      ['id', 'POSTDEC', ({ id }) => new PostNode(type(id, IdNode), '--')],
-      ['id', 'POSTINC', ({ id }) => new PostNode(type(id, IdNode), '++')],
       [
         'INPUT',
         'id',

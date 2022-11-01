@@ -46,7 +46,13 @@ export abstract class AstNode {
    * Run Name Analysis on an AST subtree
    */
   public nameAnalysis(context: NameAnalysisContext): void {
-    this.nameAnalysisContext = context;
+    this.nameAnalysisContext = {
+      ...context,
+      symbolTable: [
+        ...this.nameAnalysisContext.symbolTable,
+        ...context.symbolTable,
+      ],
+    };
 
     this.children.forEach((child) => child.nameAnalysis(context));
   }
@@ -516,7 +522,7 @@ export class StatementList extends AstNode {
     super(children);
   }
 
-  public pretty(printContext: PrintContext) {
+  public pretty(printContext: PrintContext): RA<string> | string {
     return this.children.flatMap((child, index, { length }) => [
       indentation.repeat(printContext.indent),
       child.print(printContext),

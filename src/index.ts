@@ -11,6 +11,7 @@ const stream = createInterface({
 console.log('Welcome to dragoninterp! Enter Drewgon code to be interpreted...');
 let bigAst: AstNode | undefined = undefined;
 
+// TODO: exit the program on return statement
 async function program(): Promise<void> {
   let input = '';
   while (true) {
@@ -42,11 +43,12 @@ async function program(): Promise<void> {
       continue;
     }
     const typeErrors = typeCheckAst(newAst, input);
-    if (Array.isArray(typeErrors)) {
+    if (typeErrors.length > 0) {
       typeErrors.forEach((error) => console.error(error));
       input = '';
       continue;
-    } else bigAst = newAst;
+    }
+    bigAst = newAst;
     input = '';
   }
 }
