@@ -11,7 +11,6 @@ const stream = createInterface({
 console.log('Welcome to dragoninterp! Enter Drewgon code to be interpreted...');
 let bigAst: AstNode | undefined = undefined;
 
-// TODO: exit the program on return statement
 async function program(): Promise<void> {
   let input = '';
   while (true) {
@@ -49,11 +48,20 @@ async function program(): Promise<void> {
       continue;
     }
     bigAst = newAst;
+    let returnCalled = false;
     ast.evaluate({
       output: console.log,
       input: handleInput(stream),
+      onReturnCalled(returnValue) {
+        returnCalled = true;
+        if (typeof returnValue === 'number') process.exitCode = returnValue;
+      },
     });
     input = '';
+    if (returnCalled) {
+      stream.close();
+      break;
+    }
   }
 }
 
@@ -66,7 +74,7 @@ stream.on('close', () => {
       needWrapping: false,
     })
   );
-  process.exit(0);
+  process.exit();
 });
 
 /*

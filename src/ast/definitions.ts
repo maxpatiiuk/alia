@@ -21,6 +21,7 @@ import {
 /* eslint-disable functional/no-this-expression */
 /* eslint-disable functional/prefer-readonly-type */
 
+/* eslint-disable @typescript-eslint/require-await */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable functional/no-throw-statement */
 
@@ -84,7 +85,7 @@ export abstract class AstNode {
 
   /**
    * Return a string that represents a stringified TypeNode. Useful when doing
-   * unparse with type anotations enabled
+   * unparse with type annotations enabled
    */
   public printType(_printContext: PrintContext): string {
     throw new Error('PrintType is not implemented');
@@ -101,7 +102,7 @@ export abstract class AstNode {
   /**
    * Evaluate the AST and return the result
    */
-  public async evaluate(_context: EvalContext): Promise<Value> {
+  public async evaluate(_context: EvalContext): Promise<EvalReturnValue> {
     throw new Error('evaluate is not implemented');
   }
 }
@@ -123,6 +124,7 @@ export type TypeCheckContext = {
 export type EvalContext = {
   readonly output: (message: string) => void;
   readonly input: ReturnType<typeof handleInput>;
+  readonly onReturnCalled: (value: EvalValue) => void;
 };
 
 type Scope = {
@@ -203,9 +205,12 @@ export class GlobalsNode extends AstNode {
 async function evalList(
   context: EvalContext,
   list: RA<Expression | StatementList>
-): Promise<Value> {
-  let value: Value = undefined;
-  for (const child of list) value = await child.evaluate(context);
+): Promise<EvalValue> {
+  let value: EvalReturnValue = undefined;
+  for (const child of list) {
+    value = await child.evaluate(context);
+    if (value instanceof ReturnValue) return value.value;
+  }
   return value;
 }
 
@@ -218,10 +223,16 @@ function getScope(node: AstNode) {
   else return currentScope;
 }
 
-type Value = FunctionDeclaration | boolean | number | string | undefined;
+type EvalValue = FunctionDeclaration | boolean | number | string | undefined;
+
+class ReturnValue {
+  public constructor(public readonly value: EvalValue) {}
+}
+
+type EvalReturnValue = EvalValue | ReturnValue;
 
 export class VariableDeclaration extends Statement {
-  public value: Value;
+  public value: EvalValue;
 
   public constructor(
     public readonly type: TypeNode,
@@ -561,6 +572,18 @@ export class FunctionDeclaration extends AstNode {
       needWrapping: false,
     });
   }
+
+  public async call(context: EvalContext, actuals: RA<EvalValue>) {
+    this.formals.children.forEach((formal, index) => {
+      formal.value = actuals[index];
+    });
+
+    const result = this.statements.evaluate(context);
+    resetValues(this.formals);
+    resetValues(this.statements);
+
+    return result;
+  }
 }
 
 export class FormalsDeclNode extends AstNode {
@@ -655,10 +678,11 @@ export class WhileNode extends BlockStatement {
   }
 
   public async evaluate(context: EvalContext) {
-    let result: Value;
+    let result: EvalValue;
     while (await this.condition.evaluate(context)) {
       result = await this.statements.evaluate(context);
       this.statements.children.forEach(resetValues);
+      if (result instanceof ReturnValue) return result.value;
     }
     return result;
   }
@@ -731,11 +755,12 @@ export class ForNode extends BlockStatement {
   }
 
   public async evaluate(context: EvalContext) {
-    let result: Value;
+    let result: EvalValue;
     await this.declaration.evaluate(context);
     while (await this.condition.evaluate(context)) {
       result = await this.statements.evaluate(context);
       this.statements.children.forEach(resetValues);
+      if (result instanceof ReturnValue) return result.value;
     }
     return result;
   }
@@ -958,7 +983,11 @@ export class ReturnNode extends LineStatement {
   }
 
   public async evaluate(context: EvalContext) {
-    return this.expression?.evaluate(context);
+    const value = await this.expression?.evaluate(context);
+    if (value instanceof ReturnValue)
+      throw new Error('Unexpected return value');
+    context.onReturnCalled(value);
+    return new ReturnValue(value);
   }
 }
 
@@ -1337,6 +1366,8 @@ export class AssignmentExpression extends Expression {
     const declaration = this.id.getDeclaration();
     if (!(declaration instanceof VariableDeclaration))
       throw new Error('Cannot assign to non-variable');
+    if (expression instanceof ReturnValue)
+      throw new Error('Cannot assign to return value');
     declaration.value = expression;
     return expression;
   }
@@ -1410,14 +1441,30 @@ export class FunctionCall extends Expression {
   }
 
   public printType(printContext: PrintContext) {
-    const declaration = findDeclaration(
-      this.id.getName(),
-      this.nameAnalysisContext
-    )!;
+    const declaration = this.id.getDeclaration()!;
     return declaration.printType(printContext);
   }
 
-  // TODO: function call
+  public async evaluate(context: EvalContext) {
+    const declaration = this.id.getDeclaration();
+    if (declaration === undefined)
+      throw new Error('Cannot call undefined function');
+
+    const actuals: WritableArray<EvalValue> = [];
+    for (const child of this.actualsList.children) {
+      const value = await child.evaluate(context);
+      if (value instanceof ReturnValue)
+        throw new Error('Unexpected return value');
+      actuals.push(value);
+    }
+
+    const localContext = { ...context, onReturnCalled: () => undefined };
+    if (declaration instanceof FunctionDeclaration)
+      return declaration.call(localContext, actuals);
+    else if (declaration.value instanceof FunctionDeclaration)
+      return declaration.value.call(localContext, actuals);
+    else throw new Error('Cannot call non-function');
+  }
 }
 
 export class ActualsList extends AstNode {
@@ -1519,6 +1566,7 @@ export class MayhemNode extends Term {
 /* eslint-enable functional/prefer-readonly-type */
 /* eslint-enable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-enable functional/no-throw-statement */
+/* eslint-enable @typescript-eslint/require-await */
 /* eslint-enable @typescript-eslint/member-ordering */
 /* eslint-enable @typescript-eslint/explicit-function-return-type */
 /* eslint-enable class-methods-use-this */
