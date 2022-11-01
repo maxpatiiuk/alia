@@ -120,7 +120,7 @@ export type EvalContext = {
   readonly onReturnCalled: (value: EvalValue) => void;
 };
 
-type Scope = {
+export type Scope = {
   readonly items: RA<FunctionDeclaration | VariableDeclaration>;
   readonly node:
     | ForNode

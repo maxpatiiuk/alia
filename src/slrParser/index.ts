@@ -25,10 +25,6 @@ export type ParseTreeLevel<
   readonly children: RA<ParseTreeNode<TERMINALS, NON_TERMINALS>>;
 };
 
-// TODO: add a :help command
-// TODO: add a :save command
-// TODO: add a :type command
-
 export function slrParser<
   TERMINALS extends keyof Tokens,
   NON_TERMINALS extends string
