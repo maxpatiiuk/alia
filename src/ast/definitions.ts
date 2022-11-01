@@ -193,6 +193,8 @@ function getScope(node: AstNode) {
 }
 
 export class VariableDeclaration extends Statement {
+  public value: FunctionDeclaration | boolean | number | string | undefined;
+
   public constructor(
     public readonly type: TypeNode,
     public readonly id: IdNode
@@ -226,7 +228,11 @@ export class VariableDeclaration extends Statement {
     return this.id.printType(printContext);
   }
 
-  public typeCheck(_context: TypeCheckContext): LanguageType {
+  public typeCheck(context: TypeCheckContext): LanguageType {
+    const type = this.id.typeCheck(context);
+    if (type instanceof IntType) this.value = 0;
+    else if (type instanceof BoolType) this.value = false;
+    else if (type instanceof StringType) this.value = '';
     return new VoidType();
   }
 }
@@ -301,7 +307,7 @@ export class IdNode extends Term {
       this.nameAnalysisContext.reportError(this, 'Undeclared identifier');
   }
 
-  private getDeclaration():
+  public getDeclaration():
     | FunctionDeclaration
     | VariableDeclaration
     | undefined {
