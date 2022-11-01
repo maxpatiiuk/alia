@@ -18,7 +18,6 @@ console.log(
 
 /*
  * TODO: add tests
- * TODO: intercept Ctrl+C when input!=''
  */
 
 async function program(): Promise<void> {
@@ -38,13 +37,9 @@ async function program(): Promise<void> {
     if (pendingInput.length > 0) pendingInput += '\n';
     pendingInput = `${pendingInput}${line}`;
 
-    const parseResult = await inputToAst(pendingInput, symbolTable);
-    if (parseResult === undefined) {
-      pendingInput = '';
-      continue;
-    }
-    const { input, ast } = parseResult;
+    const { input, ast } = await inputToAst(pendingInput, symbolTable);
     pendingInput = input;
+    if (ast === undefined) continue;
 
     symbolTable = ast.nameAnalysisContext.symbolTable;
     let returnCalled = false;
@@ -70,21 +65,26 @@ async function program(): Promise<void> {
 async function inputToAst(
   rawInput: string,
   symbolTable: RA<Scope>
-): Promise<{ readonly input: string; readonly ast: AstNode } | undefined> {
+): Promise<{ readonly input: string; readonly ast: AstNode | undefined }> {
   let input = rawInput;
   let ast: AstNode | undefined;
   try {
-    ast = await run(rawInput, undefined, undefined, false, 'SLR', 'ast');
+    ast = await run(input, undefined, undefined, false, 'SLR', 'ast');
   } catch {
-    // Automatically insert semicolons if necessary
+    // Automatically insert trailing semicolon if necessary
     try {
-      input = `${input};`;
-      ast = await run(input, undefined, undefined, false, 'SLR', 'ast');
+      const localInput = `${input};`;
+      ast = await run(localInput, undefined, undefined, false, 'SLR', 'ast');
+      input = localInput;
     } catch {
       ast = undefined;
     }
   }
-  if (ast === undefined) return undefined;
+  if (ast === undefined)
+    return {
+      input,
+      ast: undefined,
+    };
 
   ast.nameAnalysisContext = {
     ...ast.nameAnalysisContext,
@@ -94,13 +94,13 @@ async function inputToAst(
   const nameErrors = nameParse(ast, false);
   if (Array.isArray(nameErrors)) {
     nameErrors.forEach((error) => console.error(error));
-    return undefined;
+    return { input: '', ast: undefined };
   }
 
   const typeErrors = typeCheckAst(ast, input);
   if (typeErrors.length > 0) {
     typeErrors.forEach((error) => console.error(error));
-    return undefined;
+    return { input: '', ast: undefined };
   }
   return { input, ast };
 }
@@ -125,19 +125,20 @@ async function handleCommand(
           `:save <fileName> - save the commands entered in the current session `,
           `into a file\n`,
           `:type <expression> - type check an expression`,
+          `:cancel - (when in a middle of entering multi-line expression) `,
+          `clears current expression and awaits futher input`,
         ].join('')
       )
     );
     return true;
-  }
+  } else if (line === ':cancel') return true;
   const fileName = reSave.exec(line)?.groups?.fileName;
   if (typeof fileName === 'string') {
-    const result = await inputToAst(totalInput.join('\n'), symbolTable);
-    if (result === undefined) {
+    const { ast } = await inputToAst(totalInput.join('\n'), symbolTable);
+    if (ast === undefined) {
       console.log(chalk.red('Unexpected error when saving'));
       return true;
     }
-    const { ast } = result;
     fs.writeFileSync(
       fileName,
       ast.print({
@@ -153,9 +154,8 @@ async function handleCommand(
 
   const expression = reType.exec(line)?.groups?.expression;
   if (typeof expression === 'string') {
-    const result = await inputToAst(expression, symbolTable);
-    if (result === undefined) return true;
-    const { ast } = result;
+    const { ast } = await inputToAst(expression, symbolTable);
+    if (ast === undefined) return true;
     const node = ast?.children.at(-1);
     if (typeof node === 'object') {
       const type = node.typeCheck({

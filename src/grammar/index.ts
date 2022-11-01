@@ -100,7 +100,6 @@ export const grammar = store(() =>
       [
         'globals',
         'stmtList',
-        'SEMICOL',
         ({ globals = new GlobalsNode([]), stmtList }) =>
           new GlobalsNode(
             [...(globals.children ?? []), stmtList].map((node) =>
