@@ -654,7 +654,24 @@ export class WhileNode extends BlockStatement {
     return this.token;
   }
 
-  // TODO: Implement evaluate
+  public async evaluate(context: EvalContext) {
+    let result: Value;
+    while (await this.condition.evaluate(context)) {
+      result = await this.statements.evaluate(context);
+      this.statements.children.forEach(resetValues);
+    }
+    return result;
+  }
+}
+
+function resetValues(statement: AstNode) {
+  if (statement instanceof VariableDeclaration)
+    statement.typeCheck({
+      reportError: () => {
+        throw new Error('reportError is not implemented');
+      },
+    });
+  else statement.children.forEach(resetValues);
 }
 
 export class ForNode extends BlockStatement {
@@ -713,7 +730,15 @@ export class ForNode extends BlockStatement {
     return this.token;
   }
 
-  // TODO: Implement evaluate
+  public async evaluate(context: EvalContext) {
+    let result: Value;
+    await this.declaration.evaluate(context);
+    while (await this.condition.evaluate(context)) {
+      result = await this.statements.evaluate(context);
+      this.statements.children.forEach(resetValues);
+    }
+    return result;
+  }
 }
 
 export class IfNode extends BlockStatement {
@@ -901,9 +926,7 @@ export class ReturnNode extends LineStatement {
     const functionDecl = Array.from(this.nameAnalysisContext.symbolTable)
       .reverse()
       .find(({ node }) => node instanceof FunctionDeclaration)?.node;
-    if (!(functionDecl instanceof FunctionDeclaration))
-      // TODO: exit program with this exit code
-      throw new Error('Return used outside of function');
+    if (!(functionDecl instanceof FunctionDeclaration)) return VoidType;
     const actualReturnType = this.expression?.typeCheck(context);
     if (actualReturnType instanceof ErrorType) return actualReturnType;
     const returnType = functionDecl.returnType;
