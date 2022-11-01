@@ -1,10 +1,10 @@
 import chalk from 'chalk';
 import fs from 'node:fs';
-import { createInterface } from 'node:readline/promises';
+import { createInterface, Interface } from 'node:readline/promises';
 
-import type { AstNode, Scope } from './ast/definitions.js';
-import { handleInput, nameParse, run, typeCheckAst } from './process.js';
-import type { RA } from './utils/types.js';
+import type { AstNode, Scope } from '../ast/definitions.js';
+import { handleInput, nameParse, run, typeCheckAst } from '../process.js';
+import type { RA } from '../utils/types.js';
 
 const stream = createInterface({
   input: process.stdin,
@@ -20,7 +20,7 @@ console.log(
  * TODO: add tests
  */
 
-async function program(): Promise<void> {
+export async function interpreter(stream: Interface): Promise<void> {
   let symbolTable: RA<Scope> = [];
   const totalInput = [];
   let pendingInput = '';
@@ -107,7 +107,7 @@ async function inputToAst(
 
 stream.on('close', () => process.exit());
 
-program();
+interpreter(stream);
 
 const reSave = /^:save \s*(?<fileName>.+)$/u;
 const reType = /^:type \s*(?<expression>.+)$/u;

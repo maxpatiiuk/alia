@@ -1,2 +1,2 @@
 #!/bin/sh
-npx ts-node-esm src/interpreter.ts "$@"
+npx ts-node-esm src/interpreter/index.ts "$@"
