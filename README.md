@@ -1,6 +1,6 @@
-# dragoninterp
+# dgc
 
-The ultimate Drewgon interpreter.
+The ultimate Drewgon compiler and interpreter.
 
 Written in TypeScript.
 
@@ -17,7 +17,21 @@ Install dependencies:
 make all
 ```
 
-## Running
+## Running Compiler
+
+To see available options, run the script with `--help` argument:
+
+```sh
+./dgc --help
+```
+
+Example call:
+
+```sh
+./dgc infile.dg -c 2> errors.txt
+```
+
+## Running Interpreter
 
 Start the interpreter:
 

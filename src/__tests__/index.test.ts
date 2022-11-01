@@ -1,27 +1,29 @@
 import { nameParse, run, typeCheckAst } from '../process.js';
 import type { RA } from '../utils/types.js';
 
-function nameAnalysis(input: string): RA<string> | string | undefined {
-  const ast = run(input);
+async function nameAnalysis(
+  input: string
+): Promise<RA<string> | string | undefined> {
+  const ast = await run(input, undefined, undefined, false, 'SLR', 'ast');
   if (ast === undefined) return undefined;
   return nameParse(ast, false);
 }
 
 describe('name analysis', () => {
-  test('simple case without errors', () =>
-    expect(nameAnalysis(`int a;`)).toBe('int a(int);'));
+  test('simple case without errors', async () =>
+    expect(nameAnalysis(`int a;`)).resolves.toBe('int a(int);'));
 
-  test('simple case with errors', () =>
+  test('simple case with errors', async () =>
     expect(
       nameAnalysis(`int a;
 void a;
 `)
-    ).toEqual([
+    ).resolves.toEqual([
       'FATAL [2,6]-[2,7]: Invalid type in declaration',
       'FATAL [2,6]-[2,7]: Multiply declared identifier',
     ]));
 
-  test('advanced cases with errors', () =>
+  test('advanced cases with errors', async () =>
     expect(
       nameAnalysis(`int a;
 int b;
@@ -472,15 +474,17 @@ int intFunction() {
   while(Bool = Bool) {}
 }`;
 
-function typeCheck(input: string): RA<string> | string | undefined {
-  const ast = run(input);
+async function typeCheck(
+  input: string
+): Promise<RA<string> | string | undefined> {
+  const ast = await run(input, undefined, undefined, false, 'SLR', 'ast');
   if (ast === undefined) return undefined;
   const nameErrors = nameParse(ast, false);
   return Array.isArray(nameErrors) ? nameErrors : typeCheckAst(ast, input);
 }
 
-test('typeCheckAst', () =>
-  expect(typeCheck(input)).toEqual([
+test('typeCheckAst', async () =>
+  expect(typeCheck(input)).resolves.toEqual([
     'FATAL [8,2]-[8,3]: Attempt to call a non-function',
     'FATAL [10,2]-[10,3]: Attempt to call a non-function',
     'FATAL [24,8]-[24,10]: Non-bool expression used as a loop condition',

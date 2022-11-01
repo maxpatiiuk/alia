@@ -1,3 +1,4 @@
+import fs from 'fs';
 import type { Interface } from 'node:readline/promises';
 
 import type { AstNode, PrintContext } from './ast/definitions.js';
@@ -16,6 +17,8 @@ import {
   createReversePositionResolver,
 } from './utils/resolvePosition.js';
 import type { RA, WritableArray } from './utils/types.js';
+import { cykParser } from './cykParser/index.js';
+import { unparseParseTree } from './unparseParseTree/index.js';
 
 export function processInput(rawText: string): {
   readonly formattedErrors: string;
@@ -32,13 +35,42 @@ export function processInput(rawText: string): {
   };
 }
 
-export function run(rawText: string): AstNode | undefined {
-  const { tokens } = processInput(rawText);
+async function printTokens(
+  rawText: string,
+  tokensOutput: string | undefined
+): Promise<RA<Token> | undefined> {
+  const { formattedErrors, formattedTokens, tokens } = processInput(rawText);
+
+  if (typeof tokensOutput === 'string')
+    await fs.promises.writeFile(tokensOutput, formattedTokens);
+  if (formattedErrors.length > 0) {
+    console.error(formattedErrors);
+    process.exitCode = 1;
+    return undefined;
+  } else return tokens;
+}
+
+export async function run(
+  rawText: string,
+  tokensOutput: string | undefined,
+  unparseOutput: string | undefined,
+  debug: boolean,
+  parser: 'CYK' | 'SLR',
+  unparseMode: 'ast' | 'parseTree'
+): Promise<AstNode | undefined> {
+  const tokens = await printTokens(rawText, tokensOutput);
 
   if (tokens === undefined) return undefined;
 
   // Don't include the END token
   const trimmedStream = tokens.slice(0, -1);
+  if (parser === 'CYK') {
+    if (!cykParser(trimmedStream)) {
+      console.error('syntax error\nParse failed');
+      process.exitCode = 1;
+    }
+    return undefined;
+  }
 
   const nullFreeGrammar = removeNullProductions(grammar());
   const parseTree = slrParser(nullFreeGrammar, trimmedStream);
@@ -47,10 +79,29 @@ export function run(rawText: string): AstNode | undefined {
     process.exitCode = 1;
   }
 
-  return parseTreeToAst(nullFreeGrammar, parseTree);
+  if (unparseMode === 'parseTree') {
+    if (unparseOutput !== undefined)
+      await fs.promises.writeFile(unparseOutput, unparseParseTree(parseTree));
+    return undefined;
+  }
+
+  const ast = parseTreeToAst(nullFreeGrammar, parseTree);
+
+  const printContext: PrintContext = {
+    indent: 0,
+    mode: 'pretty',
+    debug,
+    needWrapping: false,
+  };
+  if (typeof unparseOutput === 'string') {
+    const pretty = ast.pretty(printContext);
+    await fs.promises.writeFile(unparseOutput, pretty);
+  }
+
+  return ast;
 }
 
-export function nameParse(ast: AstNode): RA<string> | string {
+export function nameParse(ast: AstNode, debug: boolean): RA<string> | string {
   const errors: WritableArray<string> = [];
   if (!(ast instanceof GlobalsNode))
     throw new Error(
@@ -73,7 +124,7 @@ export function nameParse(ast: AstNode): RA<string> | string {
   const printContext: PrintContext = {
     indent: 0,
     mode: 'nameAnalysis',
-    debug: false,
+    debug,
     needWrapping: false,
   };
 

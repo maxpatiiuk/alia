@@ -1,90 +1,104 @@
-import { createInterface } from 'node:readline/promises';
+import { program } from 'commander';
+import fs from 'node:fs';
 
-import type { AstNode } from './ast/definitions.js';
-import { GlobalsNode } from './ast/definitions.js';
-import { handleInput, nameParse, run, typeCheckAst } from './process.js';
+import { nameParse, run, typeCheckAst } from './process.js';
 
-const stream = createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-console.log('Welcome to dragoninterp! Enter Drewgon code to be interpreted...');
-let bigAst: AstNode | undefined = undefined;
+program.name('dgc').description('The ultimate Drewgon compiler');
 
-// TODO: exit the program on return statement
-async function program(): Promise<void> {
-  let input = '';
-  while (true) {
-    const line = await stream.question(input.length === 0 ? '' : '. ');
-    let ast: AstNode | undefined = undefined;
-    input = `${input}\n${line}`;
-    try {
-      ast = run(input);
-    } catch {
-      ast = undefined;
-    }
-    if (ast === undefined) continue;
-    const oldNameContext = bigAst?.nameAnalysisContext;
-    const newAst = new GlobalsNode([
-      ...(bigAst?.children ?? []),
-      ...ast.children,
-    ]);
-    newAst.nameAnalysisContext = {
-      ...newAst.nameAnalysisContext,
-      symbolTable: [
-        ...(oldNameContext?.symbolTable ?? []),
-        ...newAst.nameAnalysisContext.symbolTable,
-      ],
-    };
-    const nameErrors = nameParse(newAst);
-    if (Array.isArray(nameErrors)) {
-      nameErrors.forEach((error) => console.error(error));
-      input = '';
-      continue;
-    }
-    const typeErrors = typeCheckAst(newAst, input);
-    if (typeErrors.length > 0) {
-      typeErrors.forEach((error) => console.error(error));
-      input = '';
-      continue;
-    }
-    bigAst = newAst;
-    ast.evaluate({
-      output: console.log,
-      input: handleInput(stream),
-    });
-    input = '';
-  }
-}
+let input = '';
 
-stream.on('close', () => {
-  console.log(
-    bigAst?.print({
-      indent: 0,
-      mode: 'pretty',
-      debug: false,
-      needWrapping: false,
-    })
+program
+  .argument('<input>', 'path to input file')
+  .action((inputString: string) => {
+    input = inputString;
+  })
+  .option('-t, --tokensOutput <string>', 'path to output file for tokens')
+  .option(
+    '-p, --parser <string>',
+    'the parser to use. Allowed values include CYK and SLR. Note, unparser is only available for the SLR parser',
+    'SLR'
+  )
+  .option(
+    '-m, --unparseMode <string>',
+    'parseTree - prettify directly from the parse tree (faster). ast - convert to AST and prettify that (better results)',
+    'ast'
+  )
+  .option(
+    '-n, --namedUnparse <string>',
+    'the file to which the augmented unparse output will be written. Ignored if unparseMode is not "ast"'
+  )
+  .option(
+    '-c, --typeCheck',
+    'run a type checker and print errors to stderr',
+    false
+  )
+  .option('-d, --debug', 'output debug information', false)
+  .option(
+    '-u, --unparse <string>',
+    'path to output file that would include preety-printed program'
   );
-  process.exit(0);
-});
 
-/*
- *Const ast = run(rawText);
- *
- *if (ast === undefined) return;
- *
- *const namedUnparseResults = nameParse(ast);
- *if (namedUnparseResults === undefined) return;
- *if (Array.isArray(namedUnparseResults)) {
- *  namedUnparseResults.forEach((errorMessage) => console.error(errorMessage));
- *  console.error('Name Analysis Failed');
- *  return;
- *}
- *
- *const errors = typeCheckAst(ast, rawText);
- *errors.forEach((errorMessage) => console.error(errorMessage));
- *if (errors.length > 0) console.error('Type Analysis Failed');
- */
+program.parse();
 
-program();
+const {
+  tokensOutput,
+  parser: rawParser,
+  unparse: unparseOutput,
+  typeCheck,
+  debug,
+  namedUnparse,
+  unparseMode = 'parseTree',
+} = program.opts<{
+  readonly tokensOutput?: string;
+  readonly parser: string;
+  readonly unparse?: string;
+  readonly debug: boolean;
+  readonly typeCheck: boolean;
+  readonly namedUnparse?: string;
+  readonly unparseMode: string;
+}>();
+
+const parser = rawParser.toUpperCase().trim();
+if (parser !== 'CYK' && parser !== 'SLR')
+  throw new Error(
+    `Unknown parser "${parser}". Allowed values include CYK and SLR.`
+  );
+if (unparseMode !== 'ast' && unparseMode !== 'parseTree')
+  throw new Error(
+    `Unknown unparse mode "${unparseMode}". Allowed values include ast and parseTree.`
+  );
+
+const readFile = async (): Promise<string> =>
+  fs.promises.readFile(input).then((data) => data.toString());
+
+readFile()
+  .then(async (rawText) => {
+    const ast = await run(
+      rawText,
+      tokensOutput,
+      unparseOutput,
+      debug,
+      parser,
+      unparseMode
+    );
+
+    if (ast === undefined) return;
+
+    const namedUnparseResults = nameParse(ast, debug);
+    if (namedUnparseResults === undefined) return;
+    if (Array.isArray(namedUnparseResults)) {
+      namedUnparseResults.forEach((errorMessage) =>
+        console.error(errorMessage)
+      );
+      console.error('Name Analysis Failed');
+      return;
+    } else if (typeof namedUnparse === 'string')
+      await fs.promises.writeFile(namedUnparse, namedUnparseResults);
+
+    if (typeCheck) {
+      const errors = typeCheckAst(ast, rawText);
+      errors.forEach((errorMessage) => console.error(errorMessage));
+      if (errors.length > 0) console.error('Type Analysis Failed');
+    }
+  })
+  .catch(console.error);
