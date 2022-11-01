@@ -7,14 +7,15 @@ import {
   BooleanOperator,
   ComparisonOperator,
   DecimalOperator,
+  EqualityOperator,
   Expression,
-  FunctionTypeNode,
   FormalDeclNode,
   FormalsDeclNode,
   ForNode,
   FunctionCall,
   FunctionCallStatement,
   FunctionDeclaration,
+  FunctionTypeNode,
   GlobalsNode,
   IdNode,
   IfNode,
@@ -35,7 +36,6 @@ import {
   TypeNode,
   VariableDeclaration,
   WhileNode,
-  EqualityOperator,
 } from '../ast/definitions.js';
 import type { RA } from '../utils/types.js';
 import { store } from '../utils/utils.js';
@@ -63,26 +63,6 @@ export const grammar = store(() =>
     /* eslint-disable @typescript-eslint/explicit-function-return-type */
     /* eslint-disable @typescript-eslint/naming-convention */
     program: [['globals', ({ globals }) => globals]],
-    /*program: [['plus', ({ globals }) => globals]],
-    plus: [
-      [
-        'times',
-        'PLUS',
-        'plus',
-        ({ times, plus }) => new DecimalOperator(times, '+', plus),
-      ],
-      ['times', ({ times }) => times],
-    ],
-    times: [
-      [
-        'id',
-        'TIMES',
-        'times',
-        ({ id, times }) => new DecimalOperator(id, '*', times),
-      ],
-      ['id', ({ id }) => id],
-    ],
-    id: [['ID', ({ ID }) => new IdNode(type(ID, TokenNode))]],*/
     globals: [
       [
         'globals',
@@ -91,7 +71,13 @@ export const grammar = store(() =>
         ({ globals = new GlobalsNode([]), varDecl }) =>
           new GlobalsNode(
             [...(globals?.children ?? []), varDecl].map((node) =>
-              type(node, VariableDeclaration, FunctionDeclaration)
+              type(
+                node,
+                VariableDeclaration,
+                FunctionDeclaration,
+                StatementList,
+                Expression
+              )
             )
           ),
       ],
@@ -101,7 +87,45 @@ export const grammar = store(() =>
         ({ globals = new GlobalsNode([]), fnDecl }) =>
           new GlobalsNode(
             [...(globals.children ?? []), fnDecl].map((node) =>
-              type(node, VariableDeclaration, FunctionDeclaration)
+              type(
+                node,
+                VariableDeclaration,
+                FunctionDeclaration,
+                StatementList,
+                Expression
+              )
+            )
+          ),
+      ],
+      [
+        'globals',
+        'freeStmtList',
+        ({ globals = new GlobalsNode([]), freeStmtList }) =>
+          new GlobalsNode(
+            [...(globals.children ?? []), freeStmtList].map((node) =>
+              type(
+                node,
+                VariableDeclaration,
+                FunctionDeclaration,
+                StatementList,
+                Expression
+              )
+            )
+          ),
+      ],
+      [
+        'globals',
+        'exp',
+        ({ globals = new GlobalsNode([]), exp }) =>
+          new GlobalsNode(
+            [...(globals.children ?? []), exp].map((node) =>
+              type(
+                node,
+                VariableDeclaration,
+                FunctionDeclaration,
+                StatementList,
+                Expression
+              )
             )
           ),
       ],
@@ -240,6 +264,30 @@ export const grammar = store(() =>
       ],
       [...epsilon, () => new StatementList([])],
     ],
+    freeStmtList: [
+      [
+        'freeStmtList',
+        'freeStmt',
+        'SEMICOL',
+        ({ stmtList, freeStmt }) =>
+          new StatementList(
+            [...(stmtList?.children ?? []), freeStmt].map((node) =>
+              type(node, Statement)
+            )
+          ),
+      ],
+      [
+        'freeStmtList',
+        'blockStmt',
+        ({ stmtList, blockStmt }) =>
+          new StatementList(
+            [...(stmtList?.children ?? []), blockStmt].map((node) =>
+              type(node, Statement)
+            )
+          ),
+      ],
+      [...epsilon, () => new StatementList([])],
+    ],
     blockStmt: [
       [
         'WHILE',
@@ -315,29 +363,15 @@ export const grammar = store(() =>
             type(IF, TokenNode),
             exp,
             type(stmtList, StatementList),
-            type(stmtList2, StatementList) as StatementList
+            type(stmtList2, StatementList)
           ),
       ],
     ],
     stmt: [
-      ['varDecl', ({ varDecl }) => varDecl],
       [
         'assignExp',
         ({ assignExp }) =>
           new AssignmentStatement(type(assignExp, AssignmentExpression)),
-      ],
-      ['id', 'POSTDEC', ({ id }) => new PostNode(type(id, IdNode), '--')],
-      ['id', 'POSTINC', ({ id }) => new PostNode(type(id, IdNode), '++')],
-      [
-        'INPUT',
-        'id',
-        ({ INPUT, id }) =>
-          new InputNode(type(INPUT, TokenNode), type(id, IdNode)),
-      ],
-      [
-        'OUTPUT',
-        'exp',
-        ({ OUTPUT, exp }) => new OutputNode(type(OUTPUT, TokenNode), exp),
       ],
       [
         'RETURN',
@@ -351,6 +385,23 @@ export const grammar = store(() =>
       [
         'callExp',
         ({ callExp }) => new FunctionCallStatement(type(callExp, FunctionCall)),
+      ],
+      ['freeStmt', ({ freeStmt }) => freeStmt],
+    ],
+    freeStmt: [
+      ['varDecl', ({ varDecl }) => varDecl],
+      ['id', 'POSTDEC', ({ id }) => new PostNode(type(id, IdNode), '--')],
+      ['id', 'POSTINC', ({ id }) => new PostNode(type(id, IdNode), '++')],
+      [
+        'INPUT',
+        'id',
+        ({ INPUT, id }) =>
+          new InputNode(type(INPUT, TokenNode), type(id, IdNode)),
+      ],
+      [
+        'OUTPUT',
+        'exp',
+        ({ OUTPUT, exp }) => new OutputNode(type(OUTPUT, TokenNode), exp),
       ],
     ],
     exp: [

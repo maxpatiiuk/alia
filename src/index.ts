@@ -1,37 +1,53 @@
 import { createInterface } from 'node:readline/promises';
 
-import { nameParse, run, typeCheckAst } from './process.js';
+import type { AstNode } from './ast/definitions.js';
 import { GlobalsNode } from './ast/definitions.js';
+import { nameParse, run, typeCheckAst } from './process.js';
 
 const stream = createInterface({
   input: process.stdin,
   output: process.stdout,
 });
 console.log('Welcome to dragoninterp! Enter Drewgon code to be interpreted...');
-let bigAst: GlobalsNode | undefined = undefined;
+let bigAst: AstNode | undefined = undefined;
 
 async function program(): Promise<void> {
   let input = '';
   while (true) {
     const line = await stream.question(input.length === 0 ? '' : '. ');
-    let ast: GlobalsNode | undefined = undefined;
+    let ast: AstNode | undefined = undefined;
     input = `${input}\n${line}`;
     try {
       ast = run(input);
     } catch {
       ast = undefined;
     }
-    if (ast === undefined || !(ast instanceof GlobalsNode)) continue;
-    input = '';
+    if (ast === undefined) continue;
     const oldNameContext = bigAst?.nameAnalysisContext;
-    bigAst = new GlobalsNode([...(bigAst?.children ?? []), ...ast.children]);
-    bigAst.nameAnalysisContext = {
-      ...bigAst.nameAnalysisContext,
+    const newAst = new GlobalsNode([
+      ...(bigAst?.children ?? []),
+      ...ast.children,
+    ]);
+    newAst.nameAnalysisContext = {
+      ...newAst.nameAnalysisContext,
       symbolTable: [
         ...(oldNameContext?.symbolTable ?? []),
-        ...bigAst.nameAnalysisContext.symbolTable,
+        ...newAst.nameAnalysisContext.symbolTable,
       ],
     };
+    const nameErrors = nameParse(newAst);
+    if (Array.isArray(nameErrors)) {
+      nameErrors.forEach((error) => console.error(error));
+      input = '';
+      continue;
+    }
+    const typeErrors = typeCheckAst(newAst, input);
+    if (Array.isArray(typeErrors)) {
+      typeErrors.forEach((error) => console.error(error));
+      input = '';
+      continue;
+    } else bigAst = newAst;
+    input = '';
   }
 }
 

@@ -156,7 +156,9 @@ export class TokenNode extends AstNode {
 
 export class GlobalsNode extends AstNode {
   public constructor(
-    public readonly children: RA<FunctionDeclaration | VariableDeclaration>
+    public readonly children: RA<
+      Expression | FunctionDeclaration | StatementList | VariableDeclaration
+    >
   ) {
     super([]);
   }
