@@ -44,24 +44,30 @@ function buildTable<T extends string>(
     const hasStartState = reducibleClosures.some(
       ({ nonTerminal }) => nonTerminal === startState
     );
-    const reducers = hasStartState
-      ? {}
-      : Object.fromEntries(
-          reducibleClosures.flatMap((closure) =>
-            Array.from(followSet[closure.nonTerminal], (terminal) => [
-              terminal,
-              closure,
-            ])
-          )
+    const rawReducers = hasStartState
+      ? []
+      : reducibleClosures.flatMap((closure) =>
+          Array.from(followSet[closure.nonTerminal], (terminal) => [
+            terminal,
+            closure,
+          ])
         );
+    /*if (
+      new Set(rawReducers.map(([terminal]) => terminal)).size !==
+      rawReducers.length
+    )
+      throw new Error('Ambiguous grammar');*/
+    const reducers = Object.fromEntries(rawReducers);
 
     return Object.fromEntries(
       [...terminals, ...nonTerminals, ''].map((part) => {
+        const isReducer = part in reducers;
+        const isEdge = part in edges;
+        // if (isReducer && isEdge) throw new Error('Ambiguous grammar');
         if (part === '' && hasStartState) return [part, { type: 'Accept' }];
-        else if (part in reducers)
+        else if (isReducer)
           return [part, { type: 'Reduce', to: reducers[part] }];
-        else if (part in edges)
-          return [part, { type: 'Move', to: edges[part] }];
+        else if (isEdge) return [part, { type: 'Move', to: edges[part] }];
         else return [part, undefined];
       })
     );

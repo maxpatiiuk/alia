@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/maxxxxxdlp/tts-reader#readme",
   "dependencies": {
+    "chalk": "^5.1.2",
     "commander": "^9.4.0"
   },
   "devDependencies": {

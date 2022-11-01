@@ -48,14 +48,7 @@ export abstract class AstNode {
    * Run Name Analysis on an AST subtree
    */
   public nameAnalysis(context: NameAnalysisContext): void {
-    this.nameAnalysisContext = {
-      ...context,
-      symbolTable: [
-        ...this.nameAnalysisContext.symbolTable,
-        ...context.symbolTable,
-      ],
-    };
-
+    this.nameAnalysisContext = context;
     this.children.forEach((child) => child.nameAnalysis(context));
   }
 
@@ -377,13 +370,7 @@ export class IdNode extends Term {
     if (declaration === undefined) return undefined;
     else if (declaration instanceof VariableDeclaration)
       return declaration.value;
-    else
-      return declaration.printType({
-        indent: 0,
-        mode: 'nameAnalysis',
-        debug: false,
-        needWrapping: false,
-      });
+    else return declaration.toString();
   }
 }
 
@@ -564,13 +551,17 @@ export class FunctionDeclaration extends AstNode {
     ].join('');
   }
 
-  public async evaluate(_context: EvalContext) {
+  public toString(): string {
     return this.printType({
       indent: 0,
       mode: 'nameAnalysis',
       debug: false,
       needWrapping: false,
     });
+  }
+
+  public async evaluate(_context: EvalContext) {
+    return this;
   }
 
   public async call(context: EvalContext, actuals: RA<EvalValue>) {
@@ -678,13 +669,12 @@ export class WhileNode extends BlockStatement {
   }
 
   public async evaluate(context: EvalContext) {
-    let result: EvalValue;
     while (await this.condition.evaluate(context)) {
-      result = await this.statements.evaluate(context);
+      const result = await this.statements.evaluate(context);
       this.statements.children.forEach(resetValues);
       if (result instanceof ReturnValue) return result.value;
     }
-    return result;
+    return undefined;
   }
 }
 
@@ -755,14 +745,15 @@ export class ForNode extends BlockStatement {
   }
 
   public async evaluate(context: EvalContext) {
-    let result: EvalValue;
     await this.declaration.evaluate(context);
     while (await this.condition.evaluate(context)) {
-      result = await this.statements.evaluate(context);
+      const result = await this.statements.evaluate(context);
+      await this.action.evaluate(context);
       this.statements.children.forEach(resetValues);
+      this.action.children.forEach(resetValues);
       if (result instanceof ReturnValue) return result.value;
     }
-    return result;
+    return undefined;
   }
 }
 
@@ -1052,7 +1043,7 @@ export class DecimalOperator extends Expression {
 
   public async evaluate(context: EvalContext) {
     const left = await this.left.evaluate(context);
-    const right = await this.left.evaluate(context);
+    const right = await this.right.evaluate(context);
     if (typeof left !== 'number' || typeof right !== 'number')
       throw new Error('Cannot perform arithmetic on non-numbers');
     else if (this.operator === '+') return left + right;
@@ -1104,7 +1095,7 @@ export class BooleanOperator extends Expression {
 
   public async evaluate(context: EvalContext) {
     const left = await this.left.evaluate(context);
-    const right = await this.left.evaluate(context);
+    const right = await this.right.evaluate(context);
     if (typeof left !== 'boolean' || typeof right !== 'boolean')
       throw new Error('Cannot perform logic on non-booleans');
     else if (this.operator === 'and') return left && right;
@@ -1175,9 +1166,7 @@ export class EqualityOperator extends Expression {
 
   public async evaluate(context: EvalContext) {
     const left = await this.left.evaluate(context);
-    const right = await this.left.evaluate(context);
-    if (typeof left !== 'boolean' || typeof right !== 'boolean')
-      throw new Error('Cannot perform logic on non-booleans');
+    const right = await this.right.evaluate(context);
     const equal = left === right;
     return (this.operator === '==') === equal;
   }
@@ -1228,7 +1217,7 @@ export class ComparisonOperator extends Expression {
 
   public async evaluate(context: EvalContext) {
     const left = await this.left.evaluate(context);
-    const right = await this.left.evaluate(context);
+    const right = await this.right.evaluate(context);
     if (typeof left !== 'number' || typeof right !== 'number')
       throw new Error('Cannot perform comparison on non-numbers');
     else if (this.operator === '<') return left < right;
@@ -1363,11 +1352,13 @@ export class AssignmentExpression extends Expression {
 
   public async evaluate(context: EvalContext) {
     const expression = await this.expression.evaluate(context);
+    if (expression instanceof ReturnValue)
+      throw new Error('Cannot assign to return value');
+
     const declaration = this.id.getDeclaration();
     if (!(declaration instanceof VariableDeclaration))
       throw new Error('Cannot assign to non-variable');
-    if (expression instanceof ReturnValue)
-      throw new Error('Cannot assign to return value');
+
     declaration.value = expression;
     return expression;
   }

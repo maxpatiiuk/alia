@@ -25,6 +25,10 @@ export type ParseTreeLevel<
   readonly children: RA<ParseTreeNode<TERMINALS, NON_TERMINALS>>;
 };
 
+// TODO: add a :help command
+// TODO: add a :save command
+// TODO: add a :type command
+
 export function slrParser<
   TERMINALS extends keyof Tokens,
   NON_TERMINALS extends string
@@ -46,6 +50,8 @@ export function slrParser<
     const lookahead = tokens[tokenIndex]?.type;
     const cell = table[state.state][lookahead ?? ''];
     if (cell === undefined) {
+      if (tokens[tokenIndex] === undefined)
+        throw new Error('Unexpected end of input');
       const { lineNumber, columnNumber } = tokens[tokenIndex].position;
       throw new Error(
         `Unexpected token ${lookahead} at (${lineNumber},${columnNumber})`

@@ -1,4 +1,5 @@
-import fs from 'fs';
+import chalk from 'chalk';
+import fs from 'node:fs';
 import type { Interface } from 'node:readline/promises';
 
 import type { AstNode, PrintContext } from './ast/definitions.js';
@@ -6,19 +7,19 @@ import { createScope, GlobalsNode } from './ast/definitions.js';
 import { parseTreeToAst } from './ast/index.js';
 import { ErrorType, typeErrors } from './ast/typing.js';
 import { removeNullProductions } from './cykParser/chomsky/removeNullProductions.js';
+import { cykParser } from './cykParser/index.js';
 import { formatErrors } from './formatErrors.js';
 import { formatTokens } from './formatTokens.js';
 import { grammar } from './grammar/index.js';
 import { slrParser } from './slrParser/index.js';
 import { tokenize } from './tokenize/index.js';
 import type { Position, Token } from './tokenize/types.js';
+import { unparseParseTree } from './unparseParseTree/index.js';
 import {
   createPositionResolver,
   createReversePositionResolver,
 } from './utils/resolvePosition.js';
 import type { RA, WritableArray } from './utils/types.js';
-import { cykParser } from './cykParser/index.js';
-import { unparseParseTree } from './unparseParseTree/index.js';
 
 export function processInput(rawText: string): {
   readonly formattedErrors: string;
@@ -108,7 +109,7 @@ export function nameParse(ast: AstNode, debug: boolean): RA<string> | string {
       `Root node must be GlobalsNode, Found ${ast.constructor.name}`
     );
   ast.nameAnalysis({
-    symbolTable: [createScope(ast)],
+    symbolTable: [...ast.nameAnalysisContext.symbolTable, createScope(ast)],
     isDeclaration: false,
     reportError(idNode, error) {
       const { lineNumber, columnNumber } = idNode.getToken().token.position;
@@ -168,7 +169,7 @@ export const handleInput =
     T extends 'bool' ? boolean : T extends 'int' ? number : string
   > => {
     let value: boolean | number | string = 0;
-    const line = await stream.question('');
+    const line = await stream.question(chalk.green('> '));
     if (type === 'string') value = line;
     else if (type === 'bool')
       value = !falsyFields.has(line.trim().toLowerCase());

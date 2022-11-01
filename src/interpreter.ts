@@ -1,7 +1,7 @@
+import chalk from 'chalk';
 import { createInterface } from 'node:readline/promises';
 
 import type { AstNode } from './ast/definitions.js';
-import { GlobalsNode } from './ast/definitions.js';
 import { handleInput, nameParse, run, typeCheckAst } from './process.js';
 
 const stream = createInterface({
@@ -14,68 +14,69 @@ let bigAst: AstNode | undefined = undefined;
 async function program(): Promise<void> {
   let input = '';
   while (true) {
-    const line = await stream.question(input.length === 0 ? '' : '. ');
+    const line = await stream.question(
+      input.length === 0 ? '' : chalk.gray('. ')
+    );
+
     let ast: AstNode | undefined = undefined;
-    input = `${input}\n${line}`;
+    if (input.length > 0) input += '\n';
+    input = `${input}${line}`;
+
     try {
       ast = await run(input, undefined, undefined, false, 'SLR', 'ast');
     } catch {
-      ast = undefined;
+      // Automatically insert semicolons if necessary
+      try {
+        ast = await run(`${input};`, undefined, undefined, false, 'SLR', 'ast');
+      } catch {
+        ast = undefined;
+      }
     }
     if (ast === undefined) continue;
-    const oldNameContext = bigAst?.nameAnalysisContext;
-    const newAst = new GlobalsNode([
-      ...(bigAst?.children ?? []),
-      ...ast.children,
-    ]);
-    newAst.nameAnalysisContext = {
-      ...newAst.nameAnalysisContext,
+
+    ast.nameAnalysisContext = {
+      ...ast.nameAnalysisContext,
       symbolTable: [
-        ...(oldNameContext?.symbolTable ?? []),
-        ...newAst.nameAnalysisContext.symbolTable,
+        ...(bigAst?.nameAnalysisContext?.symbolTable ?? []),
+        ...ast.nameAnalysisContext.symbolTable,
       ],
     };
-    const nameErrors = nameParse(newAst, false);
+
+    const nameErrors = nameParse(ast, false);
     if (Array.isArray(nameErrors)) {
       nameErrors.forEach((error) => console.error(error));
       input = '';
       continue;
     }
-    const typeErrors = typeCheckAst(newAst, input);
+
+    const typeErrors = typeCheckAst(ast, input);
     if (typeErrors.length > 0) {
       typeErrors.forEach((error) => console.error(error));
       input = '';
       continue;
     }
-    bigAst = newAst;
+
+    bigAst = ast;
     let returnCalled = false;
-    ast.evaluate({
+    const result = await ast.evaluate({
       output: console.log,
       input: handleInput(stream),
-      onReturnCalled(returnValue) {
+      onReturnCalled() {
         returnCalled = true;
-        if (typeof returnValue === 'number') process.exitCode = returnValue;
       },
     });
+    console.log(chalk.gray(result?.toString() ?? 'undefined'));
+
     input = '';
     if (returnCalled) {
+      if (typeof result === 'number') process.exitCode = result;
       stream.close();
       break;
     }
   }
 }
 
-stream.on('close', () => {
-  console.log(
-    bigAst?.print({
-      indent: 0,
-      mode: 'pretty',
-      debug: false,
-      needWrapping: false,
-    })
-  );
-  process.exit();
-});
+stream.on('close', () => process.exit());
 
 /*
  *Const ast = run(rawText);
