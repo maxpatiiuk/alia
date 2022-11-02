@@ -43,7 +43,7 @@ export async function runtime(stream: Interface): Promise<void> {
     totalInput.push(pendingInput);
     pendingInput = '';
     if (returnCalled) {
-      if (typeof result === 'number') process.exitCode = result;
+      if (typeof returnValue === 'number') process.exitCode = returnValue;
       stream.close();
       break;
     }
@@ -67,7 +67,8 @@ async function handleCommand(
           `into a file\n`,
           `:type <expression> - type check an expression`,
           `:cancel - (when in a middle of entering multi-line expression) `,
-          `clears current expression and awaits futher input`,
+          `clears current expression and awaits futher input\n`,
+          `return 0 - exit the program with exit code 0`,
         ].join('')
       )
     );
