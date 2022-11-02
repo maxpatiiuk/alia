@@ -5,6 +5,7 @@ import type { Interface } from 'node:readline/promises';
 import type { AstNode, Scope } from '../ast/definitions.js';
 import { handleInput, nameParse, run, typeCheckAst } from '../process.js';
 import type { RA } from '../utils/types.js';
+import { ReturnValue } from '../ast/definitions.js';
 
 export async function runtime(stream: Interface): Promise<void> {
   let symbolTable: RA<Scope> = [];
@@ -36,7 +37,8 @@ export async function runtime(stream: Interface): Promise<void> {
         returnCalled = true;
       },
     });
-    console.log(chalk.gray(result?.toString() ?? 'undefined'));
+    const returnValue = result instanceof ReturnValue ? result.value : result;
+    console.log(chalk.gray(returnValue?.toString() ?? 'undefined'));
 
     totalInput.push(pendingInput);
     pendingInput = '';

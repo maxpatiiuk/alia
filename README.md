@@ -41,6 +41,8 @@ Start the interpreter:
 
 ## Testing
 
+Automated tests for the interpreter are located in [./src/interpreter/__tests__/runtime.test.ts](./src/interpreter/__tests__/runtime.test.ts)
+
 Jest is used for unit testing.
 
 You can run it like this:

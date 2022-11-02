@@ -180,7 +180,7 @@ export class GlobalsNode extends AstNode {
   public pretty(printContext: PrintContext) {
     return this.children.flatMap((child, index, { length }) => [
       child.print(printContext),
-      child instanceof FunctionDeclaration ? '' : `${token('SEMICOL')}`,
+      child instanceof VariableDeclaration ? `${token('SEMICOL')}` : '',
       index + 1 === length ? '' : '\n',
     ]);
   }
@@ -198,11 +198,11 @@ export class GlobalsNode extends AstNode {
 async function evalList(
   context: EvalContext,
   list: RA<Expression | StatementList>
-): Promise<EvalValue> {
+): Promise<EvalReturnValue> {
   let value: EvalReturnValue = undefined;
   for (const child of list) {
     value = await child.evaluate(context);
-    if (value instanceof ReturnValue) return value.value;
+    if (value instanceof ReturnValue) return value;
   }
   return value;
 }
@@ -218,7 +218,7 @@ function getScope(node: AstNode) {
 
 type EvalValue = FunctionDeclaration | boolean | number | string | undefined;
 
-class ReturnValue {
+export class ReturnValue {
   public constructor(public readonly value: EvalValue) {}
 }
 
@@ -370,7 +370,7 @@ export class IdNode extends Term {
     if (declaration === undefined) return undefined;
     else if (declaration instanceof VariableDeclaration)
       return declaration.value;
-    else return declaration.toString();
+    else return declaration;
   }
 }
 
@@ -569,11 +569,11 @@ export class FunctionDeclaration extends AstNode {
       formal.value = actuals[index];
     });
 
-    const result = this.statements.evaluate(context);
+    const result = await this.statements.evaluate(context);
     resetValues(this.formals);
     resetValues(this.statements);
 
-    return result;
+    return result instanceof ReturnValue ? result.value : result;
   }
 }
 
@@ -672,7 +672,7 @@ export class WhileNode extends BlockStatement {
     while (await this.condition.evaluate(context)) {
       const result = await this.statements.evaluate(context);
       this.statements.children.forEach(resetValues);
-      if (result instanceof ReturnValue) return result.value;
+      if (result instanceof ReturnValue) return result;
     }
     return undefined;
   }
@@ -751,7 +751,7 @@ export class ForNode extends BlockStatement {
       await this.action.evaluate(context);
       this.statements.children.forEach(resetValues);
       this.action.children.forEach(resetValues);
-      if (result instanceof ReturnValue) return result.value;
+      if (result instanceof ReturnValue) return result;
     }
     return undefined;
   }
@@ -815,7 +815,7 @@ export class IfNode extends BlockStatement {
   }
 
   public async evaluate(context: EvalContext) {
-    const condition = this.condition.evaluate(context);
+    const condition = await this.condition.evaluate(context);
     return Boolean(condition)
       ? this.statements.evaluate(context)
       : this.elseStatements?.evaluate(context);
