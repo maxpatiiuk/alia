@@ -1,13 +1,17 @@
 import type { RA } from '../../utils/types.js';
+import { filterArray } from '../../utils/types.js';
 import type { EvalContext } from '../eval.js';
 import { evalList } from '../eval.js';
+import type { Quad } from '../quads/definitions.js';
+import { GlobalQuad } from '../quads/definitions.js';
+import type { QuadsContext } from '../quads/index.js';
 import type { LanguageType, TypeCheckContext } from '../typing.js';
 import { VoidType } from '../typing.js';
 import type { PrintContext } from '../unparse.js';
 import { AstNode } from './AstNode.js';
 import type { Expression } from './expression/index.js';
-import type { FunctionDeclaration } from './FunctionDeclaration.js';
-import type { StatementList } from './statement/StatementList.js';
+import { FunctionDeclaration } from './FunctionDeclaration.js';
+import { StatementList } from './statement/StatementList.js';
 import { VariableDeclaration } from './statement/VariableDeclaration.js';
 import { token } from './TokenNode.js';
 
@@ -35,5 +39,31 @@ export class GlobalsNode extends AstNode {
 
   public async evaluate(context: EvalContext) {
     return evalList(context, this.children);
+  }
+
+  public toQuads(context: QuadsContext): RA<Quad> {
+    return [
+      new GlobalQuad(
+        filterArray(
+          this.children
+            .flatMap((child) =>
+              child instanceof StatementList ? child.children : [child]
+            )
+            .map((child) =>
+              child instanceof VariableDeclaration ||
+              child instanceof FunctionDeclaration
+                ? child.id.getName()
+                : undefined
+            )
+        )
+      ),
+      ...filterArray(
+        this.children.flatMap((child) =>
+          child instanceof FunctionDeclaration
+            ? child.toQuads(context)
+            : undefined
+        )
+      ),
+    ];
   }
 }

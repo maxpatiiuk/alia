@@ -1,6 +1,7 @@
 import { program } from 'commander';
 import fs from 'node:fs';
 
+import { toQuads } from './ast/quads/index.js';
 import { nameParse, run, typeCheckAst } from './process.js';
 
 program.name('dgc').description('The ultimate Drewgon compiler');
@@ -32,6 +33,10 @@ program
     'run a type checker and print errors to stderr',
     false
   )
+  .option(
+    '-a, --assemble <string>',
+    'generate a 3AC representation of the program'
+  )
   .option('-d, --debug', 'output debug information', false)
   .option(
     '-u, --unparse <string>',
@@ -47,6 +52,7 @@ const {
   typeCheck,
   debug,
   namedUnparse,
+  assemble,
   unparseMode = 'parseTree',
 } = program.opts<{
   readonly tokensOutput?: string;
@@ -56,6 +62,7 @@ const {
   readonly typeCheck: boolean;
   readonly namedUnparse?: string;
   readonly unparseMode: string;
+  readonly assemble?: string;
 }>();
 
 const parser = rawParser.toUpperCase().trim();
@@ -99,6 +106,14 @@ readFile()
       const errors = typeCheckAst(ast, rawText);
       errors.forEach((errorMessage) => console.error(errorMessage));
       if (errors.length > 0) console.error('Type Analysis Failed');
+    }
+
+    if (typeof assemble === 'string') {
+      const quads = toQuads(ast);
+      await fs.promises.writeFile(
+        assemble,
+        quads.flatMap((quad) => quad.toString()).join('\n')
+      );
     }
   })
   .catch(console.error);

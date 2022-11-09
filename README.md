@@ -28,7 +28,7 @@ To see available options, run the script with `--help` argument:
 Example call:
 
 ```sh
-./dgc infile.dg -c 2> errors.txt
+./dgc infile.dg -a 3ac.txt 2> errors.txt
 ```
 
 ## Running Interpreter

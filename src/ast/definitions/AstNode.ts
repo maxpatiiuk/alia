@@ -6,6 +6,8 @@ import type { PrintContext } from '../unparse.js';
 import type { FunctionDeclaration } from './FunctionDeclaration.js';
 import type { VariableDeclaration } from './statement/VariableDeclaration.js';
 import type { TokenNode } from './TokenNode.js';
+import { Quad } from '../quads/definitions.js';
+import { QuadsContext } from '../quads/index.js';
 
 export abstract class AstNode {
   // eslint-disable-next-line functional/prefer-readonly-type
@@ -79,5 +81,12 @@ export abstract class AstNode {
    */
   public async evaluate(_context: EvalContext): Promise<EvalReturnValue> {
     throw new Error('evaluate is not implemented');
+  }
+
+  /**
+   * Recursively convert AST to 3AC quads
+   */
+  public toQuads(_context: QuadsContext): RA<Quad> {
+    throw new Error('toQuads is not implemented');
   }
 }

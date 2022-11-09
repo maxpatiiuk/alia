@@ -15,6 +15,8 @@ import { token } from './TokenNode.js';
 import { FunctionTypeNode } from './types/FunctionTypeNode.js';
 import type { TypeNode } from './types/index.js';
 import { TypeListNode } from './types/TypeListNode.js';
+import { FunctionQuad, Quad } from '../quads/definitions.js';
+import { QuadsContext } from '../quads/index.js';
 
 export class FunctionDeclaration extends AstNode {
   public readonly typeNode: FunctionType;
@@ -112,5 +114,11 @@ export class FunctionDeclaration extends AstNode {
     resetValues(this.statements);
 
     return result instanceof ReturnValue ? result.value : result;
+  }
+
+  public toQuads(context: QuadsContext): RA<Quad> {
+    return [
+      new FunctionQuad(this.id.getName(), this.formals.toQuads(), context),
+    ];
   }
 }

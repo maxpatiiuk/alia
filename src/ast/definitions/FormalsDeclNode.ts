@@ -1,4 +1,5 @@
 import type { RA } from '../../utils/types.js';
+import type { Quad } from '../quads/definitions.js';
 import type { LanguageType, TypeCheckContext } from '../typing.js';
 import { VoidType } from '../typing.js';
 import type { PrintContext } from '../unparse.js';
@@ -25,5 +26,9 @@ export class FormalsDeclNode extends AstNode {
 
   public typeCheck(_context: TypeCheckContext): LanguageType {
     return new VoidType();
+  }
+
+  public toQuads(): RA<Quad> {
+    return this.children.flatMap((formal) => formal.toQuads());
   }
 }
