@@ -6,7 +6,7 @@ import {
 } from '../uselessRules.js';
 import { theories } from '../../../tests/utils.js';
 import { epsilon } from '../../../grammar/utils.js';
-import { TypeListNode } from '../../../ast/definitions.js';
+import { TypeListNode } from '../../../ast/definitions/types/TypeListNode.js';
 
 theories(removeUselessProductions, [
   {

@@ -2,8 +2,6 @@ import chalk from 'chalk';
 import fs from 'node:fs';
 import type { Interface } from 'node:readline/promises';
 
-import type { AstNode, PrintContext } from './ast/definitions.js';
-import { createScope, GlobalsNode } from './ast/definitions.js';
 import { parseTreeToAst } from './ast/index.js';
 import { ErrorType, typeErrors } from './ast/typing.js';
 import { removeNullProductions } from './cykParser/chomsky/removeNullProductions.js';
@@ -20,6 +18,10 @@ import {
   createReversePositionResolver,
 } from './utils/resolvePosition.js';
 import type { RA, WritableArray } from './utils/types.js';
+import { AstNode } from './ast/definitions/AstNode.js';
+import { PrintContext } from './ast/unparse.js';
+import { GlobalsNode } from './ast/definitions/GlobalsNode.js';
+import { createScope } from './ast/nameAnalysis.js';
 
 export function processInput(rawText: string): {
   readonly formattedErrors: string;

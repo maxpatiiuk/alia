@@ -1,6 +1,6 @@
 import type { Tokens } from '../tokenize/tokens.js';
 import type { IR, RA, RR } from '../utils/types.js';
-import { AstNode } from '../ast/definitions.js';
+import { AstNode } from '../ast/definitions/AstNode.js';
 
 export type PureGrammar<T extends string> = RR<T, RA<PureGrammarLine<T>>>;
 

@@ -1,6 +1,6 @@
 import type { RA } from '../utils/types.js';
-import type { AstNode, TypeCheckContext } from './definitions.js';
-import { FunctionTypeNode } from './definitions.js';
+import { AstNode } from './definitions/AstNode.js';
+import { FunctionTypeNode } from './definitions/types/FunctionTypeNode.js';
 
 export class LanguageType {
   public toString(): string {
@@ -62,6 +62,13 @@ const types = {
   void: VoidType,
 } as const;
 type ReturnTypes = typeof types;
+
+export type TypeCheckContext = {
+  readonly reportError: (
+    node: AstNode,
+    message: keyof typeof typeErrors
+  ) => ErrorType;
+};
 
 export function assertType<TYPES extends keyof ReturnTypes>(
   context: TypeCheckContext,

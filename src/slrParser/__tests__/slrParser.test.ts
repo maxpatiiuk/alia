@@ -1,6 +1,6 @@
 import { slrParser } from '../index.js';
 import { AbstractGrammar } from '../../grammar/utils.js';
-import { TypeListNode } from '../../ast/definitions.js';
+import { TypeListNode } from '../../ast/definitions/types/TypeListNode.js';
 
 const ast = () => new TypeListNode([]);
 

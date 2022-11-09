@@ -1,46 +1,44 @@
-import type { AstNode } from '../ast/definitions.js';
-import {
-  ActualsList,
-  AssignmentExpression,
-  AssignmentStatement,
-  BooleanLiteralNode,
-  BooleanOperator,
-  ComparisonOperator,
-  DecimalOperator,
-  EqualityOperator,
-  Expression,
-  FormalDeclNode,
-  FormalsDeclNode,
-  ForNode,
-  FunctionCall,
-  FunctionCallStatement,
-  FunctionDeclaration,
-  FunctionTypeNode,
-  GlobalsNode,
-  IdNode,
-  IfNode,
-  InputNode,
-  IntLiteralNode,
-  MayhemNode,
-  MinusNode,
-  NotNode,
-  OutputNode,
-  PostNode,
-  PrimaryTypeNode,
-  ReturnNode,
-  Statement,
-  StatementList,
-  StringLiteralNode,
-  TokenNode,
-  TypeListNode,
-  TypeNode,
-  VariableDeclaration,
-  WhileNode,
-} from '../ast/definitions.js';
 import type { RA } from '../utils/types.js';
 import { store } from '../utils/utils.js';
 import { optimizeGrammar } from './optimize.js';
 import { epsilon } from './utils.js';
+import { AstNode } from '../ast/definitions/AstNode.js';
+import { TokenNode } from '../ast/definitions/TokenNode.js';
+import { GlobalsNode } from '../ast/definitions/GlobalsNode.js';
+import { Statement } from '../ast/definitions/statement/index.js';
+import { VariableDeclaration } from '../ast/definitions/statement/VariableDeclaration.js';
+import { TypeNode } from '../ast/definitions/types/index.js';
+import { PrimaryTypeNode } from '../ast/definitions/types/PrimaryTypeNode.js';
+import { Expression } from '../ast/definitions/expression/index.js';
+import { IdNode } from '../ast/definitions/term/IdNode.js';
+import { FunctionTypeNode } from '../ast/definitions/types/FunctionTypeNode.js';
+import { TypeListNode } from '../ast/definitions/types/TypeListNode.js';
+import { FunctionDeclaration } from '../ast/definitions/FunctionDeclaration.js';
+import { FormalsDeclNode } from '../ast/definitions/FormalsDeclNode.js';
+import { FormalDeclNode } from '../ast/definitions/statement/FormalDeclNode.js';
+import { StatementList } from '../ast/definitions/statement/StatementList.js';
+import { WhileNode } from '../ast/definitions/statement/block/WhileNode.js';
+import { ForNode } from '../ast/definitions/statement/block/ForNode.js';
+import { IfNode } from '../ast/definitions/statement/block/IfNode.js';
+import { PostNode } from '../ast/definitions/statement/line/PostNode.js';
+import { InputNode } from '../ast/definitions/statement/line/InputNode.js';
+import { OutputNode } from '../ast/definitions/statement/line/OutputNode.js';
+import { ReturnNode } from '../ast/definitions/statement/line/ReturnNode.js';
+import { DecimalOperator } from '../ast/definitions/expression/DecimalOperator.js';
+import { BooleanOperator } from '../ast/definitions/expression/BooleanOperator.js';
+import { EqualityOperator } from '../ast/definitions/expression/EqualityOperator.js';
+import { ComparisonOperator } from '../ast/definitions/expression/ComparisonOperator.js';
+import { NotNode } from '../ast/definitions/expression/NotNode.js';
+import { MinusNode } from '../ast/definitions/expression/MinusNode.js';
+import { AssignmentStatement } from '../ast/definitions/statement/line/AssignmentStatement.js';
+import { AssignmentExpression } from '../ast/definitions/expression/AssignmentExpression.js';
+import { FunctionCallStatement } from '../ast/definitions/statement/line/FunctionCallStatement.js';
+import { FunctionCall } from '../ast/definitions/expression/FunctionCall.js';
+import { ActualsList } from '../ast/definitions/ActualsList.js';
+import { IntLiteralNode } from '../ast/definitions/term/IntLiteralNode.js';
+import { StringLiteralNode } from '../ast/definitions/term/StringLiteralNode.js';
+import { BooleanLiteralNode } from '../ast/definitions/term/BooleanLiteralNode.js';
+import { MayhemNode } from '../ast/definitions/term/MayhemNode.js';
 
 function type<T extends AstNode, V extends RA<new (...args: RA<any>) => T>>(
   node: AstNode,

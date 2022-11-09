@@ -1,11 +1,9 @@
 import { exportsForTests } from '../index.js';
 import { theories } from '../../tests/utils.js';
-import {
-  FormalsDeclNode,
-  GlobalsNode,
-  StatementList,
-  TypeListNode,
-} from '../definitions.js';
+import { GlobalsNode } from '../definitions/GlobalsNode.js';
+import { TypeListNode } from '../definitions/types/TypeListNode.js';
+import { FormalsDeclNode } from '../definitions/FormalsDeclNode.js';
+import { StatementList } from '../definitions/statement/StatementList.js';
 
 const { indexParts } = exportsForTests;
 

@@ -5,8 +5,8 @@ import type { ParseTreeLevel, ParseTreeNode } from '../slrParser/index.js';
 import type { Tokens } from '../tokenize/tokens.js';
 import type { IR, R, RA, WritableArray } from '../utils/types.js';
 import { getUniqueName } from '../utils/uniquifyName.js';
-import type { AstNode } from './definitions.js';
-import { TokenNode } from './definitions.js';
+import { AstNode } from './definitions/AstNode.js';
+import { TokenNode } from './definitions/TokenNode.js';
 
 export function parseTreeToAst(
   nullFreeGrammar: AbstractGrammar<GrammarKey>,

@@ -1,7 +1,7 @@
 import { theories } from '../../tests/utils.js';
 import { optimizeGrammar, removeTypeFixes } from '../optimize.js';
 import { epsilon } from '../utils.js';
-import { TypeListNode } from '../../ast/definitions.js';
+import { TypeListNode } from '../../ast/definitions/types/TypeListNode.js';
 
 const ast = () => new TypeListNode([]);
 
