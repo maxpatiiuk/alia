@@ -118,7 +118,12 @@ export class FunctionDeclaration extends AstNode {
 
   public toQuads(context: QuadsContext): RA<Quad> {
     return [
-      new FunctionQuad(this.id.getName(), this.formals.toQuads(), context),
+      new FunctionQuad(
+        this.id.getName(),
+        this.formals.toQuads(),
+        this.statements,
+        context
+      ),
     ];
   }
 }

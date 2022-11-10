@@ -6,6 +6,8 @@ import { wrap, wrapChild } from '../../unparse.js';
 import type { TokenNode } from '../TokenNode.js';
 import { assertToken } from '../TokenNode.js';
 import { Expression } from './index.js';
+import { QuadsContext } from '../../quads/index.js';
+import { OperationQuad } from '../../quads/definitions.js';
 
 export class BooleanOperator extends Expression {
   public readonly operator: 'and' | 'or';
@@ -50,5 +52,15 @@ export class BooleanOperator extends Expression {
       throw new Error('Cannot perform logic on non-booleans');
     else if (this.operator === 'and') return left && right;
     else return left || right;
+  }
+
+  public toQuads(context: QuadsContext) {
+    return [
+      new OperationQuad(
+        this.left.toQuads(context),
+        this.operator,
+        this.right.toQuads(context)
+      ),
+    ];
   }
 }

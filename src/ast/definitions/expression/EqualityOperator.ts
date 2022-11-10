@@ -1,4 +1,6 @@
 import type { EvalContext } from '../../eval.js';
+import { OperationQuad } from '../../quads/definitions.js';
+import type { QuadsContext } from '../../quads/index.js';
 import type { LanguageType, TypeCheckContext } from '../../typing.js';
 import { assertType, BoolType, cascadeError, ErrorType } from '../../typing.js';
 import type { PrintContext } from '../../unparse.js';
@@ -64,5 +66,15 @@ export class EqualityOperator extends Expression {
     const right = await this.right.evaluate(context);
     const equal = left === right;
     return (this.operator === '==') === equal;
+  }
+
+  public toQuads(context: QuadsContext) {
+    return [
+      new OperationQuad(
+        this.left.toQuads(context),
+        this.operator,
+        this.right.toQuads(context)
+      ),
+    ];
   }
 }

@@ -1,12 +1,9 @@
 import type { EvalContext } from '../../eval.js';
 import { ReturnValue } from '../../eval.js';
-import type { TypeCheckContext } from '../../typing.js';
-import {
-  assertType,
-  cascadeError,
-  ErrorType,
-  LanguageType,
-} from '../../typing.js';
+import { AssignQuad } from '../../quads/definitions.js';
+import type { QuadsContext } from '../../quads/index.js';
+import type { LanguageType, TypeCheckContext } from '../../typing.js';
+import { assertType, cascadeError, ErrorType } from '../../typing.js';
 import type { PrintContext } from '../../unparse.js';
 import { VariableDeclaration } from '../statement/VariableDeclaration.js';
 import { SynteticToken } from '../SynteticToken.js';
@@ -71,5 +68,11 @@ export class AssignmentExpression extends Expression {
 
     declaration.value = expression;
     return expression;
+  }
+
+  public toQuads(context: QuadsContext) {
+    return [
+      new AssignQuad(this.id.getName(), this.expression.toQuads(context)),
+    ];
   }
 }

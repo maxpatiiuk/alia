@@ -81,4 +81,6 @@ export class FunctionCall extends Expression {
       return declaration.value.call(localContext, actuals);
     else throw new Error('Cannot call non-function');
   }
+
+  // FIXME: implement toQuads
 }

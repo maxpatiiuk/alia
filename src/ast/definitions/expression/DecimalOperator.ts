@@ -1,4 +1,6 @@
 import type { EvalContext } from '../../eval.js';
+import { OperationQuad } from '../../quads/definitions.js';
+import type { QuadsContext } from '../../quads/index.js';
 import type { TypeCheckContext } from '../../typing.js';
 import { assertType, cascadeError } from '../../typing.js';
 import type { PrintContext } from '../../unparse.js';
@@ -56,5 +58,15 @@ export class DecimalOperator extends Expression {
       return left / right;
     }
     return undefined;
+  }
+
+  public toQuads(context: QuadsContext) {
+    return [
+      new OperationQuad(
+        this.left.toQuads(context),
+        this.operator,
+        this.right.toQuads(context)
+      ),
+    ];
   }
 }

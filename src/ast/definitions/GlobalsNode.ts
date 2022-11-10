@@ -42,6 +42,23 @@ export class GlobalsNode extends AstNode {
   }
 
   public toQuads(context: QuadsContext): RA<Quad> {
+    // eslint-disable-next-line functional/prefer-readonly-type
+    const strings: { readonly name: string; readonly value: string }[] = [];
+    const newContext: QuadsContext = {
+      ...context,
+      requestString(value) {
+        const name = newContext.requestString(value);
+        strings.push({ name, value });
+        return name;
+      },
+    };
+    const functions = filterArray(
+      this.children.flatMap((child) =>
+        child instanceof FunctionDeclaration
+          ? child.toQuads(newContext)
+          : undefined
+      )
+    );
     return [
       new GlobalQuad(
         filterArray(
@@ -55,15 +72,10 @@ export class GlobalsNode extends AstNode {
                 ? child.id.getName()
                 : undefined
             )
-        )
+        ),
+        strings
       ),
-      ...filterArray(
-        this.children.flatMap((child) =>
-          child instanceof FunctionDeclaration
-            ? child.toQuads(context)
-            : undefined
-        )
-      ),
+      ...functions,
     ];
   }
 }

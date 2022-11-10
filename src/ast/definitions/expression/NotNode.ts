@@ -1,4 +1,6 @@
 import type { EvalContext } from '../../eval.js';
+import { OperationQuad } from '../../quads/definitions.js';
+import type { QuadsContext } from '../../quads/index.js';
 import type { TypeCheckContext } from '../../typing.js';
 import { assertType } from '../../typing.js';
 import type { PrintContext } from '../../unparse.js';
@@ -31,5 +33,11 @@ export class NotNode extends Expression {
     if (typeof expression !== 'boolean')
       throw new Error('Cannot perform negation on non-boolean');
     return !expression;
+  }
+
+  public toQuads(context: QuadsContext) {
+    return [
+      new OperationQuad(undefined, '!', this.expression.toQuads(context)),
+    ];
   }
 }

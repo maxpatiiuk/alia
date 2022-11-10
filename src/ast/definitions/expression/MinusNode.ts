@@ -1,4 +1,6 @@
 import type { EvalContext } from '../../eval.js';
+import { OperationQuad } from '../../quads/definitions.js';
+import type { QuadsContext } from '../../quads/index.js';
 import type { TypeCheckContext } from '../../typing.js';
 import { assertType } from '../../typing.js';
 import type { PrintContext } from '../../unparse.js';
@@ -31,5 +33,11 @@ export class MinusNode extends Expression {
     if (typeof expression !== 'number')
       throw new Error('Cannot negate a non-number');
     return -expression;
+  }
+
+  public toQuads(context: QuadsContext) {
+    return [
+      new OperationQuad(undefined, 'neg', this.expression.toQuads(context)),
+    ];
   }
 }
