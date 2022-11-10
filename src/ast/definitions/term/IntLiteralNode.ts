@@ -1,5 +1,6 @@
 import type { Tokens } from '../../../tokenize/tokens.js';
 import type { EvalContext } from '../../eval.js';
+import { TermQuad } from '../../quads/definitions.js';
 import { IntType } from '../../typing.js';
 import type { TokenNode } from '../TokenNode.js';
 import { Term } from './index.js';
@@ -23,5 +24,9 @@ export class IntLiteralNode extends Term {
 
   public async evaluate(_context: EvalContext) {
     return (this.token.token.data as Tokens['INTLITERAL']).literal;
+  }
+
+  public toQuads() {
+    return [new TermQuad(this.pretty())];
   }
 }

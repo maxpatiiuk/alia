@@ -1,5 +1,7 @@
 import type { Tokens } from '../../../tokenize/tokens.js';
 import type { EvalContext } from '../../eval.js';
+import { TermQuad } from '../../quads/definitions.js';
+import type { QuadsContext } from '../../quads/index.js';
 import { StringType } from '../../typing.js';
 import type { TokenNode } from '../TokenNode.js';
 import { Term } from './index.js';
@@ -25,5 +27,10 @@ export class StringLiteralNode extends Term {
 
   public async evaluate(_context: EvalContext) {
     return (this.token.token.data as Tokens['STRINGLITERAL']).literal;
+  }
+
+  public toQuads(context: QuadsContext) {
+    const variable = context.requestString(this.pretty());
+    return [new TermQuad(variable)];
   }
 }

@@ -12,6 +12,7 @@ import { token } from '../TokenNode.js';
 import { FunctionTypeNode } from '../types/FunctionTypeNode.js';
 import { PrimaryTypeNode } from '../types/PrimaryTypeNode.js';
 import { Term } from './index.js';
+import { mem, TermQuad } from '../../quads/definitions.js';
 
 export class IdNode extends Term {
   public constructor(public readonly token: TokenNode) {
@@ -78,5 +79,9 @@ export class IdNode extends Term {
     else if (declaration instanceof VariableDeclaration)
       return declaration.value;
     else return declaration;
+  }
+
+  public toQuads() {
+    return [new TermQuad(mem(this.getName()))];
   }
 }

@@ -19,4 +19,9 @@ export class MayhemNode extends Term {
   public async evaluate(_context: EvalContext) {
     return Math.random() * 1024;
   }
+
+  public toQuads() {
+    throw new Error('// FIXME: not implemented');
+    return [];
+  }
 }

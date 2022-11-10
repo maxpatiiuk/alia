@@ -1,4 +1,5 @@
 import type { EvalContext } from '../../eval.js';
+import { TermQuad } from '../../quads/definitions.js';
 import { BoolType } from '../../typing.js';
 import type { TokenNode } from '../TokenNode.js';
 import { Term } from './index.js';
@@ -18,5 +19,9 @@ export class BooleanLiteralNode extends Term {
 
   public async evaluate(_context: EvalContext) {
     return this.token.token.type === 'TRUE';
+  }
+
+  public toQuads() {
+    return [new TermQuad(this.token.token.type === 'TRUE' ? '1' : '0')];
   }
 }
