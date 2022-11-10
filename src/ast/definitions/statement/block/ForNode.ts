@@ -80,4 +80,6 @@ export class ForNode extends BlockStatement {
     }
     return undefined;
   }
+
+  // FIXME: implement toQuads
 }

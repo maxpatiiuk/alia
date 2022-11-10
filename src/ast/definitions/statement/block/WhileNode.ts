@@ -61,4 +61,6 @@ export class WhileNode extends BlockStatement {
     }
     return undefined;
   }
+
+  // FIXME: implement toQuads
 }
