@@ -2,6 +2,8 @@ import { indentation } from '../../../unparseParseTree/index.js';
 import type { RA } from '../../../utils/types.js';
 import type { EvalContext, EvalReturnValue } from '../../eval.js';
 import { evalList } from '../../eval.js';
+import type { Quad } from '../../quads/definitions.js';
+import type { QuadsContext } from '../../quads/index.js';
 import type { LanguageType, TypeCheckContext } from '../../typing.js';
 import { VoidType } from '../../typing.js';
 import type { PrintContext } from '../../unparse.js';
@@ -31,5 +33,9 @@ export class StatementList extends AstNode {
 
   public async evaluate(context: EvalContext): Promise<EvalReturnValue> {
     return evalList(context, this.children);
+  }
+
+  public toQuads(context: QuadsContext): RA<Quad> {
+    return this.children.flatMap((statement) => statement.toQuads(context));
   }
 }

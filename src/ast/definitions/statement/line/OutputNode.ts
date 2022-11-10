@@ -7,6 +7,8 @@ import { FunctionDeclaration } from '../../FunctionDeclaration.js';
 import type { TokenNode } from '../../TokenNode.js';
 import { token } from '../../TokenNode.js';
 import { LineStatement } from './index.js';
+import { QuadsContext } from '../../../quads/index.js';
+import { ReportQuad } from '../../../quads/definitions.js';
 
 export class OutputNode extends LineStatement {
   public constructor(
@@ -46,5 +48,9 @@ export class OutputNode extends LineStatement {
         : value?.toString() ?? 'undefined'
     );
     return undefined;
+  }
+
+  public toQuads(context: QuadsContext) {
+    return [new ReportQuad(this.expression.toQuads(context))];
   }
 }

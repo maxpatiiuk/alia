@@ -5,6 +5,7 @@ import type { PrintContext } from '../../../unparse.js';
 import type { IdNode } from '../../term/IdNode.js';
 import { VariableDeclaration } from '../VariableDeclaration.js';
 import { LineStatement } from './index.js';
+import { PostQuad } from '../../../quads/definitions.js';
 
 export class PostNode extends LineStatement {
   public constructor(
@@ -35,5 +36,9 @@ export class PostNode extends LineStatement {
       throw new Error('Cannot increment non-numeric variable');
     declaration.value = value + (this.type === '++' ? 1 : -1);
     return value;
+  }
+
+  public toQuads() {
+    return [new PostQuad(this.id.getName(), this.type)];
   }
 }

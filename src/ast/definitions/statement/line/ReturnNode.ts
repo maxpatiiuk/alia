@@ -1,5 +1,8 @@
+import { filterArray } from '../../../../utils/types.js';
 import type { EvalContext } from '../../../eval.js';
 import { ReturnValue } from '../../../eval.js';
+import { SimpleQuad } from '../../../quads/definitions.js';
+import type { QuadsContext } from '../../../quads/index.js';
 import type { LanguageType, TypeCheckContext } from '../../../typing.js';
 import { ErrorType, VoidType } from '../../../typing.js';
 import type { PrintContext } from '../../../unparse.js';
@@ -58,5 +61,16 @@ export class ReturnNode extends LineStatement {
       throw new Error('Unexpected return value');
     context.onReturnCalled(value);
     return new ReturnValue(value);
+  }
+
+  public toQuads(context: QuadsContext) {
+    const quads = this.expression?.toQuads(context);
+    return filterArray([
+      ...(quads ?? []),
+      typeof quads === 'object'
+        ? new SimpleQuad('setred', quads.at(-1)!.toValue())
+        : undefined,
+      new SimpleQuad('goto', context.returnLabel),
+    ]);
   }
 }

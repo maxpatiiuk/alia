@@ -1,4 +1,5 @@
 import type { EvalContext } from '../../../eval.js';
+import { ReceiveQuad } from '../../../quads/definitions.js';
 import type { TypeCheckContext } from '../../../typing.js';
 import { assertType } from '../../../typing.js';
 import type { PrintContext } from '../../../unparse.js';
@@ -39,5 +40,9 @@ export class InputNode extends LineStatement {
     const type = typeNode.token.token.type === 'INT' ? 'int' : 'bool';
     declaration.value = await context.input(type);
     return declaration.value;
+  }
+
+  public toQuads() {
+    return [new ReceiveQuad(this.id.getName())];
   }
 }

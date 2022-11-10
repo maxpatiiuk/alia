@@ -1,4 +1,5 @@
 import type { EvalContext } from '../../../eval.js';
+import type { QuadsContext } from '../../../quads/index.js';
 import type { TypeCheckContext } from '../../../typing.js';
 import type { PrintContext } from '../../../unparse.js';
 import type { AssignmentExpression } from '../../expression/AssignmentExpression.js';
@@ -23,5 +24,9 @@ export class AssignmentStatement extends LineStatement {
 
   public async evaluate(context: EvalContext) {
     return this.expression.evaluate(context);
+  }
+
+  public toQuads(context: QuadsContext) {
+    return this.expression.toQuads(context);
   }
 }
