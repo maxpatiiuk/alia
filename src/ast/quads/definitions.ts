@@ -321,7 +321,7 @@ export class OpQuad extends TermQuad {
 }
 
 export class OperationQuad extends Quad {
-  private readonly assignQuad: OpQuad;
+  private readonly assignQuad: AssignQuad;
 
   public constructor(
     private readonly left: RA<Quad> | undefined,
@@ -395,9 +395,12 @@ export class IfQuad extends Quad {
   }
 
   public toString() {
-    return this.quads.flatMap((quad) => quad.toString());
+    return quadsToString(this.quads);
   }
 }
+
+const quadsToString = (quads: RA<Quad>): RA<LabelQuad | string> =>
+  quads.flatMap((quad) => (quad instanceof LabelQuad ? quad : quad.toString()));
 
 class IfzQuad extends Quad {
   public constructor(
@@ -409,5 +412,28 @@ class IfzQuad extends Quad {
 
   public toString() {
     return [`IFZ ${this.condition} GOTO ${this.label}`];
+  }
+}
+
+export class ForQuad extends Quad {
+  private readonly quads: RA<Quad>;
+
+  public constructor(
+    private readonly declaration: RA<Quad>,
+    private readonly condition: RA<Quad>,
+    private readonly statements: RA<Quad>,
+    private readonly startLabel: string,
+    private readonly endLabel: string
+  ) {
+    super();
+    this.quads = [
+      ...this.declaration,
+      new LabelQuad(this.startLabel, new NopQuad()),
+      new IfQuad(this.condition, this.statements, undefined, this.endLabel),
+    ];
+  }
+
+  public toString() {
+    return quadsToString(this.quads);
   }
 }
