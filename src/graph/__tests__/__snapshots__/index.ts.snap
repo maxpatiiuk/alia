@@ -8,46 +8,46 @@ exports[`Generating a graph 1`] = `
   
    0 [ label=\\"0
 A→• B
-B→• C B
-B→• hello B
-B→• w o rld\\" ];
+B→• NOT B
+B→• LPAREN B
+B→• RPAREN ARROW IF\\" ];
  1 [ label=\\"1
 A→B •\\" ];
  2 [ label=\\"2
-B→C • B
-B→• C B
-B→• hello B
-B→• w o rld\\" ];
+B→NOT • B
+B→• NOT B
+B→• LPAREN B
+B→• RPAREN ARROW IF\\" ];
  3 [ label=\\"3
-B→hello • B
-B→• C B
-B→• hello B
-B→• w o rld\\" ];
+B→LPAREN • B
+B→• NOT B
+B→• LPAREN B
+B→• RPAREN ARROW IF\\" ];
  4 [ label=\\"4
-B→w • o rld\\" ];
+B→RPAREN • ARROW IF\\" ];
  5 [ label=\\"5
-B→C B •\\" ];
+B→NOT B •\\" ];
  6 [ label=\\"6
-B→hello B •\\" ];
+B→LPAREN B •\\" ];
  7 [ label=\\"7
-B→w o • rld\\" ];
+B→RPAREN ARROW • IF\\" ];
  8 [ label=\\"8
-B→w o rld •\\" ];
+B→RPAREN ARROW IF •\\" ];
   
    0 -> 1 [ label=\\"B\\" ];
- 0 -> 2 [ label=\\"C\\" ];
- 0 -> 3 [ label=\\"hello\\" ];
- 0 -> 4 [ label=\\"w\\" ];
+ 0 -> 2 [ label=\\"NOT\\" ];
+ 0 -> 3 [ label=\\"LPAREN\\" ];
+ 0 -> 4 [ label=\\"RPAREN\\" ];
  2 -> 5 [ label=\\"B\\" ];
- 2 -> 2 [ label=\\"C\\" ];
- 2 -> 3 [ label=\\"hello\\" ];
- 2 -> 4 [ label=\\"w\\" ];
+ 2 -> 2 [ label=\\"NOT\\" ];
+ 2 -> 3 [ label=\\"LPAREN\\" ];
+ 2 -> 4 [ label=\\"RPAREN\\" ];
  3 -> 6 [ label=\\"B\\" ];
- 3 -> 2 [ label=\\"C\\" ];
- 3 -> 3 [ label=\\"hello\\" ];
- 3 -> 4 [ label=\\"w\\" ];
- 4 -> 7 [ label=\\"o\\" ];
- 7 -> 8 [ label=\\"rld\\" ];
+ 3 -> 2 [ label=\\"NOT\\" ];
+ 3 -> 3 [ label=\\"LPAREN\\" ];
+ 3 -> 4 [ label=\\"RPAREN\\" ];
+ 4 -> 7 [ label=\\"ARROW\\" ];
+ 7 -> 8 [ label=\\"IF\\" ];
   
 }"
 `;

@@ -48,7 +48,7 @@ describe('slrParser', () => {
           },
         ]
       )
-    ).resolves.toEqual({
+    ).toEqual({
       children: [
         {
           data: {},

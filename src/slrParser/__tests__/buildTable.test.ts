@@ -1,7 +1,7 @@
 import { theories } from '../../tests/utils.js';
 import type { Tokens } from '../../tokenize/tokens.js';
 import { getTable, splitGrammar } from '../buildTable.js';
-import {PureGrammar} from '../../grammar/utils.js';
+import { PureGrammar } from '../../grammar/utils.js';
 
 const abstractGrammar: PureGrammar<'L' | 'P' | 'S'> = {
   S: [['P']],
@@ -15,8 +15,8 @@ const recursiveGrammar: PureGrammar<'S' | 'X'> = {
 };
 
 describe('buildTable', () => {
-  test('regular grammar', () =>
-    expect(getTable(abstractGrammar)).toEqual([
+  test('regular grammar', async () =>
+    expect(getTable(abstractGrammar)).resolves.toEqual([
       {
         LPAREN: {
           to: 2,
@@ -99,8 +99,8 @@ describe('buildTable', () => {
         },
       },
     ]));
-  test('recursive grammar', () =>
-    expect(getTable(recursiveGrammar)).toEqual([
+  test('recursive grammar', async () =>
+    expect(getTable(recursiveGrammar)).resolves.toEqual([
       {
         X: {
           to: 1,
