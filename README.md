@@ -50,3 +50,24 @@ You can run it like this:
 ```sh
 make test
 ```
+
+## Generate a graph
+
+There is an option to create a graph of the processed grammar (could be useful
+for debugging)
+
+> NOTE: due to grammar being quite large, the resulting graph is enormous
+
+First, create a `parser.dot` text file (in the DOT format):
+
+```
+./dgc --diagramPath parser.dot
+```
+
+Then, convert it into a `parser.svg` image (assuming dot is installed):
+
+```sh
+dot -Tsvg parser.dot -o parser.svg
+```
+
+Tested with `dot v6.0.1`

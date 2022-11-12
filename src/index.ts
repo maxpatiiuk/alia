@@ -39,6 +39,10 @@ program
   )
   .option('-d, --debug', 'output debug information', false)
   .option(
+    '-d, --diagramPath <string>',
+    'path to the output diagram for the grammar in the DOT format'
+  )
+  .option(
     '-u, --unparse <string>',
     'path to output file that would include preety-printed program'
   );
@@ -54,6 +58,7 @@ const {
   namedUnparse,
   assemble,
   unparseMode = 'parseTree',
+  diagramPath,
 } = program.opts<{
   readonly tokensOutput?: string;
   readonly parser: string;
@@ -63,6 +68,7 @@ const {
   readonly namedUnparse?: string;
   readonly unparseMode: string;
   readonly assemble?: string;
+  readonly diagramPath?: string;
 }>();
 
 const parser = rawParser.toUpperCase().trim();
@@ -80,14 +86,15 @@ const readFile = async (): Promise<string> =>
 
 readFile()
   .then(async (rawText) => {
-    const ast = await run(
+    const ast = await run({
       rawText,
       tokensOutput,
       unparseOutput,
       debug,
       parser,
-      unparseMode
-    );
+      unparseMode,
+      diagramPath,
+    });
 
     if (ast === undefined) return;
 

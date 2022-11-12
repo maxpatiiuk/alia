@@ -3,12 +3,13 @@ import type { Action } from 'typesafe-reducer';
 import { getGrammarRoot } from '../cykParser/chomsky/uselessRules.js';
 import { getFirstSets } from '../firstFollowSets/firstSets.js';
 import { getFollowSets } from '../firstFollowSets/followSets.js';
+import type { PureGrammar, PureGrammarLine } from '../grammar/utils.js';
+import { createGraph } from '../graph/index.js';
 import type { IR, RA } from '../utils/types.js';
 import { split } from '../utils/utils.js';
 import type { Closure } from './closure.js';
 import type { DiagramNode } from './stateDiagram.js';
 import { buildStateDiagram } from './stateDiagram.js';
-import { PureGrammar, PureGrammarLine } from '../grammar/utils.js';
 
 type Move = Action<'Move', { readonly to: number }>;
 type Accept = Action<'Accept'>;
@@ -19,12 +20,17 @@ type Reduce<T extends string> = Action<
 export type TableCell<T extends string> = Accept | Move | Reduce<T> | undefined;
 export type SlrTable<T extends string> = RA<IR<TableCell<T>>>;
 
-export function getTable<T extends string>(
-  grammar: PureGrammar<T>
-): SlrTable<T> {
+export async function getTable<T extends string>(
+  grammar: PureGrammar<T>,
+  diagramPath?: string
+): Promise<SlrTable<T>> {
   const firstSets = getFirstSets(grammar);
   const followSets = getFollowSets(grammar, firstSets);
   const diagram = buildStateDiagram(grammar);
+
+  if (typeof diagramPath === 'string')
+    await createGraph(grammar, diagram, diagramPath);
+
   return buildTable(grammar, diagram, followSets);
 }
 
@@ -52,18 +58,20 @@ function buildTable<T extends string>(
             closure,
           ])
         );
-    /*if (
-      new Set(rawReducers.map(([terminal]) => terminal)).size !==
-      rawReducers.length
-    )
-      throw new Error('Ambiguous grammar');*/
+    /*
+     *If (
+     *new Set(rawReducers.map(([terminal]) => terminal)).size !==
+     *rawReducers.length
+     *)
+     *throw new Error('Ambiguous grammar');
+     */
     const reducers = Object.fromEntries(rawReducers);
 
     return Object.fromEntries(
       [...terminals, ...nonTerminals, ''].map((part) => {
         const isReducer = part in reducers;
         const isEdge = part in edges;
-        // if (isReducer && isEdge) throw new Error('Ambiguous grammar');
+        // If (isReducer && isEdge) throw new Error('Ambiguous grammar');
         if (part === '' && hasStartState) return [part, { type: 'Accept' }];
         else if (isReducer)
           return [part, { type: 'Reduce', to: reducers[part] }];

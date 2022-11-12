@@ -2,13 +2,19 @@ import chalk from 'chalk';
 import fs from 'node:fs';
 import type { Interface } from 'node:readline/promises';
 
+import type { AstNode } from './ast/definitions/AstNode.js';
+import { GlobalsNode } from './ast/definitions/GlobalsNode.js';
 import { parseTreeToAst } from './ast/index.js';
+import { createScope } from './ast/nameAnalysis.js';
 import { ErrorType, typeErrors } from './ast/typing.js';
+import type { PrintContext } from './ast/unparse.js';
 import { removeNullProductions } from './cykParser/chomsky/removeNullProductions.js';
 import { cykParser } from './cykParser/index.js';
 import { formatErrors } from './formatErrors.js';
 import { formatTokens } from './formatTokens.js';
 import { grammar } from './grammar/index.js';
+import { toPureGrammar } from './grammar/utils.js';
+import { getTable } from './slrParser/buildTable.js';
 import { slrParser } from './slrParser/index.js';
 import { tokenize } from './tokenize/index.js';
 import type { Position, Token } from './tokenize/types.js';
@@ -18,10 +24,6 @@ import {
   createReversePositionResolver,
 } from './utils/resolvePosition.js';
 import type { RA, WritableArray } from './utils/types.js';
-import { AstNode } from './ast/definitions/AstNode.js';
-import { PrintContext } from './ast/unparse.js';
-import { GlobalsNode } from './ast/definitions/GlobalsNode.js';
-import { createScope } from './ast/nameAnalysis.js';
 
 export function processInput(rawText: string): {
   readonly formattedErrors: string;
@@ -53,14 +55,23 @@ async function printTokens(
   } else return tokens;
 }
 
-export async function run(
-  rawText: string,
-  tokensOutput: string | undefined,
-  unparseOutput: string | undefined,
-  debug: boolean,
-  parser: 'CYK' | 'SLR',
-  unparseMode: 'ast' | 'parseTree'
-): Promise<AstNode | undefined> {
+export async function run({
+  rawText,
+  tokensOutput,
+  unparseOutput,
+  debug = false,
+  parser = 'SLR',
+  unparseMode = 'ast',
+  diagramPath,
+}: {
+  readonly rawText: string;
+  readonly tokensOutput?: string;
+  readonly unparseOutput?: string;
+  readonly debug?: boolean;
+  readonly parser?: 'CYK' | 'SLR';
+  readonly unparseMode?: 'ast' | 'parseTree';
+  readonly diagramPath?: string;
+}): Promise<AstNode | undefined> {
   const tokens = await printTokens(rawText, tokensOutput);
 
   if (tokens === undefined) return undefined;
@@ -76,7 +87,8 @@ export async function run(
   }
 
   const nullFreeGrammar = removeNullProductions(grammar());
-  const parseTree = slrParser(nullFreeGrammar, trimmedStream);
+  const table = await getTable(toPureGrammar(nullFreeGrammar), diagramPath);
+  const parseTree = slrParser(nullFreeGrammar, table, trimmedStream);
   if (parseTree === undefined) {
     console.error('syntax error\nParse failed');
     process.exitCode = 1;

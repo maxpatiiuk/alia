@@ -3,6 +3,7 @@ import {
   escapeRegExp,
   findArrayDivergencePoint,
   group,
+  insertItem,
   mappedFind,
   removeItem,
   replaceItem,
@@ -67,6 +68,19 @@ theories(removeItem, {
   'remove at the end': { in: [[1, 2, 3, 4, 0], 4], out: [1, 2, 3, 4] },
   'remove from the end': { in: [[1, 2, 3, 0, 4], -1], out: [1, 2, 3, 4] },
   'remove after the end': { in: [[1, 2, 3, 4], 99], out: [1, 2, 3, 4] },
+});
+
+theories(insertItem, {
+  'insert at the beginning': { in: [[2, 3, 4], 0, 1], out: [1, 2, 3, 4] },
+  'insert in the middle': { in: [[1, 3, 4], 1, 2], out: [1, 2, 3, 4] },
+  'insert at the end': { in: [[1, 2, 3], 3, 4], out: [1, 2, 3, 4] },
+  // Not sure if "-1" should insert into last or pre last position
+  'insert from the end': { in: [[1, 2, 4], -1, 3], out: [1, 2, 3, 4] },
+  'insert in the middle from the end': {
+    in: [[1, 3, 4], -2, 2],
+    out: [1, 2, 3, 4],
+  },
+  'insert after the end': { in: [[1, 2, 3], 99, 4], out: [1, 2, 3, 4] },
 });
 
 theories(replaceItem, {

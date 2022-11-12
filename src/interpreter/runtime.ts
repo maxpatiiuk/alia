@@ -121,12 +121,12 @@ async function inputToAst(
   let input = rawInput;
   let ast: AstNode | undefined;
   try {
-    ast = await run(input, undefined, undefined, false, 'SLR', 'ast');
+    ast = await run({ rawText: input });
   } catch {
     // Automatically insert trailing semicolon if necessary
     try {
       const localInput = `${input};`;
-      ast = await run(localInput, undefined, undefined, false, 'SLR', 'ast');
+      ast = await run({ rawText: localInput });
       input = localInput;
     } catch {
       ast = undefined;

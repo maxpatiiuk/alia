@@ -4,7 +4,7 @@ import type { RA } from '../utils/types.js';
 async function nameAnalysis(
   input: string
 ): Promise<RA<string> | string | undefined> {
-  const ast = await run(input, undefined, undefined, false, 'SLR', 'ast');
+  const ast = await run({ rawText: input });
   if (ast === undefined) return undefined;
   return nameParse(ast, false);
 }
@@ -477,7 +477,7 @@ int intFunction() {
 async function typeCheck(
   input: string
 ): Promise<RA<string> | string | undefined> {
-  const ast = await run(input, undefined, undefined, false, 'SLR', 'ast');
+  const ast = await run({ rawText: input });
   if (ast === undefined) return undefined;
   const nameErrors = nameParse(ast, false);
   return Array.isArray(nameErrors) ? nameErrors : typeCheckAst(ast, input);

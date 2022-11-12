@@ -1,6 +1,7 @@
 import { slrParser } from '../index.js';
-import { AbstractGrammar } from '../../grammar/utils.js';
+import { AbstractGrammar, toPureGrammar } from '../../grammar/utils.js';
 import { TypeListNode } from '../../ast/definitions/types/TypeListNode.js';
+import { getTable } from '../buildTable.js';
 
 const ast = () => new TypeListNode([]);
 
@@ -14,36 +15,40 @@ const abstractGrammar: AbstractGrammar<'L' | 'P' | 'S'> = {
 };
 
 describe('slrParser', () => {
-  test('simple grammar', () =>
+  test('simple grammar', async () =>
     expect(
-      slrParser(abstractGrammar, [
-        {
-          type: 'MAYHEM',
-          data: {},
-          position: { lineNumber: 1, columnNumber: 1 },
-        },
-        {
-          type: 'LPAREN',
-          data: {},
-          position: { lineNumber: 1, columnNumber: 2 },
-        },
-        {
-          type: 'ID',
-          data: { literal: 'a' },
-          position: { lineNumber: 1, columnNumber: 3 },
-        },
-        {
-          type: 'RPAREN',
-          data: {},
-          position: { lineNumber: 1, columnNumber: 4 },
-        },
-        {
-          type: 'MAYHEM',
-          data: {},
-          position: { lineNumber: 1, columnNumber: 5 },
-        },
-      ])
-    ).toEqual({
+      slrParser(
+        abstractGrammar,
+        await getTable(toPureGrammar(abstractGrammar)),
+        [
+          {
+            type: 'MAYHEM',
+            data: {},
+            position: { lineNumber: 1, columnNumber: 1 },
+          },
+          {
+            type: 'LPAREN',
+            data: {},
+            position: { lineNumber: 1, columnNumber: 2 },
+          },
+          {
+            type: 'ID',
+            data: { literal: 'a' },
+            position: { lineNumber: 1, columnNumber: 3 },
+          },
+          {
+            type: 'RPAREN',
+            data: {},
+            position: { lineNumber: 1, columnNumber: 4 },
+          },
+          {
+            type: 'MAYHEM',
+            data: {},
+            position: { lineNumber: 1, columnNumber: 5 },
+          },
+        ]
+      )
+    ).resolves.toEqual({
       children: [
         {
           data: {},

@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Generating a graph 1`] = `
+"digraph Grammar {
+  rankdir=LR;
+  node [ shape=square ];
+  edge [ style=solid ];
+  
+   0 [ label=\\"0
+A→• B
+B→• C B
+B→• hello B
+B→• w o rld\\" ];
+ 1 [ label=\\"1
+A→B •\\" ];
+ 2 [ label=\\"2
+B→C • B
+B→• C B
+B→• hello B
+B→• w o rld\\" ];
+ 3 [ label=\\"3
+B→hello • B
+B→• C B
+B→• hello B
+B→• w o rld\\" ];
+ 4 [ label=\\"4
+B→w • o rld\\" ];
+ 5 [ label=\\"5
+B→C B •\\" ];
+ 6 [ label=\\"6
+B→hello B •\\" ];
+ 7 [ label=\\"7
+B→w o • rld\\" ];
+ 8 [ label=\\"8
+B→w o rld •\\" ];
+  
+   0 -> 1 [ label=\\"B\\" ];
+ 0 -> 2 [ label=\\"C\\" ];
+ 0 -> 3 [ label=\\"hello\\" ];
+ 0 -> 4 [ label=\\"w\\" ];
+ 2 -> 5 [ label=\\"B\\" ];
+ 2 -> 2 [ label=\\"C\\" ];
+ 2 -> 3 [ label=\\"hello\\" ];
+ 2 -> 4 [ label=\\"w\\" ];
+ 3 -> 6 [ label=\\"B\\" ];
+ 3 -> 2 [ label=\\"C\\" ];
+ 3 -> 3 [ label=\\"hello\\" ];
+ 3 -> 4 [ label=\\"w\\" ];
+ 4 -> 7 [ label=\\"o\\" ];
+ 7 -> 8 [ label=\\"rld\\" ];
+  
+}"
+`;

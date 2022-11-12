@@ -92,6 +92,13 @@ export const removeItem = <T>(array: RA<T>, index: number): RA<T> =>
     ? [...array.slice(0, index - 1), ...array.slice(index)]
     : [...array.slice(0, index), ...array.slice(index + 1)];
 
+/** Create a new array with a new item at a given position */
+export const insertItem = <T>(array: RA<T>, index: number, item: T): RA<T> => [
+  ...array.slice(0, index),
+  item,
+  ...array.slice(index),
+];
+
 /** Create a new array with a given item replaced */
 export const replaceItem = <T>(array: RA<T>, index: number, item: T): RA<T> =>
   array[index] === item
