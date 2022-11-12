@@ -1,11 +1,6 @@
-import type { RA } from '../../../utils/types.js';
 import type { EvalContext } from '../../eval.js';
 import { ReturnValue } from '../../eval.js';
-import type { Quad } from '../../quads/definitions.js';
-import {
-  AssignQuad,
-  GetRetQuad as GetReturnValueQuad,
-} from '../../quads/definitions.js';
+import { AssignQuad } from '../../quads/definitions.js';
 import type { QuadsContext } from '../../quads/index.js';
 import type { LanguageType, TypeCheckContext } from '../../typing.js';
 import { assertType, cascadeError, ErrorType } from '../../typing.js';
@@ -75,16 +70,9 @@ export class AssignmentExpression extends Expression {
     return expression;
   }
 
-  public toPartialQuads(context: QuadsContext): RA<Quad> {
-    return [
-      new AssignQuad(this.id.getName(), this.expression.toQuads(context)),
-    ];
-  }
-
   public toQuads(context: QuadsContext) {
     return [
-      ...this.toPartialQuads(context),
-      new GetReturnValueQuad(context.requestTemp()),
+      new AssignQuad(this.id.getName(), this.expression.toQuads(context)),
     ];
   }
 }

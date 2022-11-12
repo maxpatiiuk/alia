@@ -1,4 +1,4 @@
-import type { RA } from '../../utils/types.js';
+import type { RA, WritableArray } from '../../utils/types.js';
 import type { StatementList } from '../definitions/statement/StatementList.js';
 import type { QuadsContext } from './index.js';
 
@@ -44,6 +44,10 @@ export class FunctionQuad extends Quad {
 
   private readonly statements: RA<Quad>;
 
+  private readonly locals: WritableArray<string> = [];
+
+  private readonly temps: WritableArray<string> = [];
+
   public constructor(
     private readonly id: string,
     private readonly formals: RA<FormalQuad>,
@@ -61,9 +65,16 @@ export class FunctionQuad extends Quad {
       (formal, index) => new GetArgQuad(index + 1, formal.id)
     );
 
+    const tempGenerator = context.createTempGenerator();
+
     this.statements = statements.toQuads({
       ...context,
-      requestTemp: context.createTempGenerator(),
+      requestTemp: () => {
+        const tempName = tempGenerator();
+        this.temps.push(tempName);
+        return tempName;
+      },
+      signalVarDeclaration: (name) => this.locals.push(name),
       returnLabel: leaveLabel,
     });
   }
@@ -72,7 +83,8 @@ export class FunctionQuad extends Quad {
     return [
       `[BEGIN ${this.id} LOCALS]`,
       ...this.formals.flatMap((formal) => formal.toString()),
-      // FIXME: add quads for locals and temp
+      ...this.locals.map(formatLocal),
+      ...this.temps.map(formatTemp),
       `[END ${this.id} LOCALS]`,
       ...this.enter.toString(),
       ...[...this.getArgs, ...this.statements]
@@ -95,6 +107,12 @@ export class FormalQuad extends Quad {
     return [`${this.id} (formal arg of 8 bytes)`];
   }
 }
+
+const formatLocal = (varName: string): string =>
+  `${varName} (local var of 8 bytes)`;
+
+const formatTemp = (tempName: string): string =>
+  `${tempName} (tmp var of 8 bytes)`;
 
 const labelOffset = 12;
 
@@ -237,7 +255,7 @@ export class GetRetQuad extends Quad {
   }
 
   public toString() {
-    return ['getret', mem(this.tempName)];
+    return [`getret ${mem(this.tempName)}`];
   }
 
   public toValue() {

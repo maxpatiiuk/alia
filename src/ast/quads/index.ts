@@ -7,6 +7,7 @@ export type QuadsContext = {
   readonly requestString: (value: string) => string;
   readonly requestTemp: () => string;
   readonly createTempGenerator: () => () => string;
+  readonly signalVarDeclaration: (name: string) => void;
   readonly returnLabel: string;
 };
 
@@ -33,6 +34,7 @@ export function toQuads(ast: AstNode): RA<Quad> {
       stringIndex += 1;
       return `str_${stringIndex}`;
     },
+    signalVarDeclaration: () => undefined,
     returnLabel: 'ERROR: Return label is not defined',
   });
 }

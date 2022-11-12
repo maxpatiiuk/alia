@@ -27,6 +27,6 @@ export class AssignmentStatement extends LineStatement {
   }
 
   public toQuads(context: QuadsContext) {
-    return this.expression.toPartialQuads(context);
+    return this.expression.toQuads(context);
   }
 }

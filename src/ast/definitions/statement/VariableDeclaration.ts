@@ -10,6 +10,7 @@ import type { IdNode } from '../term/IdNode.js';
 import type { TypeNode } from '../types/index.js';
 import { PrimaryTypeNode } from '../types/PrimaryTypeNode.js';
 import { Statement } from './index.js';
+import { QuadsContext } from '../../quads/index.js';
 
 export class VariableDeclaration extends Statement {
   // eslint-disable-next-line functional/prefer-readonly-type
@@ -60,7 +61,8 @@ export class VariableDeclaration extends Statement {
     return this.value;
   }
 
-  public toQuads(): RA<Quad> {
+  public toQuads(context: QuadsContext): RA<Quad> {
+    context.signalVarDeclaration(this.id.getName());
     return [];
   }
 }
