@@ -11,7 +11,7 @@ import { token } from '../../TokenNode.js';
 import type { StatementList } from '../StatementList.js';
 import { BlockStatement } from './index.js';
 import { QuadsContext } from '../../../quads/index.js';
-import { Quad } from '../../../quads/definitions.js';
+import { IfQuad, Quad } from '../../../quads/definitions.js';
 import { RA } from '../../../../utils/types.js';
 
 export class IfNode extends BlockStatement {
@@ -78,8 +78,19 @@ export class IfNode extends BlockStatement {
       : this.elseStatements?.evaluate(context);
   }
 
-  // FIXME: implement toQuads
-  public toQuads(_context: QuadsContext): RA<Quad> {
-    return [];
+  public toQuads(context: QuadsContext): RA<Quad> {
+    return [
+      new IfQuad(
+        this.condition.toQuads(context),
+        this.statements.toQuads(context),
+        typeof this.elseStatements === 'object'
+          ? {
+              quads: this.elseStatements.toQuads(context),
+              label: context.requestLabel(),
+            }
+          : undefined,
+        context.requestLabel()
+      ),
+    ];
   }
 }
