@@ -37,7 +37,12 @@ export class NotNode extends Expression {
 
   public toQuads(context: QuadsContext) {
     return [
-      new OperationQuad(undefined, '!', this.expression.toQuads(context)),
+      new OperationQuad(
+        undefined,
+        '!',
+        this.expression.toQuads(context),
+        context.requestTemp()
+      ),
     ];
   }
 }

@@ -4,7 +4,7 @@ import type { QuadsContext } from './index.js';
 
 export class Quad {
   /** Convert quad to a printable string */
-  public toString(): RA<string> {
+  public toString(): RA<string | LabelQuad> {
     throw new Error('Not implemented');
   }
 
@@ -40,7 +40,7 @@ export class FunctionQuad extends Quad {
 
   private readonly leave: LabelQuad;
 
-  private readonly getArgs: RA<LineQuad>;
+  private readonly getArgs: RA<Quad>;
 
   private readonly statements: RA<Quad>;
 
@@ -58,24 +58,29 @@ export class FunctionQuad extends Quad {
     const leaveLabel = context.requestLabel();
     this.leave = new LabelQuad(leaveLabel, new SimpleQuad('leave', this.id));
     this.getArgs = this.formals.map(
-      (formal, index) => new LineQuad(new GetArgQuad(index + 1, formal.id))
+      (formal, index) => new GetArgQuad(index + 1, formal.id)
     );
 
     this.statements = statements.toQuads({
-      ...context.createContext(),
+      ...context,
+      requestTemp: context.createTempGenerator(),
       returnLabel: leaveLabel,
     });
   }
 
-  public toString() {
+  public toString(): RA<string> {
     return [
       `[BEGIN ${this.id} LOCALS]`,
       ...this.formals.flatMap((formal) => formal.toString()),
       // FIXME: add quads for locals and temp
       `[END ${this.id} LOCALS]`,
       ...this.enter.toString(),
-      ...this.getArgs.flatMap((getArgument) => getArgument.toString()),
-      ...this.statements.flatMap((quad) => quad.toString()),
+      ...[...this.getArgs, ...this.statements]
+        .flatMap((quad) => quad.toString())
+        .map((formatted) =>
+          typeof formatted === 'string' ? new LineQuad(formatted) : formatted
+        )
+        .flatMap((quad) => quad.toString()),
       ...this.leave.toString(),
     ];
   }
@@ -106,26 +111,39 @@ export class LabelQuad extends Quad {
     if (lines.length !== 1) throw new Error('LabelQuad called on invalid quad');
     return [
       `${this.label}:${' '.repeat(
-        Math.max(0, labelOffset - this.label.length - 1)
+        Math.max(1, labelOffset - this.label.length - 1)
       )}${lines[0]}`,
     ];
   }
 }
 
 export class LineQuad extends Quad {
-  public constructor(private readonly quad: Quad) {
+  public constructor(private readonly line: string) {
     super();
   }
 
   public toString(): RA<string> {
-    const lines = this.quad.toString();
-    if (lines.length !== 1) throw new Error('LabelQuad called on invalid quad');
-    return [`${' '.repeat(labelOffset)}${lines[0]}`];
+    return [`${' '.repeat(labelOffset)}${this.line}`];
   }
 }
 
 export class CallQuad extends Quad {
-  public readonly name = 'call';
+  private readonly quads: RA<Quad>;
+
+  public constructor(actuals: RA<RA<Quad>>, private readonly name: string) {
+    super();
+    this.quads = actuals.flatMap((actual, index) => [
+      ...actual,
+      new SetArgQuad(index + 1, actual.at(-1)!.toValue()),
+    ]);
+  }
+
+  public toString() {
+    return [
+      ...this.quads.flatMap((quad) => quad.toString()),
+      `call ${this.name}`,
+    ];
+  }
 }
 
 export class SimpleQuad extends Quad {
@@ -149,7 +167,7 @@ export class AssignQuad extends Quad {
     super();
   }
 
-  public toString(): RA<string> {
+  public toString() {
     return [
       ...this.expression.flatMap((quad) => quad.toString()),
       `${mem(this.id)} := ${this.expression.at(-1)!.toValue()}`,
@@ -157,7 +175,7 @@ export class AssignQuad extends Quad {
   }
 
   public toValue(): string {
-    return this.id;
+    return mem(this.id);
   }
 }
 
@@ -166,10 +184,10 @@ export class ReportQuad extends Quad {
     super();
   }
 
-  public toString(): RA<string> {
+  public toString() {
     return [
       ...this.quads.flatMap((quad) => quad.toString()),
-      `REPORT ${mem(this.quads.at(-1)!.toValue())}`,
+      `REPORT ${this.quads.at(-1)!.toValue()}`,
     ];
   }
 }
@@ -210,15 +228,30 @@ export class GetArgQuad extends Quad {
 }
 
 export class GetRetQuad extends Quad {
-  public readonly name = 'getret';
+  public constructor(private readonly tempName: string) {
+    super();
+  }
+
+  public toString() {
+    return ['getret', mem(this.tempName)];
+  }
+
+  public toValue() {
+    return mem(this.tempName);
+  }
 }
 
 export class SetArgQuad extends Quad {
-  public readonly name = 'setarg';
-}
+  public constructor(
+    private readonly index: number,
+    private readonly value: string
+  ) {
+    super();
+  }
 
-export class SetRetQuad extends Quad {
-  public readonly name = 'setret';
+  public toString() {
+    return [`setarg ${this.index} ${this.value}`];
+  }
 }
 
 /** Wrap an identifier in square brackets (indicates memory access) */
@@ -232,7 +265,7 @@ export class PostQuad extends Quad {
     this.quad = new AssignQuad(id, [new OpQuad(mem(id), type, '1')]);
   }
 
-  public toString(): RA<string> {
+  public toString() {
     return this.quad.toString();
   }
 }
@@ -284,27 +317,47 @@ export class OpQuad extends TermQuad {
 }
 
 export class OperationQuad extends Quad {
-  private readonly opQuad: OpQuad;
+  private readonly assignQuad: OpQuad;
 
   public constructor(
     private readonly left: RA<Quad> | undefined,
     type: keyof typeof operationTranslations,
-    private readonly right: RA<Quad>
+    private readonly right: RA<Quad>,
+    tempName: string
   ) {
     super();
 
-    this.opQuad = new OpQuad(
+    const opQuad = new OpQuad(
       this.left?.at(-1)!.toValue() ?? '',
       type,
       this.right.at(-1)!.toValue()
     );
+    this.assignQuad = new AssignQuad(tempName, [opQuad]);
   }
 
-  public toString(): RA<string> {
+  public toString() {
     return [
       ...(this.left ?? []).flatMap((quad) => quad.toString()),
       ...this.right.flatMap((quad) => quad.toString()),
-      ...this.opQuad.toString(),
+      ...this.assignQuad.toString(),
     ];
+  }
+
+  public toValue() {
+    return this.assignQuad.toValue();
+  }
+}
+
+export class MayhemQuad extends Quad {
+  public constructor(private readonly tempName: string) {
+    super();
+  }
+
+  public toString() {
+    return [`MAYHEM ${mem(this.tempName)}`];
+  }
+
+  public toValue() {
+    return mem(this.tempName);
   }
 }

@@ -47,7 +47,7 @@ export class GlobalsNode extends AstNode {
     const newContext: QuadsContext = {
       ...context,
       requestString(value) {
-        const name = newContext.requestString(value);
+        const name = context.requestString(value);
         strings.push({ name, value });
         return name;
       },

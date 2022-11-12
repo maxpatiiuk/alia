@@ -68,7 +68,7 @@ export class ReturnNode extends LineStatement {
     return filterArray([
       ...(quads ?? []),
       typeof quads === 'object'
-        ? new SimpleQuad('setred', quads.at(-1)!.toValue())
+        ? new SimpleQuad('setret', quads.at(-1)!.toValue())
         : undefined,
       new SimpleQuad('goto', context.returnLabel),
     ]);

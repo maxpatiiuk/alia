@@ -12,6 +12,9 @@ import { token } from '../../TokenNode.js';
 import type { Statement } from '../index.js';
 import { StatementList } from '../StatementList.js';
 import { BlockStatement } from './index.js';
+import { Quad } from '../../../quads/definitions.js';
+import { QuadsContext } from '../../../quads/index.js';
+import { RA } from '../../../../utils/types.js';
 
 export class ForNode extends BlockStatement {
   public constructor(
@@ -82,4 +85,7 @@ export class ForNode extends BlockStatement {
   }
 
   // FIXME: implement toQuads
+  public toQuads(_context: QuadsContext): RA<Quad> {
+    return [];
+  }
 }

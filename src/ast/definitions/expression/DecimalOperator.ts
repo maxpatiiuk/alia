@@ -65,7 +65,8 @@ export class DecimalOperator extends Expression {
       new OperationQuad(
         this.left.toQuads(context),
         this.operator,
-        this.right.toQuads(context)
+        this.right.toQuads(context),
+        context.requestTemp()
       ),
     ];
   }

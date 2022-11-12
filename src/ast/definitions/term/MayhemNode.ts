@@ -2,6 +2,8 @@ import type { EvalContext } from '../../eval.js';
 import { IntType } from '../../typing.js';
 import type { TokenNode } from '../TokenNode.js';
 import { Term } from './index.js';
+import { MayhemQuad } from '../../quads/definitions.js';
+import { QuadsContext } from '../../quads/index.js';
 
 export class MayhemNode extends Term {
   public constructor(public readonly token: TokenNode) {
@@ -20,8 +22,7 @@ export class MayhemNode extends Term {
     return Math.random() * 1024;
   }
 
-  public toQuads() {
-    throw new Error('// FIXME: not implemented');
-    return [];
+  public toQuads(context: QuadsContext) {
+    return [new MayhemQuad(context.requestTemp())];
   }
 }

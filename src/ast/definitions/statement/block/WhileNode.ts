@@ -11,6 +11,9 @@ import type { TokenNode } from '../../TokenNode.js';
 import { token } from '../../TokenNode.js';
 import type { StatementList } from '../StatementList.js';
 import { BlockStatement } from './index.js';
+import { Quad } from '../../../quads/definitions.js';
+import { QuadsContext } from '../../../quads/index.js';
+import { RA } from '../../../../utils/types.js';
 
 export class WhileNode extends BlockStatement {
   public constructor(
@@ -63,4 +66,7 @@ export class WhileNode extends BlockStatement {
   }
 
   // FIXME: implement toQuads
+  public toQuads(_context: QuadsContext): RA<Quad> {
+    return [];
+  }
 }

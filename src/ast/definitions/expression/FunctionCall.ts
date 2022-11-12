@@ -10,6 +10,8 @@ import type { IdNode } from '../term/IdNode.js';
 import type { TokenNode } from '../TokenNode.js';
 import { token } from '../TokenNode.js';
 import { Expression } from './index.js';
+import { QuadsContext } from '../../quads/index.js';
+import { CallQuad } from '../../quads/definitions.js';
 
 export class FunctionCall extends Expression {
   public constructor(
@@ -82,5 +84,12 @@ export class FunctionCall extends Expression {
     else throw new Error('Cannot call non-function');
   }
 
-  // FIXME: implement toQuads
+  toQuads(context: QuadsContext) {
+    return [
+      new CallQuad(
+        this.actualsList.expressions.map((child) => child.toQuads(context)),
+        this.id.getName()
+      ),
+    ];
+  }
 }
