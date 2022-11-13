@@ -6,6 +6,7 @@ import type { IdNode } from '../../term/IdNode.js';
 import { VariableDeclaration } from '../VariableDeclaration.js';
 import { LineStatement } from './index.js';
 import { PostQuad } from '../../../quads/definitions/PostQuad.js';
+import { QuadsContext } from '../../../quads/index.js';
 
 export class PostNode extends LineStatement {
   public constructor(
@@ -38,7 +39,14 @@ export class PostNode extends LineStatement {
     return value;
   }
 
-  public toQuads() {
-    return [new PostQuad(this.id.getName(), this.type)];
+  public toQuads(context: QuadsContext) {
+    return [
+      new PostQuad(
+        this.id.getName(),
+        this.id.getTempVariable(),
+        context,
+        this.type
+      ),
+    ];
   }
 }

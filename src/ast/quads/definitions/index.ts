@@ -1,4 +1,5 @@
 import type { RA } from '../../../utils/types.js';
+import { formatTemp } from '../index.js';
 
 export class Quad {
   /** Convert quad to a printable string */
@@ -15,13 +16,25 @@ export class Quad {
   public toMips(): RA<LabelQuad | string> {
     throw new Error('Not implemented');
   }
+
+  /** Get the name of the temp register created by the mips instruction */
+  public toMipsValue(): string {
+    throw new Error('Not implemented');
+  }
 }
 
 /** Wrap an identifier in square brackets (indicates memory access) */
-export const mem = (id: string): string => `[${id}]`;
+export const mem = (id: string | number): string =>
+  `[${typeof id === 'number' ? formatTemp(id) : id}]`;
 
 export const quadsToString = (quads: RA<Quad>): RA<LabelQuad | string> =>
   quads.flatMap((quad) => (quad instanceof LabelQuad ? quad : quad.toString()));
+
+/**
+ * Number of bites used for a single value.
+ * 4*8 = 32 bits
+ */
+export const mipsSize = 4;
 
 /**
  * NOTE: this stateful variable needs to be reset before running compiler

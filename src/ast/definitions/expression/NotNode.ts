@@ -1,4 +1,5 @@
 import type { EvalContext } from '../../eval.js';
+import { OperationQuad } from '../../quads/definitions/OperationQuad.js';
 import type { QuadsContext } from '../../quads/index.js';
 import type { TypeCheckContext } from '../../typing.js';
 import { assertType } from '../../typing.js';
@@ -6,7 +7,6 @@ import type { PrintContext } from '../../unparse.js';
 import type { TokenNode } from '../TokenNode.js';
 import { token } from '../TokenNode.js';
 import { Expression } from './index.js';
-import { OperationQuad } from '../../quads/definitions/OperationQuad.js';
 
 export class NotNode extends Expression {
   public constructor(
@@ -41,7 +41,7 @@ export class NotNode extends Expression {
         undefined,
         '!',
         this.expression.toQuads(context),
-        context.requestTemp()
+        context
       ),
     ];
   }

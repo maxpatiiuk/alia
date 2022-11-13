@@ -69,7 +69,7 @@ export class ComparisonOperator extends Expression {
         this.left.toQuads(context),
         this.operator,
         this.right.toQuads(context),
-        context.requestTemp()
+        context
       ),
     ];
   }

@@ -12,4 +12,8 @@ export class GetArgQuad extends Quad {
   public toString(): RA<string> {
     return [`getarg ${this.index} ${mem(this.id)}`];
   }
+
+  public toMips() {
+    return [];
+  }
 }

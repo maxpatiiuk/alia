@@ -24,4 +24,4 @@ export class GlobalVarQuad extends Quad {
   }
 }
 
-const formatGlobalVariable = (name: string): string => `global_${name}`;
+export const formatGlobalVariable = (name: string): string => `global_${name}`;

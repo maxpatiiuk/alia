@@ -1,5 +1,5 @@
 import { GenericQuad } from './GenericQuad.js';
-import { LabelQuad, Quad } from './index.js';
+import { LabelQuad, mipsSize, Quad } from './index.js';
 
 export class FunctionEpilogueQuad extends Quad {
   private readonly leave: LabelQuad;
@@ -23,9 +23,9 @@ export class FunctionEpilogueQuad extends Quad {
   public toMips() {
     return [
       this.leave,
-      'lw $ra, 8($fp)  # Restore return address',
-      'lw $fp, 4($fp)  # Restore frame pointer',
-      'addiu $sp, $fp, 8  # Restore the stack pointer',
+      `lw $ra, ${mipsSize * 2}($fp)  # Restore return address`,
+      `lw $fp, ${mipsSize}($fp)  # Restore frame pointer`,
+      `addiu $sp, $fp, ${mipsSize * 2}  # Restore the stack pointer`,
       'jr $ra # Return to caller',
       '',
     ];

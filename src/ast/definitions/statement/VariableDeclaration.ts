@@ -12,10 +12,12 @@ import { PrimaryTypeNode } from '../types/PrimaryTypeNode.js';
 import { Statement } from './index.js';
 import { QuadsContext } from '../../quads/index.js';
 import { FunctionDeclaration } from '../FunctionDeclaration.js';
+import { MipsQuad } from '../../quads/definitions/GenericQuad.js';
 
 export class VariableDeclaration extends Statement {
   // eslint-disable-next-line functional/prefer-readonly-type
   public value: EvalValue;
+  public tempVariable: string | number = -1;
 
   public constructor(
     public readonly type: TypeNode,
@@ -63,8 +65,9 @@ export class VariableDeclaration extends Statement {
   }
 
   public toQuads(context: QuadsContext): RA<Quad> {
-    context.signalVarDeclaration(this.id.getName());
-    return [];
+    // FIXME: implement scopes in if/while/for
+    this.tempVariable = context.declareVar(this.id.getName());
+    return [new MipsQuad('pushq')];
   }
 }
 

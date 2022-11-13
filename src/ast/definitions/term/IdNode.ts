@@ -12,8 +12,8 @@ import { token } from '../TokenNode.js';
 import { FunctionTypeNode } from '../types/FunctionTypeNode.js';
 import { PrimaryTypeNode } from '../types/PrimaryTypeNode.js';
 import { Term } from './index.js';
-import { mem } from '../../quads/definitions/index.js';
-import { TermQuad } from '../../quads/definitions/TermQuad.js';
+import { IdQuad } from '../../quads/definitions/IdQuad.js';
+import { QuadsContext } from '../../quads/index.js';
 
 export class IdNode extends Term {
   public constructor(public readonly token: TokenNode) {
@@ -82,7 +82,17 @@ export class IdNode extends Term {
     else return declaration;
   }
 
-  public toQuads() {
-    return [new TermQuad(mem(this.getName()))];
+  public getTempVariable() {
+    const variable = this.getDeclaration()!;
+    // FIXME: support function pointers
+    if (variable instanceof FunctionDeclaration)
+      throw new Error('Not supported');
+    if (variable.tempVariable === -1) return this.getName();
+    else return variable.tempVariable;
+  }
+
+  public toQuads(context: QuadsContext) {
+    // FIXME: make sure this is called for reading only
+    return [new IdQuad(this.getName(), this.getTempVariable())];
   }
 }

@@ -41,7 +41,7 @@ export class MinusNode extends Expression {
         undefined,
         'neg',
         this.expression.toQuads(context),
-        context.requestTemp()
+        context
       ),
     ];
   }

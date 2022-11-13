@@ -5,34 +5,34 @@ import type { Quad } from './definitions/index.js';
 export type QuadsContext = {
   readonly requestLabel: () => string;
   readonly requestString: (value: string) => string;
-  readonly requestTemp: () => string;
-  readonly createTempGenerator: () => () => string;
-  readonly signalVarDeclaration: (name: string) => void;
+  readonly requestTemp: () => number;
+  readonly declareVar: (name: string) => string | number;
   readonly returnLabel: string;
+  readonly requestTempRegister: () => string;
 };
 
 export function toQuads(ast: AstNode): RA<Quad> {
   let labelIndex = -1;
-
-  function createTemporaryGenerator(): () => string {
-    let temporaryIndex = -1;
-    return () => {
-      temporaryIndex += 1;
-      return `tmp${temporaryIndex}`;
-    };
-  }
 
   return ast.toQuads({
     requestLabel() {
       labelIndex += 1;
       return `lbl_${labelIndex}`;
     },
-    requestTemp: createTemporaryGenerator(),
-    createTempGenerator: createTemporaryGenerator,
+    requestTemp() {
+      throw new Error('not Implemented');
+    },
     requestString() {
       throw new Error('Not Implemented');
     },
-    signalVarDeclaration: () => undefined,
+    requestTempRegister() {
+      throw new Error('Not Implemented');
+    },
+    declareVar(name: string) {
+      return name;
+    },
     returnLabel: 'ERROR: Return label is not defined',
   });
 }
+
+export const formatTemp = (index: number) => `tmp${index}`;

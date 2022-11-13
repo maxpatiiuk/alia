@@ -13,4 +13,8 @@ export class LineQuad extends Quad {
         : `${' '.repeat(getLongestLabel() + labelPadding + 1)}${this.line}`,
     ];
   }
+
+  public toMips() {
+    return this.toString();
+  }
 }

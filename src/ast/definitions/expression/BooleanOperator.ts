@@ -45,13 +45,17 @@ export class BooleanOperator extends Expression {
     return this.token;
   }
 
+  // Do short circuiting
   public async evaluate(context: EvalContext) {
     const left = await this.left.evaluate(context);
-    const right = await this.right.evaluate(context);
-    if (typeof left !== 'boolean' || typeof right !== 'boolean')
+    if (typeof left !== 'boolean')
       throw new Error('Cannot perform logic on non-booleans');
-    else if (this.operator === 'and') return left && right;
-    else return left || right;
+    if (this.operator === 'and' && !left) return false;
+    if (this.operator === 'or' && left) return true;
+    const right = await this.right.evaluate(context);
+    if (typeof right !== 'boolean')
+      throw new Error('Cannot perform logic on non-booleans');
+    return right;
   }
 
   public toQuads(context: QuadsContext) {
@@ -60,7 +64,7 @@ export class BooleanOperator extends Expression {
         this.left.toQuads(context),
         this.operator,
         this.right.toQuads(context),
-        context.requestTemp()
+        context
       ),
     ];
   }

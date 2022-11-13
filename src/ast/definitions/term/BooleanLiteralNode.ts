@@ -2,7 +2,8 @@ import type { EvalContext } from '../../eval.js';
 import { BoolType } from '../../typing.js';
 import type { TokenNode } from '../TokenNode.js';
 import { Term } from './index.js';
-import { TermQuad } from '../../quads/definitions/TermQuad.js';
+import { QuadsContext } from '../../quads/index.js';
+import { IntLiteralQuad } from '../../quads/definitions/IntLiteralQuad.js';
 
 export class BooleanLiteralNode extends Term {
   public constructor(public readonly token: TokenNode) {
@@ -21,7 +22,12 @@ export class BooleanLiteralNode extends Term {
     return this.token.token.type === 'TRUE';
   }
 
-  public toQuads() {
-    return [new TermQuad(this.token.token.type === 'TRUE' ? '1' : '0')];
+  public toQuads(context: QuadsContext) {
+    return [
+      new IntLiteralQuad(
+        this.token.token.type === 'TRUE' ? '1' : '0',
+        context.requestTempRegister()
+      ),
+    ];
   }
 }

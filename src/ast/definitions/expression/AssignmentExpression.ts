@@ -72,7 +72,11 @@ export class AssignmentExpression extends Expression {
 
   public toQuads(context: QuadsContext) {
     return [
-      new AssignQuad(this.id.getName(), this.expression.toQuads(context)),
+      new AssignQuad(
+        this.id.getName(),
+        this.id.getTempVariable(),
+        this.expression.toQuads(context)
+      ),
     ];
   }
 }

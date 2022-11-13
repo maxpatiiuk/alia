@@ -1,7 +1,8 @@
 import type { RA } from '../../../utils/types.js';
 import { AssignQuad } from './AssignQuad.js';
 import { Quad } from './index.js';
-import { TermQuad } from './TermQuad.js';
+import { QuadsContext } from '../index.js';
+import { LoadQuad } from './LoadQuad.js';
 
 const operationTranslations = {
   '--': 'SUB64',
@@ -12,46 +13,134 @@ const operationTranslations = {
   '/': 'DIV64',
   or: 'OR64',
   and: 'AND64',
-  eq: 'EQ64',
   '<': 'LT64',
   '>': 'GT64',
   '<=': 'LTE64',
   '>=': 'GTE64',
-  neg: 'NEG64',
-  '!': 'NOT64',
   '==': 'EQ64',
   '!=': 'NEQ64',
+  '!': 'NOT64',
+  neg: 'NEG64',
 } as const;
 
-export class OpQuad extends TermQuad {
+export class OpQuad extends Quad {
   public constructor(
-    left: string,
-    type: keyof typeof operationTranslations,
-    right: string
+    private readonly left: string,
+    private readonly type: keyof typeof operationTranslations,
+    private readonly right: string,
+    private readonly tempRegister: string
   ) {
-    super(
-      `${left === '' ? '' : `${left} `}${operationTranslations[type]} ${right}`
-    );
+    super();
+  }
+
+  public toString() {
+    return [];
+  }
+
+  public toValue() {
+    return `${this.left === '' ? '' : `${this.left} `}${
+      operationTranslations[this.type]
+    } ${this.right}`;
+  }
+
+  public toMips() {
+    if (this.type === '--' || this.type === '-')
+      return [`sub ${this.tempRegister}, ${this.left}, ${this.right}`];
+    else if (this.type === '++' || this.type === '+')
+      return [`add ${this.tempRegister}, ${this.left}, ${this.right}`];
+    else if (this.type === '*')
+      return [
+        `mult ${this.left}, ${this.right}`,
+        // Note: this does not check for overflow
+        `move ${this.tempRegister}, LO`,
+      ];
+    else if (this.type === '/')
+      return [
+        `div ${this.left}, ${this.right}`,
+        // Note: this discards the remainder
+        `move ${this.tempRegister}, Lo`,
+      ];
+    else if (this.type === 'or')
+      return [`or ${this.tempRegister}, ${this.left}, ${this.right}`];
+    else if (this.type === 'and')
+      return [`and ${this.tempRegister}, ${this.left}, ${this.right}`];
+    else if (this.type === '<')
+      return [`slt ${this.tempRegister}, ${this.left}, ${this.right}`];
+    else if (this.type === '>')
+      return [`slt ${this.tempRegister}, ${this.right}, ${this.left}`];
+    else if (this.type === '<=')
+      return [
+        `slt ${this.tempRegister}, ${this.right}, ${this.left}`,
+        `xori ${this.tempRegister}, ${this.tempRegister}, 1`,
+      ];
+    else if (this.type === '>=')
+      return [
+        `slt ${this.tempRegister}, ${this.left}, ${this.right}`,
+        `xori ${this.tempRegister}, ${this.tempRegister}, 1`,
+      ];
+    else if (this.type === '==')
+      return [
+        `sub ${this.tempRegister}, ${this.left}, ${this.right}`,
+        `xori ${this.tempRegister}, ${this.tempRegister}, 1`,
+      ];
+    else if (this.type === '!=')
+      return [
+        `sub ${this.tempRegister}, ${this.left}, ${this.right}`,
+        `andi ${this.tempRegister}, ${this.tempRegister}, 1`,
+      ];
+    else if (this.type === '!')
+      return [`xori ${this.tempRegister}, ${this.tempRegister}, 1`];
+    else if (this.type === 'neg')
+      return [`sub ${this.tempRegister}, $zero, ${this.tempRegister}`];
+    else throw new Error(`Unknown operation ${this.type}`);
+  }
+
+  public toMipsValue() {
+    return this.tempRegister;
   }
 }
 
 export class OperationQuad extends Quad {
   private readonly assignQuad: AssignQuad;
+  private readonly assignMips: AssignQuad;
+  private readonly leftMips: LoadQuad | undefined;
+  private readonly rightMips: LoadQuad;
 
   public constructor(
     private readonly left: RA<Quad> | undefined,
-    type: keyof typeof operationTranslations,
+    private readonly type: keyof typeof operationTranslations,
     private readonly right: RA<Quad>,
-    tempName: string
+    context: QuadsContext
   ) {
     super();
 
+    const tempVariable = context.requestTemp();
+    const tempRegister = context.requestTempRegister();
     const opQuad = new OpQuad(
       this.left?.at(-1)!.toValue() ?? '',
-      type,
-      this.right.at(-1)!.toValue()
+      this.type,
+      this.right.at(-1)!.toValue(),
+      tempRegister
     );
-    this.assignQuad = new AssignQuad(tempName, [opQuad]);
+    this.assignQuad = new AssignQuad(undefined, tempVariable, [opQuad]);
+
+    const leftTemp = context.requestTempRegister();
+    const leftValue = this.left?.at(-1)!.toMipsValue();
+    this.leftMips =
+      leftValue === undefined ? undefined : new LoadQuad(leftTemp, leftValue);
+
+    this.rightMips = new LoadQuad(
+      context.requestTempRegister(),
+      this.right.at(-1)!.toMipsValue()
+    );
+
+    const opMips = new OpQuad(
+      this.leftMips?.toMipsValue() ?? '',
+      this.type,
+      this.rightMips.toMipsValue(),
+      tempRegister
+    );
+    this.assignMips = new AssignQuad(undefined, tempVariable, [opMips]);
   }
 
   public toString() {
@@ -64,5 +153,21 @@ export class OperationQuad extends Quad {
 
   public toValue() {
     return this.assignQuad.toValue();
+  }
+
+  public toMips() {
+    return [
+      `# ${this.toString().join('; ')}`,
+      `# Operation: ${operationTranslations[this.type]}`,
+      ...(this.left ?? []).flatMap((quad) => quad.toMips()),
+      ...this.right.flatMap((quad) => quad.toMips()),
+      ...(this.leftMips?.toMips() ?? []),
+      ...this.rightMips.toMips(),
+      ...this.assignMips.toMips(),
+    ];
+  }
+
+  public toMipsValue() {
+    return this.assignMips.toMipsValue();
   }
 }

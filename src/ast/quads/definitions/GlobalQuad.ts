@@ -74,7 +74,8 @@ export class GlobalQuad extends Quad {
     ]);
   }
 
-  public toMips(): RA<string> {
+  // FIXME: add comments to output to make it more readable
+  public toMips() {
     const main = this.functions.find(
       (quad): quad is FunctionQuad =>
         quad instanceof FunctionQuad && quad.id === 'main'
