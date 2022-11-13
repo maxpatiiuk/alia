@@ -1,4 +1,5 @@
-import { mem, Quad } from './index.js';
+import { addComment, mem, Quad } from './index.js';
+import { reg } from './IdQuad.js';
 
 export class MayhemQuad extends Quad {
   public constructor(private readonly tempVariable: string | number) {
@@ -13,5 +14,19 @@ export class MayhemQuad extends Quad {
     return mem(this.tempVariable);
   }
 
-  // FIXME: convert to MIPS
+  public toMips() {
+    return addComment(
+      [
+        'addi $v0, $zero, 41',
+        'move $a0, $zero',
+        'syscall',
+        `sw $a0, ${reg(this.tempVariable)} # END Mayhem`,
+      ],
+      'BEGIN Mayhem'
+    );
+  }
+
+  public toMipsValue() {
+    return reg(this.tempVariable);
+  }
 }
