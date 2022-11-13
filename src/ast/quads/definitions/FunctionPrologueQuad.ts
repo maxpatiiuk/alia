@@ -1,14 +1,16 @@
+import type { QuadsContext } from '../index.js';
+import { AssignQuad } from './AssignQuad.js';
 import { formatFunctionName } from './FunctionQuad.js';
 import { GenericQuad } from './GenericQuad.js';
-import { LabelQuad, Quad } from './index.js';
-import { PushQuad } from './PushQuad.js';
+import { Register } from './GetArgQuad.js';
+import { addComment, LabelQuad, mipsSize, Quad } from './index.js';
 
 export class FunctionPrologueQuad extends Quad {
   private readonly entry: LabelQuad;
-  private readonly pushRa: Quad;
-  private readonly pushFp: Quad;
 
-  public constructor(private readonly id: string) {
+  private readonly setRa: Quad;
+
+  public constructor(private readonly id: string, context: QuadsContext) {
     super();
 
     this.entry = new LabelQuad(
@@ -19,20 +21,24 @@ export class FunctionPrologueQuad extends Quad {
       })
     );
 
-    this.pushRa = new PushQuad('$ra', 'Save return address');
-    this.pushFp = new PushQuad('$fp', 'Save frame pointer');
+    // Allocate stack space for the function pointer
+    context.requestTemp();
+    this.setRa = new AssignQuad(undefined, context.requestTemp(), [
+      new Register('$ra'),
+    ]);
   }
 
   public toString() {
     return this.entry.toString();
   }
 
+  // FIXME: add a _start function that would do exit 0 syscall
   public toMips() {
     return [
       this.entry,
-      ...this.pushRa.toMips(),
-      ...this.pushFp.toMips(),
-      'move $fp, $sp  # Set new frame pointer',
+      `sw $fp, -${mipsSize}($sp) # Save frame pointer`,
+      `move $fp, $sp  # Set new frame pointer`,
+      ...addComment(this.setRa.toMips(), 'Save return address'),
       '# Function body:',
     ];
   }

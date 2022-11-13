@@ -17,7 +17,6 @@ export class PostQuad extends Quad {
   ) {
     super();
     const tempRegister = context.requestTempRegister();
-    const secondTempRegister = context.requestTempRegister();
     this.quad = new AssignQuad(id, tempVariable, [
       new OpQuad(mem(id), type, '1', tempRegister),
     ]);
@@ -25,7 +24,11 @@ export class PostQuad extends Quad {
       new OpQuad(
         reg(tempVariable),
         type,
-        new IntLiteralQuad('1', secondTempRegister).toMips()[0],
+        new IntLiteralQuad(
+          '1',
+          context.requestTempRegister(),
+          context.requestTemp()
+        ).toMips()[0],
         tempRegister
       ),
     ]);

@@ -11,6 +11,8 @@ import type { TokenNode } from '../TokenNode.js';
 import { token } from '../TokenNode.js';
 import { Expression } from './index.js';
 import { AssignQuad } from '../../quads/definitions/AssignQuad.js';
+import { LoadQuad } from '../../quads/definitions/LoadQuad.js';
+import { Register } from '../../quads/definitions/GetArgQuad.js';
 
 export class AssignmentExpression extends Expression {
   public constructor(
@@ -71,12 +73,14 @@ export class AssignmentExpression extends Expression {
   }
 
   public toQuads(context: QuadsContext) {
+    const tempRegister = context.requestTempRegister();
+    const quads = this.expression.toQuads(context);
     return [
-      new AssignQuad(
-        this.id.getName(),
-        this.id.getTempVariable(),
-        this.expression.toQuads(context)
-      ),
+      ...quads,
+      new LoadQuad(tempRegister, quads.at(-1)!.toMipsValue()),
+      new AssignQuad(this.id.getName(), this.id.getTempVariable(), [
+        new Register(tempRegister),
+      ]),
     ];
   }
 }

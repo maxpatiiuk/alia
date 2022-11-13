@@ -8,16 +8,19 @@ import {
   VariableDeclaration,
 } from '../../definitions/statement/VariableDeclaration.js';
 import type { QuadsContext } from '../index.js';
-import { FunctionQuad } from './FunctionQuad.js';
-import { PrintQuad } from './GenericQuad.js';
+import { formatFunctionName, FunctionQuad } from './FunctionQuad.js';
 import { GlobalVarQuad as GlobalVariableQuad } from './GlobalVarQuad.js';
-import { Quad, quadsToString } from './index.js';
+import { LabelQuad, Quad, quadsToString } from './index.js';
 import { formatStringQuad, StringQuad } from './StringQuad.js';
+import { MipsQuad } from './GenericQuad.js';
+import { LineQuad } from './LineQuad.js';
 
 export class GlobalQuad extends Quad {
   private readonly globalQuads: RA<Quad>;
 
   private readonly functions: RA<Quad>;
+
+  private readonly bootloader: RA<Quad>;
 
   public constructor(
     private readonly children: GlobalsNode['children'],
@@ -63,13 +66,22 @@ export class GlobalQuad extends Quad {
       ...globals.map(({ name, value }) => new GlobalVariableQuad(name, value)),
       ...strings.flatMap((value, index) => new StringQuad(index, value)),
     ];
+
+    this.bootloader = [
+      new LabelQuad(
+        startFunction,
+        new MipsQuad(`jal ${formatFunctionName(mainFunction)}`)
+      ),
+      new LineQuad('li $v0, 10  # Exit syscall'),
+      new LineQuad('syscall'),
+    ];
   }
 
   public toString() {
     return quadsToString([
-      new PrintQuad('[BEGIN GLOBALS]'),
+      '[BEGIN GLOBALS]',
       ...this.globalQuads,
-      new PrintQuad('[END GLOBALS]'),
+      '[END GLOBALS]',
       ...this.functions,
     ]);
   }
@@ -78,19 +90,23 @@ export class GlobalQuad extends Quad {
   public toMips() {
     const main = this.functions.find(
       (quad): quad is FunctionQuad =>
-        quad instanceof FunctionQuad && quad.id === 'main'
+        quad instanceof FunctionQuad && quad.id === mainFunction
     );
     if (main === undefined)
       throw new Error(
         'Conversion to MIPS requires there to be a main() function. Please define it'
       );
     return [
-      `.globl ${main.name}`,
+      `.globl ${startFunction}`,
       '.data',
       ...this.globalQuads.flatMap((quad) => quad.toMips()),
       '.text',
-      ...main.toMips(),
-      ...this.functions.flatMap((quad) => (quad === main ? [] : quad.toMips())),
+      ...this.bootloader.flatMap((quad) => quad.toMips()),
+      '',
+      ...this.functions.flatMap((quad) => quad.toMips()),
     ];
   }
 }
+
+const startFunction = '_start';
+const mainFunction = 'main';

@@ -1,4 +1,3 @@
-import { filterArray } from '../../../../utils/types.js';
 import type { EvalContext } from '../../../eval.js';
 import { ReturnValue } from '../../../eval.js';
 import type { QuadsContext } from '../../../quads/index.js';
@@ -10,7 +9,7 @@ import { FunctionDeclaration } from '../../FunctionDeclaration.js';
 import type { TokenNode } from '../../TokenNode.js';
 import { token } from '../../TokenNode.js';
 import { LineStatement } from './index.js';
-import { PrintQuad } from '../../../quads/definitions/GenericQuad.js';
+import { ReturnQuad } from '../../../quads/definitions/ReturnQuad.js';
 
 export class ReturnNode extends LineStatement {
   public constructor(
@@ -65,12 +64,6 @@ export class ReturnNode extends LineStatement {
 
   public toQuads(context: QuadsContext) {
     const quads = this.expression?.toQuads(context);
-    return filterArray([
-      ...(quads ?? []),
-      typeof quads === 'object'
-        ? new PrintQuad('setret', quads.at(-1)!.toValue())
-        : undefined,
-      new PrintQuad('goto', context.returnLabel),
-    ]);
+    return [new ReturnQuad(quads, context.returnLabel)];
   }
 }

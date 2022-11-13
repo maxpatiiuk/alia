@@ -30,4 +30,6 @@ export class ForQuad extends Quad {
   public toString() {
     return quadsToString(this.quads);
   }
+
+  // FIXME: convert to MIPS
 }

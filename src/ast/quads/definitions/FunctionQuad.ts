@@ -8,6 +8,7 @@ import { LineQuad } from './LineQuad.js';
 import { FunctionPrologueQuad } from './FunctionPrologueQuad.js';
 import { FunctionEpilogueQuad } from './FunctionEpilogueQuad.js';
 import { formatTemp } from '../index.js';
+import { FormalsDeclNode } from '../../definitions/FormalsDeclNode.js';
 
 export class FunctionQuad extends Quad {
   private readonly enter: Quad;
@@ -25,31 +26,26 @@ export class FunctionQuad extends Quad {
 
   public readonly name: string;
 
+  private readonly formals: RA<FormalQuad>;
+
   public constructor(
     public readonly id: string,
-    private readonly formals: RA<FormalQuad>,
+    formalsNode: FormalsDeclNode,
     statements: StatementList,
     context: QuadsContext
   ) {
     super();
-    this.name = formatFunctionName(this.id);
-    this.enter = new FunctionPrologueQuad(this.id);
-    const leaveLabel = context.requestLabel();
-    this.leave = new FunctionEpilogueQuad(leaveLabel, this.id);
-    this.getArgs = this.formals.map(
-      (formal, index) => new GetArgumentQuad(index + 1, formal.id)
-    );
 
     this.tempsCount = 0;
     const requestTemp = () => {
       this.tempsCount += 1;
       return this.tempsCount;
     };
-
     let tempRegisterIndex = -1;
-    this.statements = statements.toQuads({
+    const newContext: QuadsContext = {
       ...context,
       requestTemp,
+      getTempCount: () => this.tempsCount,
       declareVar: (name) => {
         this.locals[name] = requestTemp();
         return this.locals[name];
@@ -64,8 +60,21 @@ export class FunctionQuad extends Quad {
         const resolvedIndex = tempRegisterIndex % tempRegisterCount;
         return `$t${resolvedIndex}`;
       },
-      returnLabel: leaveLabel,
-    });
+      returnLabel: context.requestLabel(),
+    };
+
+    this.name = formatFunctionName(this.id);
+    this.enter = new FunctionPrologueQuad(this.id, newContext);
+    this.leave = new FunctionEpilogueQuad(newContext.returnLabel, this.id);
+
+    const tempRegister = newContext.requestTempRegister();
+    this.formals = formalsNode.toQuads(newContext);
+    this.getArgs = this.formals.map(
+      (formal, index, { length }) =>
+        new GetArgumentQuad(index, formal, tempRegister, length)
+    );
+
+    this.statements = statements.toQuads(newContext);
   }
 
   public toString() {
@@ -91,7 +100,9 @@ export class FunctionQuad extends Quad {
   public toMips() {
     return [
       ...this.enter.toMips(),
-      ...this.statements.flatMap((statement) => statement.toMips()),
+      ...[...this.getArgs, ...this.statements].flatMap((statement) =>
+        statement.toMips()
+      ),
       ...this.leave.toMips(),
       '',
     ]

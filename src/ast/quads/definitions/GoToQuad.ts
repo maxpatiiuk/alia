@@ -8,4 +8,8 @@ export class GoToQuad extends Quad {
   public toString() {
     return [`goto ${this.label}`];
   }
+
+  public toMips() {
+    return [`j ${this.label}`];
+  }
 }

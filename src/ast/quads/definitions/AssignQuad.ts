@@ -1,5 +1,5 @@
 import type { RA } from '../../../utils/types.js';
-import { mem, Quad } from './index.js';
+import { addComment, mem, Quad } from './index.js';
 import { reg } from './IdQuad.js';
 
 export class AssignQuad extends Quad {
@@ -25,12 +25,14 @@ export class AssignQuad extends Quad {
   }
 
   public toMips() {
-    return [
-      ...(typeof this.id === 'string' ? [`# Assign ${this.id} START`] : []),
+    const mips = [
       ...this.expression.flatMap((quad) => quad.toMips()),
       `sw ${this.expression.at(-1)!.toMipsValue()}, ${reg(this.tempVariable)}`,
-      ...(typeof this.id === 'string' ? [`# Assign ${this.id} END`] : []),
+      ...(typeof this.id === 'string' ? [`# END Assigning ${this.id}`] : []),
     ];
+    return typeof this.id === 'string'
+      ? addComment(mips, `BEGIN Assigning ${this.id}`)
+      : mips;
   }
 
   public toMipsValue() {

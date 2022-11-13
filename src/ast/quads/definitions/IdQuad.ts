@@ -35,5 +35,5 @@ export class IdQuad extends Quad {
  */
 export const reg = (tempVariable: string | number) =>
   typeof tempVariable === 'string'
-    ? `(${formatGlobalVariable(tempVariable)})`
-    : `-${tempVariable * mipsSize}($fp)`;
+    ? formatGlobalVariable(tempVariable)
+    : `${tempVariable > 0 ? '-' : ''}${Math.abs(tempVariable) * mipsSize}($fp)`;

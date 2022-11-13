@@ -47,4 +47,6 @@ class IfzQuad extends Quad {
   public toString() {
     return [`IFZ ${this.condition} GOTO ${this.label}`];
   }
+
+  // FIXME: convert to MIPS
 }

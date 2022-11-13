@@ -6,6 +6,7 @@ export type QuadsContext = {
   readonly requestLabel: () => string;
   readonly requestString: (value: string) => string;
   readonly requestTemp: () => number;
+  readonly getTempCount: () => number;
   readonly declareVar: (name: string) => string | number;
   readonly returnLabel: string;
   readonly requestTempRegister: () => string;
@@ -22,6 +23,7 @@ export function toQuads(ast: AstNode): RA<Quad> {
     requestTemp() {
       throw new Error('not Implemented');
     },
+    getTempCount: () => 0,
     requestString() {
       throw new Error('Not Implemented');
     },

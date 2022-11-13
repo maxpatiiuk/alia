@@ -1,6 +1,6 @@
 import type { RA } from '../../../utils/types.js';
 import { AssignQuad } from './AssignQuad.js';
-import { Quad } from './index.js';
+import { addComment, Quad } from './index.js';
 import { QuadsContext } from '../index.js';
 import { LoadQuad } from './LoadQuad.js';
 
@@ -52,13 +52,13 @@ export class OpQuad extends Quad {
       return [
         `mult ${this.left}, ${this.right}`,
         // Note: this does not check for overflow
-        `move ${this.tempRegister}, LO`,
+        `mflo ${this.tempRegister}`,
       ];
     else if (this.type === '/')
       return [
         `div ${this.left}, ${this.right}`,
         // Note: this discards the remainder
-        `move ${this.tempRegister}, Lo`,
+        `mflo ${this.tempRegister}`,
       ];
     else if (this.type === 'or')
       return [`or ${this.tempRegister}, ${this.left}, ${this.right}`];
@@ -156,15 +156,16 @@ export class OperationQuad extends Quad {
   }
 
   public toMips() {
-    return [
-      `# ${this.toString().join('; ')}`,
-      `# Operation: ${operationTranslations[this.type]}`,
-      ...(this.left ?? []).flatMap((quad) => quad.toMips()),
-      ...this.right.flatMap((quad) => quad.toMips()),
-      ...(this.leftMips?.toMips() ?? []),
-      ...this.rightMips.toMips(),
-      ...this.assignMips.toMips(),
-    ];
+    return addComment(
+      [
+        ...(this.left ?? []).flatMap((quad) => quad.toMips()),
+        ...this.right.flatMap((quad) => quad.toMips()),
+        ...(this.leftMips?.toMips() ?? []),
+        ...this.rightMips.toMips(),
+        ...this.assignMips.toMips(),
+      ],
+      `Operation: ${operationTranslations[this.type]}`
+    );
   }
 
   public toMipsValue() {

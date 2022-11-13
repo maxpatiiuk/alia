@@ -24,7 +24,7 @@ export class IntLiteralQuad extends Quad {
 
   public toMips() {
     return [
-      `li ${this.tempRegister}, ${this.value}`,
+      `li ${this.tempRegister}, ${this.value} # Int Literal: ${this.value}`,
       `sw ${this.tempRegister}, ${reg(this.tempVariable)}`,
     ];
   }

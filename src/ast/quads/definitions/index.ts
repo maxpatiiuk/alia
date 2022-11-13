@@ -24,10 +24,12 @@ export class Quad {
 }
 
 /** Wrap an identifier in square brackets (indicates memory access) */
-export const mem = (id: string | number): string =>
+export const mem = (id: number | string): string =>
   `[${typeof id === 'number' ? formatTemp(id) : id}]`;
 
-export const quadsToString = (quads: RA<Quad>): RA<LabelQuad | string> =>
+export const quadsToString = (
+  quads: RA<Quad | string>
+): RA<LabelQuad | string> =>
   quads.flatMap((quad) => (quad instanceof LabelQuad ? quad : quad.toString()));
 
 /**
@@ -61,7 +63,7 @@ export class LabelQuad extends Quad {
     return this.buildLine(this.quad.toMips());
   }
 
-  private buildLine(lines: RA<string | LabelQuad>): RA<string> {
+  private buildLine(lines: RA<LabelQuad | string>): RA<string> {
     const label = `${this.label}:${' '.repeat(
       Math.max(0, longestLabel - this.label.length) + labelPadding
     )}`;
@@ -70,3 +72,11 @@ export class LabelQuad extends Quad {
     return [`${label}${lines[0]}`];
   }
 }
+
+export const addComment = (
+  lines: RA<LabelQuad | string>,
+  comment: string
+): RA<LabelQuad | string> =>
+  typeof lines[0] === 'string'
+    ? [`${lines[0]}  # ${comment}`, ...lines.slice(1)]
+    : [`# ${comment}`, ...lines];

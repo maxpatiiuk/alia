@@ -121,7 +121,7 @@ export class FunctionDeclaration extends AstNode {
     return [
       new FunctionQuad(
         this.id.getName(),
-        this.formals.toQuads(),
+        this.formals,
         this.statements,
         context
       ),

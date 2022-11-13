@@ -13,6 +13,6 @@ export class LoadQuad extends Quad {
   }
 
   public toMipsValue() {
-    return this.tempVariable;
+    return this.tempRegister;
   }
 }

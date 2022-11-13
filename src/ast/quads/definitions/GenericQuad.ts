@@ -20,14 +20,6 @@ export class GenericQuad extends Quad {
   }
 }
 
-export class PrintQuad extends GenericQuad {
-  public constructor(name: string, operation?: string) {
-    super({
-      quad: `${name}${operation === undefined ? '' : ` ${operation}`}`,
-    });
-  }
-}
-
 export class MipsQuad extends GenericQuad {
   public constructor(name: string, operation?: string) {
     super({

@@ -11,7 +11,7 @@ export class GlobalVarQuad extends Quad {
     this.name = formatGlobalVariable(id);
     this.mipsQuad =
       typeof this.value === 'number'
-        ? new LabelQuad(this.name, new MipsQuad(`.quad ${this.value}`))
+        ? new LabelQuad(this.name, new MipsQuad(`.word ${this.value}`))
         : undefined;
   }
 

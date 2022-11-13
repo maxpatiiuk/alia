@@ -88,6 +88,7 @@ export class FunctionCall extends Expression {
   toPartialQuads(context: QuadsContext) {
     return [
       new CallQuad(
+        context,
         this.actualsList.expressions.map((child) => child.toQuads(context)),
         this.id.getName()
       ),

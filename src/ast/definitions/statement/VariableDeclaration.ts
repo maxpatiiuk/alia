@@ -12,7 +12,7 @@ import { PrimaryTypeNode } from '../types/PrimaryTypeNode.js';
 import { Statement } from './index.js';
 import { QuadsContext } from '../../quads/index.js';
 import { FunctionDeclaration } from '../FunctionDeclaration.js';
-import { MipsQuad } from '../../quads/definitions/GenericQuad.js';
+import { VarDeclQuad } from '../../quads/definitions/VarDeclQuad.js';
 
 export class VariableDeclaration extends Statement {
   // eslint-disable-next-line functional/prefer-readonly-type
@@ -66,8 +66,11 @@ export class VariableDeclaration extends Statement {
 
   public toQuads(context: QuadsContext): RA<Quad> {
     // FIXME: implement scopes in if/while/for
-    this.tempVariable = context.declareVar(this.id.getName());
-    return [new MipsQuad('pushq')];
+    const name = this.id.getName();
+    this.tempVariable = context.declareVar(name);
+    return typeof this.tempVariable === 'number'
+      ? [new VarDeclQuad(name, this.tempVariable)]
+      : [];
   }
 }
 
