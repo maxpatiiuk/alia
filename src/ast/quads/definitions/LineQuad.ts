@@ -7,6 +7,10 @@ export class LineQuad extends Quad {
   }
 
   public toString(): RA<string> {
-    return [`${' '.repeat(getLongestLabel() + labelPadding)}${this.line}`];
+    return [
+      this.line === ''
+        ? ''
+        : `${' '.repeat(getLongestLabel() + labelPadding + 1)}${this.line}`,
+    ];
   }
 }

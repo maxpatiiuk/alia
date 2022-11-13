@@ -12,7 +12,7 @@ export class Quad {
   }
 
   /** Convert Quad to MIPS instructions */
-  public toMips(): RA<string> {
+  public toMips(): RA<LabelQuad | string> {
     throw new Error('Not implemented');
   }
 }
@@ -54,6 +54,6 @@ export class LabelQuad extends Quad {
     )}`;
     if (lines.length !== 1 || typeof lines[0] !== 'string')
       throw new Error('LabelQuad called on invalid quad');
-    return [`${label} ${lines[0]}`];
+    return [`${label}${lines[0]}`];
   }
 }

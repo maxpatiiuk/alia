@@ -1,37 +1,37 @@
-import type { RA } from '../../../utils/types.js';
+import type { RR, RA } from '../../../utils/types.js';
 import { Quad } from './index.js';
 
-type Mode = 'mips' | 'string';
+type Mode = 'mips' | 'quad';
 
 export class GenericQuad extends Quad {
-  private readonly value: string;
+  private readonly data: Partial<RR<Mode, string>>;
 
-  public constructor(
-    private readonly modes: RA<Mode>,
-    name: string,
-    operation: string | undefined
-  ) {
+  public constructor(data: Partial<RR<Mode, string>> | string) {
     super();
-    this.value = `${name}${operation === undefined ? '' : ` ${operation}`}`;
+    this.data = typeof data === 'object' ? data : { quad: data, mips: data };
   }
 
   public toString(): RA<string> {
-    return this.modes.includes('string') ? [this.value] : [];
+    return typeof this.data.quad === 'string' ? [this.data.quad] : [];
   }
 
   public toMips() {
-    return this.modes.includes('mips') ? [this.value] : [];
+    return typeof this.data.mips === 'string' ? [this.data.mips] : [];
   }
 }
 
 export class PrintQuad extends GenericQuad {
   public constructor(name: string, operation?: string) {
-    super(['string'], name, operation);
+    super({
+      quad: `${name}${operation === undefined ? '' : ` ${operation}`}`,
+    });
   }
 }
 
 export class MipsQuad extends GenericQuad {
   public constructor(name: string, operation?: string) {
-    super(['mips'], name, operation);
+    super({
+      mips: `${name}${operation === undefined ? '' : ` ${operation}`}`,
+    });
   }
 }

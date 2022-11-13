@@ -3,14 +3,15 @@ import type { StatementList } from '../../definitions/statement/StatementList.js
 import type { QuadsContext } from '../index.js';
 import type { FormalQuad } from './FormalQuad.js';
 import { GetArgQuad as GetArgumentQuad } from './GetArgQuad.js';
-import { LabelQuad, Quad } from './index.js';
+import { Quad } from './index.js';
 import { LineQuad } from './LineQuad.js';
-import { PrintQuad } from './GenericQuad.js';
+import { FunctionPrologueQuad } from './FunctionPrologueQuad.js';
+import { FunctionEpilogueQuad } from './FunctionEpilogueQuad.js';
 
 export class FunctionQuad extends Quad {
-  private readonly enter: LabelQuad;
+  private readonly enter: Quad;
 
-  private readonly leave: LabelQuad;
+  private readonly leave: Quad;
 
   private readonly getArgs: RA<Quad>;
 
@@ -30,9 +31,9 @@ export class FunctionQuad extends Quad {
   ) {
     super();
     this.name = formatFunctionName(this.id);
-    this.enter = new LabelQuad(this.name, new PrintQuad('enter', this.id));
+    this.enter = new FunctionPrologueQuad(this.id);
     const leaveLabel = context.requestLabel();
-    this.leave = new LabelQuad(leaveLabel, new PrintQuad('leave', this.id));
+    this.leave = new FunctionEpilogueQuad(leaveLabel, this.id);
     this.getArgs = this.formals.map(
       (formal, index) => new GetArgumentQuad(index + 1, formal.id)
     );
@@ -42,21 +43,21 @@ export class FunctionQuad extends Quad {
     this.statements = statements.toQuads({
       ...context,
       requestTemp: () => {
-        const tempName = temporaryGenerator();
-        this.temps.push(tempName);
-        return tempName;
+        const temporaryName = temporaryGenerator();
+        this.temps.push(temporaryName);
+        return temporaryName;
       },
       signalVarDeclaration: (name) => this.locals.push(name),
       returnLabel: leaveLabel,
     });
   }
 
-  public toString(): RA<string> {
+  public toString() {
     return [
       `[BEGIN ${this.id} LOCALS]`,
       ...this.formals.flatMap((formal) => formal.toString()),
       ...this.locals.map(formatLocal),
-      ...this.temps.map(formatTemp),
+      ...this.temps.map(formatTemporary),
       `[END ${this.id} LOCALS]`,
       ...this.enter.toString(),
       ...[...this.getArgs, ...this.statements]
@@ -70,7 +71,11 @@ export class FunctionQuad extends Quad {
   }
 
   public toMips() {
-    return [this.id];
+    return [...this.enter.toMips(), ...this.leave.toMips(), '']
+      .map((formatted) =>
+        typeof formatted === 'string' ? new LineQuad(formatted) : formatted
+      )
+      .flatMap((quad) => quad.toString());
   }
 }
 
@@ -79,5 +84,5 @@ export const formatFunctionName = (name: string): string => `fun_${name}`;
 const formatLocal = (variableName: string): string =>
   `${variableName} (local var of 8 bytes)`;
 
-const formatTemp = (tempName: string): string =>
-  `${tempName} (tmp var of 8 bytes)`;
+const formatTemporary = (temporaryName: string): string =>
+  `${temporaryName} (tmp var of 8 bytes)`;
