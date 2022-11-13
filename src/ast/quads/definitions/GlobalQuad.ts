@@ -10,7 +10,7 @@ import {
 import type { QuadsContext } from '../index.js';
 import { formatFunctionName, FunctionQuad } from './FunctionQuad.js';
 import { GlobalVarQuad as GlobalVariableQuad } from './GlobalVarQuad.js';
-import { LabelQuad, Quad, quadsToString } from './index.js';
+import { LabelQuad, Quad, quadsToMips, quadsToString } from './index.js';
 import { formatStringQuad, StringDefQuad } from './StringDefQuad.js';
 import { MipsQuad } from './GenericQuad.js';
 import { LineQuad } from './LineQuad.js';
@@ -88,7 +88,6 @@ export class GlobalQuad extends Quad {
     ]);
   }
 
-  // FIXME: add comments to output to make it more readable
   public toMips() {
     const main = this.functions.find(
       (quad): quad is FunctionQuad =>
@@ -98,15 +97,15 @@ export class GlobalQuad extends Quad {
       throw new Error(
         'Conversion to MIPS requires there to be a main() function. Please define it'
       );
-    return [
+    return quadsToMips([
       `.globl ${startFunction}`,
       '.data',
-      ...this.globalQuads.flatMap((quad) => quad.toMips()),
+      ...this.globalQuads,
       '.text',
       ...this.bootloader.flatMap((quad) => quad.toMips()),
       '',
-      ...this.functions.flatMap((quad) => quad.toMips()),
-    ];
+      ...this.functions,
+    ]);
   }
 }
 

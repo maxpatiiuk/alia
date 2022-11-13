@@ -4,21 +4,28 @@ import { addComment, Quad } from './index.js';
 import { LoadQuad } from './LoadQuad.js';
 
 export class SetArgQuad extends Quad {
-  private readonly loadQuad: LoadQuad;
+  private readonly loadQuad: LoadQuad | undefined;
 
   private readonly assignQuad: AssignQuad;
 
   public constructor(
     private readonly index: number,
     private readonly value: string,
-    mipsVariable: string,
+    mipsVariable: string | Register,
     tempRegister: string,
     tempVariable: number
   ) {
     super();
-    this.loadQuad = new LoadQuad(tempRegister, mipsVariable);
+    this.loadQuad =
+      typeof mipsVariable === 'string'
+        ? new LoadQuad(tempRegister, mipsVariable)
+        : undefined;
     this.assignQuad = new AssignQuad(undefined, tempVariable, [
-      new Register(tempRegister),
+      new Register(
+        mipsVariable instanceof Register
+          ? mipsVariable.toMipsValue()
+          : tempRegister
+      ),
     ]);
   }
 
@@ -28,7 +35,7 @@ export class SetArgQuad extends Quad {
 
   public toMips() {
     return addComment(
-      [...this.loadQuad.toMips(), ...this.assignQuad.toMips()],
+      [...(this.loadQuad?.toMips() ?? []), ...this.assignQuad.toMips()],
       `Setting argument ${this.index}`
     );
   }

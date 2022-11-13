@@ -381,11 +381,6 @@ export const grammar = store(() =>
     ],
     exp: [
       ['assignExp', ({ assignExp }) => assignExp],
-      [
-        'MINUS',
-        'term',
-        ({ MINUS, term }) => new MinusNode(type(MINUS, TokenNode), term),
-      ],
       ['expOr', ({ expOr }) => expOr],
     ],
     expOr: [
@@ -552,6 +547,11 @@ export const grammar = store(() =>
       ],
       ['TRUE', ({ TRUE }) => new BooleanLiteralNode(type(TRUE, TokenNode))],
       ['FALSE', ({ FALSE }) => new BooleanLiteralNode(type(FALSE, TokenNode))],
+      [
+        'MINUS',
+        'term',
+        ({ MINUS, term }) => new MinusNode(type(MINUS, TokenNode), term),
+      ],
       ['LPAREN', 'exp', 'RPAREN', ({ exp }) => exp],
       [
         'NOT',

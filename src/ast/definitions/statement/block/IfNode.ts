@@ -90,7 +90,7 @@ export class IfNode extends BlockStatement {
               label: context.requestLabel(),
             }
           : undefined,
-        context.requestLabel()
+        context
       ),
     ];
   }

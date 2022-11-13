@@ -32,6 +32,15 @@ export const quadsToString = (
 ): RA<LabelQuad | string> =>
   quads.flatMap((quad) => (quad instanceof LabelQuad ? quad : quad.toString()));
 
+export const quadsToMips = (quads: RA<Quad | string>): RA<LabelQuad | string> =>
+  quads.flatMap((quad) =>
+    quad instanceof LabelQuad
+      ? quad
+      : typeof quad === 'object'
+      ? quad.toMips()
+      : [quad]
+  );
+
 /**
  * Number of bites used for a single value.
  * 4*8 = 32 bits
@@ -67,9 +76,10 @@ export class LabelQuad extends Quad {
     const label = `${this.label}:${' '.repeat(
       Math.max(0, longestLabel - this.label.length) + labelPadding
     )}`;
+    if (lines.length === 0) return [label];
     if (lines.length !== 1 || typeof lines[0] !== 'string')
       throw new Error('LabelQuad called on invalid quad');
-    return [`${label}${lines[0]}`];
+    return [`${label}${lines[0] ?? ''}`];
   }
 }
 

@@ -31,7 +31,7 @@ export class GetArgQuad extends Quad {
     return [
       ...addComment(
         this.loadQuad.toMips(),
-        `Getting ${this.formal.id} argument`
+        `Getting argument "${this.formal.id}"`
       ),
       ...this.assignQuad.toMips(),
     ];

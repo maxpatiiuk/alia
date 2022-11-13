@@ -1,6 +1,6 @@
 import type { RA } from '../../../utils/types.js';
 import { AssignQuad } from './AssignQuad.js';
-import { addComment, Quad } from './index.js';
+import { addComment, Quad, quadsToMips } from './index.js';
 import { QuadsContext } from '../index.js';
 import { LoadQuad } from './LoadQuad.js';
 
@@ -80,18 +80,21 @@ export class OpQuad extends Quad {
       ];
     else if (this.type === '==')
       return [
-        `sub ${this.tempRegister}, ${this.left}, ${this.right}`,
-        `xori ${this.tempRegister}, ${this.tempRegister}, 1`,
+        `xor ${this.tempRegister}, ${this.left}, ${this.right}`,
+        `sltiu ${this.tempRegister}, ${this.tempRegister}, 1`,
       ];
     else if (this.type === '!=')
       return [
-        `sub ${this.tempRegister}, ${this.left}, ${this.right}`,
-        `andi ${this.tempRegister}, ${this.tempRegister}, 1`,
+        `xor ${this.tempRegister}, ${this.left}, ${this.right}`,
+        `sltu ${this.tempRegister}, $zero, ${this.tempRegister}`,
       ];
     else if (this.type === '!')
-      return [`xori ${this.tempRegister}, ${this.tempRegister}, 1`];
+      return [
+        `sltiu ${this.tempRegister}, ${this.right}, 1`,
+        `andi ${this.tempRegister}, ${this.tempRegister}, 0x00ff`,
+      ];
     else if (this.type === 'neg')
-      return [`sub ${this.tempRegister}, $zero, ${this.tempRegister}`];
+      return [`sub ${this.tempRegister}, $zero, ${this.right}`];
     else throw new Error(`Unknown operation ${this.type}`);
   }
 
@@ -157,13 +160,13 @@ export class OperationQuad extends Quad {
 
   public toMips() {
     return addComment(
-      [
-        ...(this.left ?? []).flatMap((quad) => quad.toMips()),
-        ...this.right.flatMap((quad) => quad.toMips()),
+      quadsToMips([
+        ...(this.left ?? []),
+        ...this.right,
         ...(this.leftMips?.toMips() ?? []),
-        ...this.rightMips.toMips(),
-        ...this.assignMips.toMips(),
-      ],
+        this.rightMips,
+        this.assignMips,
+      ]),
       `Operation: ${operationTranslations[this.type]}`
     );
   }

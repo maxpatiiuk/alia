@@ -1,8 +1,9 @@
 import type { RA } from '../../../utils/types.js';
 import { formatFunctionName } from './FunctionQuad.js';
-import { mipsSize, Quad } from './index.js';
+import { mipsSize, Quad, quadsToMips } from './index.js';
 import { SetArgQuad as SetArgumentQuad } from './SetArgQuad.js';
 import { QuadsContext } from '../index.js';
+import { Register } from './GetArgQuad.js';
 
 export class CallQuad extends Quad {
   private readonly quads: RA<Quad>;
@@ -10,17 +11,17 @@ export class CallQuad extends Quad {
 
   public constructor(
     context: QuadsContext,
-    actuals: RA<RA<Quad>>,
+    actuals: RA<RA<Quad> | undefined>,
     private readonly name: string
   ) {
     super();
     const tempRegister = context.requestTempRegister();
     this.quads = actuals.flatMap((actual, index) => [
-      ...actual,
+      ...(actual ?? []),
       new SetArgumentQuad(
         index + 1,
-        actual.at(-1)!.toValue(),
-        actual.at(-1)!.toMipsValue(),
+        actual?.at(-1)!.toValue() ?? '0',
+        actual?.at(-1)!.toMipsValue() ?? new Register('$zero'),
         tempRegister,
         context.requestTemp()
       ),
@@ -37,10 +38,10 @@ export class CallQuad extends Quad {
 
   public toMips() {
     const stackSize = this.tempsCount * mipsSize;
-    return [
+    return quadsToMips([
+      ...this.quads,
       `addi $sp, $fp, -${stackSize}  # BEGIN Calling ${this.name}`,
-      ...this.quads.flatMap((quad) => quad.toMips()),
       `jal ${formatFunctionName(this.name)}  # END Calling ${this.name}`,
-    ];
+    ]);
   }
 }

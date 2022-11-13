@@ -13,6 +13,7 @@ import { Expression } from './index.js';
 import { QuadsContext } from '../../quads/index.js';
 import { CallQuad } from '../../quads/definitions/CallQuad.js';
 import { GetRetQuad } from '../../quads/definitions/GetRetQuad.js';
+import { IntLiteralQuad } from '../../quads/definitions/IntLiteralQuad.js';
 
 export class FunctionCall extends Expression {
   public constructor(
@@ -86,10 +87,21 @@ export class FunctionCall extends Expression {
   }
 
   toPartialQuads(context: QuadsContext) {
+    const declaration = this.id.getDeclaration();
+    if (declaration === undefined)
+      throw new Error('Cannot call undefined function');
+    let argumentCount = this.actualsList.expressions.length;
+    if (declaration instanceof FunctionDeclaration)
+      argumentCount = declaration.formals.children.length;
+    else if (declaration.value instanceof FunctionDeclaration)
+      argumentCount = declaration.value.formals.children.length;
+    else throw new Error('Cannot call non-function');
     return [
       new CallQuad(
         context,
-        this.actualsList.expressions.map((child) => child.toQuads(context)),
+        Array.from({ length: argumentCount }, (_, index) =>
+          this.actualsList.expressions[index]?.toQuads(context)
+        ),
         this.id.getName()
       ),
     ];
