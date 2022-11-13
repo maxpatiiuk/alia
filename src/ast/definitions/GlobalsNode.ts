@@ -1,5 +1,4 @@
 import type { RA } from '../../utils/types.js';
-import { filterArray } from '../../utils/types.js';
 import type { EvalContext } from '../eval.js';
 import { evalList } from '../eval.js';
 import type { Quad } from '../quads/definitions/index.js';
@@ -42,40 +41,6 @@ export class GlobalsNode extends AstNode {
   }
 
   public toQuads(context: QuadsContext): RA<Quad> {
-    // eslint-disable-next-line functional/prefer-readonly-type
-    const strings: { readonly name: string; readonly value: string }[] = [];
-    const newContext: QuadsContext = {
-      ...context,
-      requestString(value) {
-        const name = context.requestString(value);
-        strings.push({ name, value });
-        return name;
-      },
-    };
-    const functions = filterArray(
-      this.children.flatMap((child) =>
-        child instanceof FunctionDeclaration
-          ? child.toQuads(newContext)
-          : undefined
-      )
-    );
-    return [
-      new GlobalQuad(
-        filterArray(
-          this.children
-            .flatMap((child) =>
-              child instanceof StatementList ? child.children : [child]
-            )
-            .map((child) =>
-              child instanceof VariableDeclaration ||
-              child instanceof FunctionDeclaration
-                ? child.id.getName()
-                : undefined
-            )
-        ),
-        strings
-      ),
-      ...functions,
-    ];
+    return [new GlobalQuad(this.children, context)];
   }
 }

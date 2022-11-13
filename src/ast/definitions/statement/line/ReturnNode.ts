@@ -10,7 +10,7 @@ import { FunctionDeclaration } from '../../FunctionDeclaration.js';
 import type { TokenNode } from '../../TokenNode.js';
 import { token } from '../../TokenNode.js';
 import { LineStatement } from './index.js';
-import { SimpleQuad } from '../../../quads/definitions/SimpleQuad.js';
+import { PrintQuad } from '../../../quads/definitions/GenericQuad.js';
 
 export class ReturnNode extends LineStatement {
   public constructor(
@@ -68,9 +68,9 @@ export class ReturnNode extends LineStatement {
     return filterArray([
       ...(quads ?? []),
       typeof quads === 'object'
-        ? new SimpleQuad('setret', quads.at(-1)!.toValue())
+        ? new PrintQuad('setret', quads.at(-1)!.toValue())
         : undefined,
-      new SimpleQuad('goto', context.returnLabel),
+      new PrintQuad('goto', context.returnLabel),
     ]);
   }
 }

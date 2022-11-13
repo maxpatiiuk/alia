@@ -20,7 +20,7 @@ program
     'SLR'
   )
   .option(
-    '-m, --unparseMode <string>',
+    '--unparseMode <string>',
     'parseTree - prettify directly from the parse tree (faster). ast - convert to AST and prettify that (better results)',
     'ast'
   )
@@ -42,6 +42,7 @@ program
     '-d, --diagramPath <string>',
     'path to the output diagram for the grammar in the DOT format'
   )
+  .option('-m, --mips <string>', 'compile the program down to MIPS')
   .option(
     '-u, --unparse <string>',
     'path to output file that would include preety-printed program'
@@ -59,6 +60,7 @@ const {
   assemble,
   unparseMode = 'parseTree',
   diagramPath,
+  mips,
 } = program.opts<{
   readonly tokensOutput?: string;
   readonly parser: string;
@@ -69,6 +71,7 @@ const {
   readonly unparseMode: string;
   readonly assemble?: string;
   readonly diagramPath?: string;
+  readonly mips?: string;
 }>();
 
 const parser = rawParser.toUpperCase().trim();
@@ -109,18 +112,23 @@ readFile()
     } else if (typeof namedUnparse === 'string')
       await fs.promises.writeFile(namedUnparse, namedUnparseResults);
 
+    const errors = typeCheckAst(ast, rawText);
     if (typeCheck) {
-      const errors = typeCheckAst(ast, rawText);
       errors.forEach((errorMessage) => console.error(errorMessage));
       if (errors.length > 0) console.error('Type Analysis Failed');
     }
 
-    if (typeof assemble === 'string') {
-      const quads = toQuads(ast);
+    const quads = toQuads(ast);
+    if (assemble !== undefined)
       await fs.promises.writeFile(
         assemble,
         quads.flatMap((quad) => quad.toString()).join('\n')
       );
-    }
+
+    if (mips !== undefined)
+      await fs.promises.writeFile(
+        mips,
+        quads.flatMap((quad) => quad.toMips()).join('\n')
+      );
   })
   .catch(console.error);

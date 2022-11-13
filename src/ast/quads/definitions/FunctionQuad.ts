@@ -3,10 +3,9 @@ import type { StatementList } from '../../definitions/statement/StatementList.js
 import type { QuadsContext } from '../index.js';
 import type { FormalQuad } from './FormalQuad.js';
 import { GetArgQuad as GetArgumentQuad } from './GetArgQuad.js';
-import { Quad } from './index.js';
-import { LabelQuad } from './LabelQuad.js';
+import { LabelQuad, Quad } from './index.js';
 import { LineQuad } from './LineQuad.js';
-import { SimpleQuad } from './SimpleQuad.js';
+import { PrintQuad } from './GenericQuad.js';
 
 export class FunctionQuad extends Quad {
   private readonly enter: LabelQuad;
@@ -21,19 +20,19 @@ export class FunctionQuad extends Quad {
 
   private readonly temps: WritableArray<string> = [];
 
+  public readonly name: string;
+
   public constructor(
-    private readonly id: string,
+    public readonly id: string,
     private readonly formals: RA<FormalQuad>,
     statements: StatementList,
     context: QuadsContext
   ) {
     super();
-    this.enter = new LabelQuad(
-      `fun_${this.id}`,
-      new SimpleQuad('enter', this.id)
-    );
+    this.name = formatFunctionName(this.id);
+    this.enter = new LabelQuad(this.name, new PrintQuad('enter', this.id));
     const leaveLabel = context.requestLabel();
-    this.leave = new LabelQuad(leaveLabel, new SimpleQuad('leave', this.id));
+    this.leave = new LabelQuad(leaveLabel, new PrintQuad('leave', this.id));
     this.getArgs = this.formals.map(
       (formal, index) => new GetArgumentQuad(index + 1, formal.id)
     );
@@ -69,7 +68,13 @@ export class FunctionQuad extends Quad {
       ...this.leave.toString(),
     ];
   }
+
+  public toMips() {
+    return [this.id];
+  }
 }
+
+export const formatFunctionName = (name: string): string => `fun_${name}`;
 
 const formatLocal = (variableName: string): string =>
   `${variableName} (local var of 8 bytes)`;

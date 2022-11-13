@@ -11,6 +11,7 @@ import type { TypeNode } from '../types/index.js';
 import { PrimaryTypeNode } from '../types/PrimaryTypeNode.js';
 import { Statement } from './index.js';
 import { QuadsContext } from '../../quads/index.js';
+import { FunctionDeclaration } from '../FunctionDeclaration.js';
 
 export class VariableDeclaration extends Statement {
   // eslint-disable-next-line functional/prefer-readonly-type
@@ -65,4 +66,14 @@ export class VariableDeclaration extends Statement {
     context.signalVarDeclaration(this.id.getName());
     return [];
   }
+}
+
+export function toPrimitiveValue(value: EvalValue): number {
+  if (typeof value === 'number') return value;
+  else if (typeof value === 'boolean') return value ? 1 : 0;
+  else if (typeof value === 'string') {
+    throw new Error('String variables are not supported');
+  } else if (value instanceof FunctionDeclaration)
+    throw new Error('Cannot convert function to primitive value');
+  throw new Error('Value is undefined');
 }

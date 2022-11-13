@@ -13,13 +13,12 @@ export type QuadsContext = {
 
 export function toQuads(ast: AstNode): RA<Quad> {
   let labelIndex = -1;
-  let stringIndex = -1;
 
-  function createTempGenerator(): () => string {
-    let tempIndex = -1;
+  function createTemporaryGenerator(): () => string {
+    let temporaryIndex = -1;
     return () => {
-      tempIndex += 1;
-      return `tmp${tempIndex}`;
+      temporaryIndex += 1;
+      return `tmp${temporaryIndex}`;
     };
   }
 
@@ -28,11 +27,10 @@ export function toQuads(ast: AstNode): RA<Quad> {
       labelIndex += 1;
       return `lbl_${labelIndex}`;
     },
-    requestTemp: createTempGenerator(),
-    createTempGenerator,
+    requestTemp: createTemporaryGenerator(),
+    createTempGenerator: createTemporaryGenerator,
     requestString() {
-      stringIndex += 1;
-      return `str_${stringIndex}`;
+      throw new Error('Not Implemented');
     },
     signalVarDeclaration: () => undefined,
     returnLabel: 'ERROR: Return label is not defined',

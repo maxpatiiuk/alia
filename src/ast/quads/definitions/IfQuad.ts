@@ -1,7 +1,6 @@
 import type { RA } from '../../../utils/types.js';
 import { GoToQuad } from './GoToQuad.js';
-import { Quad, quadsToString } from './index.js';
-import { LabelQuad } from './LabelQuad.js';
+import { LabelQuad, Quad, quadsToString } from './index.js';
 import { NopQuad } from './NopQuad.js';
 
 export class IfQuad extends Quad {
