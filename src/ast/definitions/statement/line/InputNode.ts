@@ -43,6 +43,6 @@ export class InputNode extends LineStatement {
   }
 
   public toQuads() {
-    return [new ReceiveQuad(this.id.getName())];
+    return [new ReceiveQuad(this.id.getName(), this.id.getTempVariable())];
   }
 }

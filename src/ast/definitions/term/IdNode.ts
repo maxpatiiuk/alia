@@ -13,7 +13,6 @@ import { FunctionTypeNode } from '../types/FunctionTypeNode.js';
 import { PrimaryTypeNode } from '../types/PrimaryTypeNode.js';
 import { Term } from './index.js';
 import { IdQuad } from '../../quads/definitions/IdQuad.js';
-import { QuadsContext } from '../../quads/index.js';
 
 export class IdNode extends Term {
   public constructor(public readonly token: TokenNode) {
@@ -91,8 +90,7 @@ export class IdNode extends Term {
     else return variable.tempVariable;
   }
 
-  public toQuads(context: QuadsContext) {
-    // FIXME: make sure this is called for reading only
+  public toQuads() {
     return [new IdQuad(this.getName(), this.getTempVariable())];
   }
 }

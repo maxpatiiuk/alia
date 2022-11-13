@@ -1,8 +1,12 @@
 import type { RA } from '../../../utils/types.js';
-import { mem, Quad } from './index.js';
+import { addComment, mem, Quad } from './index.js';
+import { reg } from './IdQuad.js';
 
 export class ReceiveQuad extends Quad {
-  public constructor(private readonly id: string) {
+  public constructor(
+    private readonly id: string,
+    private readonly tempVariable: string | number
+  ) {
     super();
   }
 
@@ -10,9 +14,14 @@ export class ReceiveQuad extends Quad {
     return [`RECEIVE ${mem(this.id)}`];
   }
 
-  public toMips(): RA<string> {
-    console.warn('Warning: "input" statement is not yet implemented in MIPS');
-    // FIXME: convert to MIPS
-    return [`# ${this.toString().at(-1)!}  # Not yet implemented`];
+  public toMips() {
+    return addComment(
+      [
+        'addi $v0, $zero, 5',
+        'syscall',
+        `sw $v0, ${reg(this.tempVariable)}  # END input ${this.id}`,
+      ],
+      `BEGIN input ${this.id}`
+    );
   }
 }
