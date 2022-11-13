@@ -12,7 +12,8 @@ import { token } from '../TokenNode.js';
 import { FunctionTypeNode } from '../types/FunctionTypeNode.js';
 import { PrimaryTypeNode } from '../types/PrimaryTypeNode.js';
 import { Term } from './index.js';
-import { mem, TermQuad } from '../../quads/definitions.js';
+import { mem } from '../../quads/definitions/index.js';
+import { TermQuad } from '../../quads/definitions/TermQuad.js';
 
 export class IdNode extends Term {
   public constructor(public readonly token: TokenNode) {

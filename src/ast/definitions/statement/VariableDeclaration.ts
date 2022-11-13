@@ -2,7 +2,7 @@ import type { RA } from '../../../utils/types.js';
 import type { EvalContext, EvalValue } from '../../eval.js';
 import type { NameAnalysisContext } from '../../nameAnalysis.js';
 import { getScope } from '../../nameAnalysis.js';
-import type { Quad } from '../../quads/definitions.js';
+import type { Quad } from '../../quads/definitions/index.js';
 import type { LanguageType, TypeCheckContext } from '../../typing.js';
 import { BoolType, IntType, StringType, VoidType } from '../../typing.js';
 import type { PrintContext } from '../../unparse.js';

@@ -5,7 +5,7 @@ import type { PrintContext } from '../../../unparse.js';
 import type { IdNode } from '../../term/IdNode.js';
 import { VariableDeclaration } from '../VariableDeclaration.js';
 import { LineStatement } from './index.js';
-import { PostQuad } from '../../../quads/definitions.js';
+import { PostQuad } from '../../../quads/definitions/PostQuad.js';
 
 export class PostNode extends LineStatement {
   public constructor(

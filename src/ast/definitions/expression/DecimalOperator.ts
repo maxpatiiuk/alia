@@ -1,5 +1,4 @@
 import type { EvalContext } from '../../eval.js';
-import { OperationQuad } from '../../quads/definitions.js';
 import type { QuadsContext } from '../../quads/index.js';
 import type { TypeCheckContext } from '../../typing.js';
 import { assertType, cascadeError } from '../../typing.js';
@@ -8,6 +7,7 @@ import { wrap, wrapChild } from '../../unparse.js';
 import type { TokenNode } from '../TokenNode.js';
 import { assertToken } from '../TokenNode.js';
 import { Expression } from './index.js';
+import { OperationQuad } from '../../quads/definitions/OperationQuad.js';
 
 export class DecimalOperator extends Expression {
   public readonly operator: '-' | '*' | '/' | '+';

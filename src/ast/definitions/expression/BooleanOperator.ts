@@ -7,7 +7,7 @@ import type { TokenNode } from '../TokenNode.js';
 import { assertToken } from '../TokenNode.js';
 import { Expression } from './index.js';
 import { QuadsContext } from '../../quads/index.js';
-import { OperationQuad } from '../../quads/definitions.js';
+import { OperationQuad } from '../../quads/definitions/OperationQuad.js';
 
 export class BooleanOperator extends Expression {
   public readonly operator: 'and' | 'or';

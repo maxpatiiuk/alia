@@ -12,9 +12,10 @@ import { token } from '../../TokenNode.js';
 import type { Statement } from '../index.js';
 import { StatementList } from '../StatementList.js';
 import { BlockStatement } from './index.js';
-import { ForQuad, Quad } from '../../../quads/definitions.js';
+import { Quad } from '../../../quads/definitions/index.js';
 import { QuadsContext } from '../../../quads/index.js';
 import { RA } from '../../../../utils/types.js';
+import { ForQuad } from '../../../quads/definitions/ForQuad.js';
 
 export class ForNode extends BlockStatement {
   public constructor(

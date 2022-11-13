@@ -1,5 +1,4 @@
 import type { EvalContext } from '../../../eval.js';
-import { ReceiveQuad } from '../../../quads/definitions.js';
 import type { TypeCheckContext } from '../../../typing.js';
 import { assertType } from '../../../typing.js';
 import type { PrintContext } from '../../../unparse.js';
@@ -9,6 +8,7 @@ import { token } from '../../TokenNode.js';
 import { PrimaryTypeNode } from '../../types/PrimaryTypeNode.js';
 import { VariableDeclaration } from '../VariableDeclaration.js';
 import { LineStatement } from './index.js';
+import { ReceiveQuad } from '../../../quads/definitions/ReceiveQuad.js';
 
 export class InputNode extends LineStatement {
   public constructor(

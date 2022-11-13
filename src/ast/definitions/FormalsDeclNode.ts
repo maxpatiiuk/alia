@@ -1,11 +1,11 @@
 import type { RA } from '../../utils/types.js';
-import type { FormalQuad } from '../quads/definitions.js';
 import type { LanguageType, TypeCheckContext } from '../typing.js';
 import { VoidType } from '../typing.js';
 import type { PrintContext } from '../unparse.js';
 import { AstNode } from './AstNode.js';
 import type { FormalDeclNode } from './statement/FormalDeclNode.js';
 import { token } from './TokenNode.js';
+import { FormalQuad } from '../quads/definitions/FormalQuad.js';
 
 export class FormalsDeclNode extends AstNode {
   public constructor(public readonly children: RA<FormalDeclNode>) {

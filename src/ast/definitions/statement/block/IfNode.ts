@@ -11,8 +11,9 @@ import { token } from '../../TokenNode.js';
 import type { StatementList } from '../StatementList.js';
 import { BlockStatement } from './index.js';
 import { QuadsContext } from '../../../quads/index.js';
-import { IfQuad, Quad } from '../../../quads/definitions.js';
+import { Quad } from '../../../quads/definitions/index.js';
 import { RA } from '../../../../utils/types.js';
+import { IfQuad } from '../../../quads/definitions/IfQuad.js';
 
 export class IfNode extends BlockStatement {
   public constructor(

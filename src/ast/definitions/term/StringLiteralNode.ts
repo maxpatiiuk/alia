@@ -1,10 +1,10 @@
 import type { Tokens } from '../../../tokenize/tokens.js';
 import type { EvalContext } from '../../eval.js';
-import { TermQuad } from '../../quads/definitions.js';
 import type { QuadsContext } from '../../quads/index.js';
 import { StringType } from '../../typing.js';
 import type { TokenNode } from '../TokenNode.js';
 import { Term } from './index.js';
+import { TermQuad } from '../../quads/definitions/TermQuad.js';
 
 export class StringLiteralNode extends Term {
   public constructor(public readonly token: TokenNode) {

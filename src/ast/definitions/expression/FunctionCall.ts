@@ -11,7 +11,8 @@ import type { TokenNode } from '../TokenNode.js';
 import { token } from '../TokenNode.js';
 import { Expression } from './index.js';
 import { QuadsContext } from '../../quads/index.js';
-import { CallQuad, GetRetQuad } from '../../quads/definitions.js';
+import { CallQuad } from '../../quads/definitions/CallQuad.js';
+import { GetRetQuad } from '../../quads/definitions/GetRetQuad.js';
 
 export class FunctionCall extends Expression {
   public constructor(

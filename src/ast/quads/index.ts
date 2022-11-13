@@ -1,6 +1,6 @@
 import type { RA } from '../../utils/types.js';
 import type { AstNode } from '../definitions/AstNode.js';
-import type { Quad } from './definitions.js';
+import type { Quad } from './definitions/index.js';
 
 export type QuadsContext = {
   readonly requestLabel: () => string;

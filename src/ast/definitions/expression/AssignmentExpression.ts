@@ -1,6 +1,5 @@
 import type { EvalContext } from '../../eval.js';
 import { ReturnValue } from '../../eval.js';
-import { AssignQuad } from '../../quads/definitions.js';
 import type { QuadsContext } from '../../quads/index.js';
 import type { LanguageType, TypeCheckContext } from '../../typing.js';
 import { assertType, cascadeError, ErrorType } from '../../typing.js';
@@ -11,6 +10,7 @@ import type { IdNode } from '../term/IdNode.js';
 import type { TokenNode } from '../TokenNode.js';
 import { token } from '../TokenNode.js';
 import { Expression } from './index.js';
+import { AssignQuad } from '../../quads/definitions/AssignQuad.js';
 
 export class AssignmentExpression extends Expression {
   public constructor(

@@ -2,7 +2,7 @@ import { indentation } from '../../../unparseParseTree/index.js';
 import type { RA } from '../../../utils/types.js';
 import type { EvalContext, EvalReturnValue } from '../../eval.js';
 import { evalList } from '../../eval.js';
-import type { Quad } from '../../quads/definitions.js';
+import type { Quad } from '../../quads/definitions/index.js';
 import type { QuadsContext } from '../../quads/index.js';
 import type { LanguageType, TypeCheckContext } from '../../typing.js';
 import { VoidType } from '../../typing.js';
