@@ -12,6 +12,7 @@ export class ReceiveQuad extends Quad {
 
   public toMips(): RA<string> {
     console.warn('Warning: "input" statement is not yet implemented in MIPS');
+    // FIXME: convert to MIPS
     return [`# ${this.toString().at(-1)!}  # Not yet implemented`];
   }
 }

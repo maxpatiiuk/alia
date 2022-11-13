@@ -19,5 +19,6 @@ module.exports = {
   ],
   rules: {
     'no-console': OFF,
+    'unicorn/prevent-abbreviations': OFF,
   },
 };

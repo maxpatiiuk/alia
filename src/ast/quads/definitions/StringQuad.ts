@@ -1,25 +1,15 @@
-import { MipsQuad } from './GenericQuad.js';
-import { LabelQuad, Quad } from './index.js';
+import { TermQuad } from './TermQuad.js';
 
-export class StringQuad extends Quad {
-  private readonly name: string;
-
-  private readonly quad: Quad;
-
-  public constructor(index: number, private readonly value: string) {
-    super();
-
-    this.name = formatStringQuad(index);
-    this.quad = new LabelQuad(this.name, new MipsQuad('.asciiz', this.value));
-  }
-
-  public toString() {
-    return [`${this.name} ${this.value}`];
+export class StringQuad extends TermQuad {
+  public constructor(private readonly name: string, value: string) {
+    super(value);
   }
 
   public toMips() {
-    return this.quad.toMips();
+    return [];
+  }
+
+  public toMipsValue() {
+    return this.name;
   }
 }
-
-export const formatStringQuad = (index: number): string => `str_${index}`;

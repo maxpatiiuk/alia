@@ -11,7 +11,7 @@ import type { QuadsContext } from '../index.js';
 import { formatFunctionName, FunctionQuad } from './FunctionQuad.js';
 import { GlobalVarQuad as GlobalVariableQuad } from './GlobalVarQuad.js';
 import { LabelQuad, Quad, quadsToString } from './index.js';
-import { formatStringQuad, StringQuad } from './StringQuad.js';
+import { formatStringQuad, StringDefQuad } from './StringDefQuad.js';
 import { MipsQuad } from './GenericQuad.js';
 import { LineQuad } from './LineQuad.js';
 
@@ -64,7 +64,9 @@ export class GlobalQuad extends Quad {
 
     this.globalQuads = [
       ...globals.map(({ name, value }) => new GlobalVariableQuad(name, value)),
-      ...strings.flatMap((value, index) => new StringQuad(index, value)),
+      ...strings.flatMap(
+        (value) => new StringDefQuad(newContext.requestString(value), value)
+      ),
     ];
 
     this.bootloader = [

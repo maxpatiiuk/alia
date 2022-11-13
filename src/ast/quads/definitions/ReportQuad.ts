@@ -1,5 +1,6 @@
 import type { RA } from '../../../utils/types.js';
-import { Quad } from './index.js';
+import { addComment, Quad } from './index.js';
+import { StringQuad } from './StringQuad.js';
 
 export class ReportQuad extends Quad {
   public constructor(private readonly quads: RA<Quad>) {
@@ -13,16 +14,17 @@ export class ReportQuad extends Quad {
     ];
   }
 
-  public toMips(): RA<string> {
-    console.warn('Warning: "output" statement is not yet implemented in MIPS');
-    const lines = this.toString();
-    const lastLine = lines.at(-1)!;
-    const priorLines = lines.slice(0, -1);
-    return [
-      ...priorLines.map((line) => `# ${line.toString()}`),
-      `# ${lastLine}  # Not yet implemented`,
-    ];
+  public toMips() {
+    const isString = this.quads.at(-1) instanceof StringQuad;
+    const value = this.quads.at(-1)!.toMipsValue();
+    return addComment(
+      [
+        ...this.quads.flatMap((quad) => quad.toMips()),
+        isString ? `la $a0, ${value}` : `lw $a0, ${value}`,
+        `addi $v0, $zero, ${isString ? 4 : 1}`,
+        'syscall  # END Output',
+      ],
+      'BEGIN Output'
+    );
   }
-
-  // FIXME: convert to MIPS
 }

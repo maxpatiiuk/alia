@@ -4,7 +4,7 @@ import type { QuadsContext } from '../../quads/index.js';
 import { StringType } from '../../typing.js';
 import type { TokenNode } from '../TokenNode.js';
 import { Term } from './index.js';
-import { TermQuad } from '../../quads/definitions/TermQuad.js';
+import { StringQuad } from '../../quads/definitions/StringQuad.js';
 
 export class StringLiteralNode extends Term {
   public constructor(public readonly token: TokenNode) {
@@ -30,7 +30,8 @@ export class StringLiteralNode extends Term {
   }
 
   public toQuads(context: QuadsContext) {
-    const variable = context.requestString(this.pretty());
-    return [new TermQuad(variable)];
+    const value = this.pretty();
+    const name = context.requestString(value);
+    return [new StringQuad(name, value)];
   }
 }

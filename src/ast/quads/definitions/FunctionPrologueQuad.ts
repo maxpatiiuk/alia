@@ -32,7 +32,6 @@ export class FunctionPrologueQuad extends Quad {
     return this.entry.toString();
   }
 
-  // FIXME: add a _start function that would do exit 0 syscall
   public toMips() {
     return [
       this.entry,
