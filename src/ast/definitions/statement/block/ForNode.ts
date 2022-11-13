@@ -91,8 +91,7 @@ export class ForNode extends BlockStatement {
         this.declaration.toQuads(context),
         this.condition.toQuads(context),
         [...this.statements.toQuads(context), ...this.action.toQuads(context)],
-        context.requestLabel(),
-        context.requestLabel()
+        context
       ),
     ];
   }

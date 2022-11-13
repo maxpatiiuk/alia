@@ -13,7 +13,6 @@ import { Expression } from './index.js';
 import { QuadsContext } from '../../quads/index.js';
 import { CallQuad } from '../../quads/definitions/CallQuad.js';
 import { GetRetQuad } from '../../quads/definitions/GetRetQuad.js';
-import { IntLiteralQuad } from '../../quads/definitions/IntLiteralQuad.js';
 
 export class FunctionCall extends Expression {
   public constructor(

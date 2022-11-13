@@ -72,8 +72,7 @@ export class WhileNode extends BlockStatement {
         [],
         this.condition.toQuads(context),
         this.statements.toQuads(context),
-        context.requestLabel(),
-        context.requestLabel()
+        context
       ),
     ];
   }
