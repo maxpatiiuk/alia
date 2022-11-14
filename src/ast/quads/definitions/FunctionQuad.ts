@@ -9,6 +9,7 @@ import { FunctionPrologueQuad } from './FunctionPrologueQuad.js';
 import { FunctionEpilogueQuad } from './FunctionEpilogueQuad.js';
 import { formatTemp } from '../index.js';
 import { FormalsDeclNode } from '../../definitions/FormalsDeclNode.js';
+import { formatGlobalVariable } from './GlobalVarQuad.js';
 
 export class FunctionQuad extends Quad {
   private readonly enter: Quad;
@@ -63,7 +64,7 @@ export class FunctionQuad extends Quad {
       returnLabel: context.requestLabel(),
     };
 
-    this.name = formatFunctionName(this.id);
+    this.name = formatGlobalVariable(this.id);
     this.enter = new FunctionPrologueQuad(this.id, newContext);
     this.leave = new FunctionEpilogueQuad(newContext.returnLabel, this.id);
 
@@ -112,8 +113,6 @@ export class FunctionQuad extends Quad {
       .flatMap((quad) => quad.toMips());
   }
 }
-
-export const formatFunctionName = (name: string): string => `fun_${name}`;
 
 const formatLocal = (variableName: string): string =>
   `${variableName} (local var of 8 bytes)`;

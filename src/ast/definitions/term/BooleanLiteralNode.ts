@@ -26,7 +26,8 @@ export class BooleanLiteralNode extends Term {
     return [
       new IntLiteralQuad(
         this.token.token.type === 'TRUE' ? '1' : '0',
-        context.requestTempRegister()
+        context.requestTempRegister(),
+        context.requestTemp()
       ),
     ];
   }

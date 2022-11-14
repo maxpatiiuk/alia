@@ -1,9 +1,9 @@
-import { RA } from '../../../utils/types.js';
-import { NopQuad } from './NopQuad.js';
-import { IfQuad } from './IfQuad.js';
+import type { RA } from '../../../utils/types.js';
+import type { QuadsContext } from '../index.js';
 import { GoToQuad } from './GoToQuad.js';
+import { IfQuad } from './IfQuad.js';
 import { LabelQuad, Quad, quadsToMips, quadsToString } from './index.js';
-import { QuadsContext } from '../index.js';
+import { NopQuad } from './NopQuad.js';
 
 export class ForQuad extends Quad {
   private readonly quads: RA<Quad>;

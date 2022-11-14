@@ -13,6 +13,7 @@ import { Expression } from './index.js';
 import { AssignQuad } from '../../quads/definitions/AssignQuad.js';
 import { LoadQuad } from '../../quads/definitions/LoadQuad.js';
 import { Register } from '../../quads/definitions/GetArgQuad.js';
+import { IdQuad } from '../../quads/definitions/IdQuad.js';
 
 export class AssignmentExpression extends Expression {
   public constructor(
@@ -75,9 +76,11 @@ export class AssignmentExpression extends Expression {
   public toQuads(context: QuadsContext) {
     const tempRegister = context.requestTempRegister();
     const quads = this.expression.toQuads(context);
+    const lastQuad = quads.at(-1)!;
+    const isFunction = lastQuad instanceof IdQuad && lastQuad.isFunction;
     return [
       ...quads,
-      new LoadQuad(tempRegister, quads.at(-1)!.toMipsValue()),
+      new LoadQuad(tempRegister, quads.at(-1)!.toMipsValue(), isFunction),
       new AssignQuad(this.id.getName(), this.id.getTempVariable(), [
         new Register(tempRegister),
       ]),

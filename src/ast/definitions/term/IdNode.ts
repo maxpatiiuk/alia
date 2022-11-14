@@ -2,6 +2,7 @@ import type { Tokens } from '../../../tokenize/tokens.js';
 import type { EvalContext } from '../../eval.js';
 import type { NameAnalysisContext } from '../../nameAnalysis.js';
 import { findDeclaration } from '../../nameAnalysis.js';
+import { IdQuad } from '../../quads/definitions/IdQuad.js';
 import type { TypeCheckContext } from '../../typing.js';
 import { BoolType, IntType } from '../../typing.js';
 import type { PrintContext } from '../../unparse.js';
@@ -12,12 +13,13 @@ import { token } from '../TokenNode.js';
 import { FunctionTypeNode } from '../types/FunctionTypeNode.js';
 import { PrimaryTypeNode } from '../types/PrimaryTypeNode.js';
 import { Term } from './index.js';
-import { IdQuad } from '../../quads/definitions/IdQuad.js';
 
 export class IdNode extends Term {
   public constructor(public readonly token: TokenNode) {
     super([token]);
   }
+
+  private declaration: FunctionDeclaration | VariableDeclaration | undefined;
 
   public getName(): string {
     return (this.token.token.data as Tokens['ID']).literal.toString();
@@ -55,7 +57,12 @@ export class IdNode extends Term {
     | FunctionDeclaration
     | VariableDeclaration
     | undefined {
-    return findDeclaration(this.getName(), this.nameAnalysisContext);
+    if (typeof this.declaration === 'object') return this.declaration;
+    this.declaration = findDeclaration(
+      this.getName(),
+      this.nameAnalysisContext
+    );
+    return this.declaration;
   }
 
   public pretty(printContext: PrintContext) {
@@ -83,14 +90,19 @@ export class IdNode extends Term {
 
   public getTempVariable() {
     const variable = this.getDeclaration()!;
-    // FIXME: support function pointers
-    if (variable instanceof FunctionDeclaration)
-      throw new Error('Not supported');
-    if (variable.tempVariable === -1) return this.getName();
-    else return variable.tempVariable;
+    return variable instanceof FunctionDeclaration ||
+      variable.tempVariable === -1
+      ? this.getName()
+      : variable.tempVariable;
   }
 
   public toQuads() {
-    return [new IdQuad(this.getName(), this.getTempVariable())];
+    return [
+      new IdQuad(
+        this.getName(),
+        this.getTempVariable(),
+        this.getDeclaration()! instanceof FunctionDeclaration
+      ),
+    ];
   }
 }

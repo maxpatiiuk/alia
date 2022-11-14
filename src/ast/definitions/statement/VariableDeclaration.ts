@@ -65,7 +65,6 @@ export class VariableDeclaration extends Statement {
   }
 
   public toQuads(context: QuadsContext): RA<Quad> {
-    // FIXME: implement scopes in if/while/for
     const name = this.id.getName();
     this.tempVariable = context.declareVar(name);
     return typeof this.tempVariable === 'number'
@@ -81,5 +80,6 @@ export function toPrimitiveValue(value: EvalValue): number {
     throw new Error('String variables are not supported');
   } else if (value instanceof FunctionDeclaration)
     throw new Error('Cannot convert function to primitive value');
-  throw new Error('Value is undefined');
+  // Happens for undefined pointers
+  else return 0;
 }

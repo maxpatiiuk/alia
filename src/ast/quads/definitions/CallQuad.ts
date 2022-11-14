@@ -1,9 +1,10 @@
 import type { RA } from '../../../utils/types.js';
-import { formatFunctionName } from './FunctionQuad.js';
-import { mipsSize, Quad, quadsToMips } from './index.js';
+import { addComment, mipsSize, Quad, quadsToMips } from './index.js';
 import { SetArgQuad as SetArgumentQuad } from './SetArgQuad.js';
 import { QuadsContext } from '../index.js';
-import { Register } from './GetArgQuad.js';
+import { formatGlobalVariable } from './GlobalVarQuad.js';
+import { getPcHelper } from './GlobalQuad.js';
+import { reg } from './IdQuad.js';
 
 export class CallQuad extends Quad {
   private readonly quads: RA<Quad>;
@@ -11,8 +12,9 @@ export class CallQuad extends Quad {
 
   public constructor(
     context: QuadsContext,
-    actuals: RA<RA<Quad> | undefined>,
-    private readonly name: string
+    actuals: RA<RA<Quad>>,
+    private readonly name: string,
+    private readonly dynamicTempVariable: string | number | undefined
   ) {
     super();
     const tempRegister = context.requestTempRegister();
@@ -20,8 +22,8 @@ export class CallQuad extends Quad {
       ...(actual ?? []),
       new SetArgumentQuad(
         index + 1,
-        actual?.at(-1)!.toValue() ?? '0',
-        actual?.at(-1)!.toMipsValue() ?? new Register('$zero'),
+        actual?.at(-1)!.toValue(),
+        actual?.at(-1)!.toMipsValue(),
         tempRegister,
         context.requestTemp()
       ),
@@ -41,7 +43,18 @@ export class CallQuad extends Quad {
     return quadsToMips([
       ...this.quads,
       `addi $sp, $fp, -${stackSize}  # BEGIN Calling ${this.name}`,
-      `jal ${formatFunctionName(this.name)}  # END Calling ${this.name}`,
+      ...(this.dynamicTempVariable === undefined
+        ? [`jal ${formatGlobalVariable(this.name)}  # END Calling ${this.name}`]
+        : addComment(
+            [
+              `jal ${getPcHelper}`,
+              'move $ra, $v0',
+              `addi $ra, $ra, ${4 * mipsSize}  # Offset the return position`,
+              `lw $v0, ${reg(this.dynamicTempVariable)}`,
+              'jr $v0',
+            ],
+            'Calling function by pointer'
+          )),
     ]);
   }
 }

@@ -8,8 +8,11 @@ import {
   VariableDeclaration,
 } from '../../definitions/statement/VariableDeclaration.js';
 import type { QuadsContext } from '../index.js';
-import { formatFunctionName, FunctionQuad } from './FunctionQuad.js';
-import { GlobalVarQuad as GlobalVariableQuad } from './GlobalVarQuad.js';
+import { FunctionQuad } from './FunctionQuad.js';
+import {
+  formatGlobalVariable,
+  GlobalVarQuad as GlobalVariableQuad,
+} from './GlobalVarQuad.js';
 import { LabelQuad, Quad, quadsToMips, quadsToString } from './index.js';
 import { formatStringQuad, StringDefQuad } from './StringDefQuad.js';
 import { MipsQuad } from './GenericQuad.js';
@@ -45,13 +48,22 @@ export class GlobalQuad extends Quad {
         .flatMap((child) =>
           child instanceof StatementList ? child.children : [child]
         )
-        .map((child) =>
-          child instanceof VariableDeclaration
-            ? { name: child.id.getName(), value: toPrimitiveValue(child.value) }
-            : child instanceof FunctionDeclaration
-            ? { name: child.id.getName(), value: undefined }
-            : undefined
-        )
+        .map((child) => {
+          if (child instanceof VariableDeclaration) {
+            child.toQuads(newContext);
+            return {
+              name: child.id.getName(),
+              value: toPrimitiveValue(child.value),
+            };
+          } else
+            return child instanceof FunctionDeclaration
+              ? { name: child.id.getName(), value: undefined }
+              : undefined;
+        })
+    );
+
+    const globalQuads = globals.map(
+      ({ name, value }) => new GlobalVariableQuad(name, value)
     );
 
     this.functions = filterArray(
@@ -62,20 +74,26 @@ export class GlobalQuad extends Quad {
       )
     );
 
-    this.globalQuads = [
-      ...globals.map(({ name, value }) => new GlobalVariableQuad(name, value)),
-      ...strings.flatMap(
-        (value) => new StringDefQuad(newContext.requestString(value), value)
-      ),
-    ];
+    const stringQuads = strings.flatMap(
+      (value) => new StringDefQuad(newContext.requestString(value), value)
+    );
+    this.globalQuads = [...globalQuads, ...stringQuads];
 
     this.bootloader = [
       new LabelQuad(
         startFunction,
-        new MipsQuad(`jal ${formatFunctionName(mainFunction)}`)
+        new MipsQuad(`jal ${formatGlobalVariable(mainFunction)}`)
       ),
       new LineQuad('li $v0, 10  # Exit syscall'),
       new LineQuad('syscall'),
+      new LineQuad(''),
+      new LabelQuad(
+        getPcHelper,
+        new MipsQuad(
+          'move $v0, $ra  # A helper function for getting current PC'
+        )
+      ),
+      new LineQuad('jr $ra'),
     ];
   }
 
@@ -111,3 +129,4 @@ export class GlobalQuad extends Quad {
 
 const startFunction = '_start';
 const mainFunction = 'main';
+export const getPcHelper = '_get_pc';

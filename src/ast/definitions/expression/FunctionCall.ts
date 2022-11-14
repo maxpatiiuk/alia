@@ -13,6 +13,7 @@ import { Expression } from './index.js';
 import { QuadsContext } from '../../quads/index.js';
 import { CallQuad } from '../../quads/definitions/CallQuad.js';
 import { GetRetQuad } from '../../quads/definitions/GetRetQuad.js';
+import { VariableDeclaration } from '../statement/VariableDeclaration.js';
 
 export class FunctionCall extends Expression {
   public constructor(
@@ -89,19 +90,16 @@ export class FunctionCall extends Expression {
     const declaration = this.id.getDeclaration();
     if (declaration === undefined)
       throw new Error('Cannot call undefined function');
-    let argumentCount = this.actualsList.expressions.length;
-    if (declaration instanceof FunctionDeclaration)
-      argumentCount = declaration.formals.children.length;
-    else if (declaration.value instanceof FunctionDeclaration)
-      argumentCount = declaration.value.formals.children.length;
-    else throw new Error('Cannot call non-function');
     return [
       new CallQuad(
         context,
-        Array.from({ length: argumentCount }, (_, index) =>
-          this.actualsList.expressions[index]?.toQuads(context)
+        this.actualsList.expressions.map((expression) =>
+          expression?.toQuads(context)
         ),
-        this.id.getName()
+        this.id.getName(),
+        declaration instanceof VariableDeclaration
+          ? declaration.tempVariable
+          : undefined
       ),
     ];
   }
