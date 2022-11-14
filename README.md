@@ -11,7 +11,7 @@ Written in TypeScript.
 
 ## Installation
 
-Install dependencies: 
+Install dependencies:
 
 ```sh
 make all
@@ -30,6 +30,11 @@ Example call:
 ```sh
 ./dgc infile.dg -m mips.asm 2> errors.txt
 ```
+
+> NOTE: when compiling to MIPS, registers are stored as 32-bit values to simplify
+> the multiplication and division operations
+
+MIPS assembly code was written to work with MARS 4.5
 
 ## Running Interpreter
 
