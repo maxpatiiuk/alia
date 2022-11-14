@@ -30,14 +30,16 @@ export class AssignmentExpression extends Expression {
       this.id,
       'invalidOperand',
       'int',
-      'bool'
+      'bool',
+      'function'
     );
     const rightType = assertType(
       context,
       this.expression,
       'invalidOperand',
       'int',
-      'bool'
+      'bool',
+      'function'
     );
     const cascadeType = cascadeError(leftType, rightType);
     return !(cascadeType instanceof ErrorType) &&

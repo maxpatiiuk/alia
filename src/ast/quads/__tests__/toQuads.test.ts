@@ -1,4 +1,4 @@
-import { run } from '../../../process.js';
+import { run } from '../../../processInput.js';
 import { toQuads } from '../index.js';
 
 test('toQuads', async () => {

@@ -9,6 +9,10 @@ export class LoadQuad extends Quad {
     super();
   }
 
+  public toString() {
+    return [];
+  }
+
   public toMips() {
     return [
       `${this.isFunction ? 'la' : 'lw'} ${this.tempRegister}, ${

@@ -1,8 +1,8 @@
 import { program } from 'commander';
 import fs from 'node:fs';
 
-import { toQuads } from './ast/quads/index.js';
-import { nameParse, run, typeCheckAst } from './process.js';
+import { run } from './processInput.js';
+import { processAst } from './processAst.js';
 
 program.name('dgc').description('The ultimate Drewgon compiler');
 
@@ -29,11 +29,6 @@ program
     'the file to which the augmented unparse output will be written. Ignored if unparseMode is not "ast"'
   )
   .option(
-    '-c, --typeCheck',
-    'run a type checker and print errors to stderr',
-    false
-  )
-  .option(
     '-a, --assemble <string>',
     'generate a 3AC representation of the program'
   )
@@ -54,7 +49,6 @@ const {
   tokensOutput,
   parser: rawParser,
   unparse: unparseOutput,
-  typeCheck,
   debug,
   namedUnparse,
   assemble,
@@ -66,7 +60,6 @@ const {
   readonly parser: string;
   readonly unparse?: string;
   readonly debug: boolean;
-  readonly typeCheck: boolean;
   readonly namedUnparse?: string;
   readonly unparseMode: string;
   readonly assemble?: string;
@@ -99,36 +92,15 @@ readFile()
       diagramPath,
     });
 
-    if (ast === undefined) return;
+    if (ast === undefined) return undefined;
 
-    const namedUnparseResults = nameParse(ast, debug);
-    if (namedUnparseResults === undefined) return;
-    if (Array.isArray(namedUnparseResults)) {
-      namedUnparseResults.forEach((errorMessage) =>
-        console.error(errorMessage)
-      );
-      console.error('Name Analysis Failed');
-      return;
-    } else if (typeof namedUnparse === 'string')
-      await fs.promises.writeFile(namedUnparse, namedUnparseResults);
-
-    const errors = typeCheckAst(ast, rawText);
-    if (typeCheck) {
-      errors.forEach((errorMessage) => console.error(errorMessage));
-      if (errors.length > 0) console.error('Type Analysis Failed');
-    }
-
-    const quads = toQuads(ast);
-    if (assemble !== undefined)
-      await fs.promises.writeFile(
-        assemble,
-        quads.flatMap((quad) => quad.toString()).join('\n')
-      );
-
-    if (mips !== undefined)
-      await fs.promises.writeFile(
-        mips,
-        quads.flatMap((quad) => quad.toMips()).join('\n')
-      );
+    return processAst({
+      ast,
+      rawText,
+      debug,
+      namedUnparse,
+      assemble,
+      mips,
+    });
   })
   .catch(console.error);

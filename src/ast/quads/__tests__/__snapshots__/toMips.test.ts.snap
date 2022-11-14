@@ -1,0 +1,891 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`toMips 1`] = `
+".globl _start
+.data
+global_globalPointer:         .word 0
+global_failCount:             .word 0
+global_totalCount:            .word 0
+str_0:                        .asciiz \\"left_\\"
+str_1:                        .asciiz \\"\\\\n\\"
+str_2:                        .asciiz \\"right_\\"
+str_3:                        .asciiz \\"Calling a function using pointer:\\\\n\\"
+str_4:                        .asciiz \\"Function as an actual:\\\\n\\"
+str_5:                        .asciiz \\"Calling a function returned from another function:\\\\n\\"
+str_6:                        .asciiz \\"Test #\\"
+str_7:                        .asciiz \\": \\"
+str_8:                        .asciiz \\"Pass\\\\n\\"
+str_9:                        .asciiz \\"Fail\\\\n\\"
+str_10:                       .asciiz \\"FAIL\\\\n\\"
+str_11:                       .asciiz \\"Expected: \\"
+str_12:                       .asciiz \\"\\\\nReceived:\\"
+str_13:                       .asciiz \\"\\\\n\\\\n\\"
+str_14:                       .asciiz \\"Passed \\"
+str_15:                       .asciiz \\" of \\"
+str_16:                       .asciiz \\" tests\\"
+.text
+_start:                       jal global_main
+                              li $v0, 10  # Exit syscall
+                              syscall
+
+_get_pc:                      move $v0, $ra  # A helper function for getting current PC
+                              jr $ra
+
+global_break:                 nop
+                              sw $fp, -4($sp) # Save frame pointer
+                              move $fp, $sp  # Set new frame pointer
+                              sw $ra, -8($fp)  # Save return address
+                              # Function body:
+lbl_0:                        nop
+                              lw $ra, -8($fp)  # Restore return address
+                              lw $fp, -4($fp)  # Restore frame pointer
+                              jr $ra # Return to caller
+
+
+global_left:                  nop
+                              sw $fp, -4($sp) # Save frame pointer
+                              move $fp, $sp  # Set new frame pointer
+                              sw $ra, -8($fp)  # Save return address
+                              # Function body:
+                              lw $t0, 0($fp)  # Getting argument \\"a\\"
+                              sw $t0, -12($fp)
+                              la $a0, str_0  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              lw $a0, -12($fp)  # BEGIN Output
+                              addi $v0, $zero, 1
+                              syscall  # END Output
+                              la $a0, str_1  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+lbl_1:                        nop
+                              lw $ra, -8($fp)  # Restore return address
+                              lw $fp, -4($fp)  # Restore frame pointer
+                              jr $ra # Return to caller
+
+
+global_right:                 nop
+                              sw $fp, -4($sp) # Save frame pointer
+                              move $fp, $sp  # Set new frame pointer
+                              sw $ra, -8($fp)  # Save return address
+                              # Function body:
+                              lw $t0, 0($fp)  # Getting argument \\"a\\"
+                              sw $t0, -12($fp)
+                              la $a0, str_2  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              lw $a0, -12($fp)  # BEGIN Output
+                              addi $v0, $zero, 1
+                              syscall  # END Output
+                              la $a0, str_1  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+lbl_2:                        nop
+                              lw $ra, -8($fp)  # Restore return address
+                              lw $fp, -4($fp)  # Restore frame pointer
+                              jr $ra # Return to caller
+
+
+global_twice:                 nop
+                              sw $fp, -4($sp) # Save frame pointer
+                              move $fp, $sp  # Set new frame pointer
+                              sw $ra, -8($fp)  # Save return address
+                              # Function body:
+                              lw $t0, 4($fp)  # Getting argument \\"f\\"
+                              sw $t0, -12($fp)
+                              lw $t0, 0($fp)  # Getting argument \\"a\\"
+                              sw $t0, -16($fp)
+                              lw $t1, -16($fp)  # Setting argument 1
+                              sw $t1, -20($fp)
+                              addi $sp, $fp, -20  # BEGIN Calling f
+                              jal _get_pc  # Calling function by pointer
+                              move $ra, $v0
+                              addi $ra, $ra, 16  # Offset the return position
+                              lw $v0, -12($fp)
+                              jr $v0
+                              lw $t2, -16($fp)  # Setting argument 1
+                              sw $t2, -24($fp)
+                              addi $sp, $fp, -24  # BEGIN Calling f
+                              jal _get_pc  # Calling function by pointer
+                              move $ra, $v0
+                              addi $ra, $ra, 16  # Offset the return position
+                              lw $v0, -12($fp)
+                              jr $v0
+                              lw $v0, -12($fp)  # Return
+lbl_3:                        nop
+                              lw $ra, -8($fp)  # Restore return address
+                              lw $fp, -4($fp)  # Restore frame pointer
+                              jr $ra # Return to caller
+
+
+global_testFunctionPointers:  nop
+                              sw $fp, -4($sp) # Save frame pointer
+                              move $fp, $sp  # Set new frame pointer
+                              sw $ra, -8($fp)  # Save return address
+                              # Function body:
+                              sw $zero, -12($fp)  # Initializing localPointer
+                              sw $zero, -16($fp)  # Initializing a
+                              addi $v0, $zero, 41  # BEGIN Mayhem
+                              move $a0, $zero
+                              syscall
+                              sw $a0, -20($fp) # END Mayhem
+                              lw $t1, -20($fp)
+                              sw $t1, -16($fp)  # BEGIN Assigning a
+                              # END Assigning a
+                              sw $zero, -24($fp)  # Initializing b
+                              addi $v0, $zero, 41  # BEGIN Mayhem
+                              move $a0, $zero
+                              syscall
+                              sw $a0, -28($fp) # END Mayhem
+                              lw $t2, -28($fp)
+                              sw $t2, -24($fp)  # BEGIN Assigning b
+                              # END Assigning b
+                              lw $t4, -16($fp)  # Operation: GT64  # BEGIN if
+                              lw $t5, -24($fp)
+                              slt $t3, $t5, $t4
+                              sw $t3, -32($fp)
+                              lw $t0, -32($fp)
+                              beq $zero, $t0, lbl_5
+                              # True Branch
+                              la $t6, global_left
+                              sw $t6, global_globalPointer  # BEGIN Assigning globalPointer
+                              # END Assigning globalPointer
+                              la $t7, global_right
+                              sw $t7, -12($fp)  # BEGIN Assigning localPointer
+                              # END Assigning localPointer
+                              j lbl_6
+                              # False Branch
+lbl_5:                        sll $zero $zero 0  # nop
+                              la $t8, global_right
+                              sw $t8, global_globalPointer  # BEGIN Assigning globalPointer
+                              # END Assigning globalPointer
+                              la $t9, global_left
+                              sw $t9, -12($fp)  # BEGIN Assigning localPointer
+                              # END Assigning localPointer
+lbl_6:                        nop  # END if
+                              addi $sp, $fp, -32  # BEGIN Calling break
+                              jal global_break  # END Calling break
+                              la $a0, str_3  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              lw $t2, -24($fp)  # Setting argument 1
+                              sw $t2, -36($fp)
+                              addi $sp, $fp, -36  # BEGIN Calling localPointer
+                              jal _get_pc  # Calling function by pointer
+                              move $ra, $v0
+                              addi $ra, $ra, 16  # Offset the return position
+                              lw $v0, -12($fp)
+                              jr $v0
+                              sw $zero, -40($fp)  # Initializing result
+                              la $a0, str_4  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              lw $t4, global_globalPointer  # Setting argument 1
+                              sw $t4, -44($fp)
+                              lw $t4, -16($fp)  # Setting argument 2
+                              sw $t4, -48($fp)
+                              addi $sp, $fp, -48  # BEGIN Calling twice
+                              jal global_twice  # END Calling twice
+                              sw $v0, -52($fp)
+                              lw $t3, -52($fp)
+                              sw $t3, -40($fp)  # BEGIN Assigning result
+                              # END Assigning result
+                              la $a0, str_5  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              lw $t5, -16($fp)  # Setting argument 1
+                              sw $t5, -56($fp)
+                              addi $sp, $fp, -56  # BEGIN Calling result
+                              jal _get_pc  # Calling function by pointer
+                              move $ra, $v0
+                              addi $ra, $ra, 16  # Offset the return position
+                              lw $v0, -40($fp)
+                              jr $v0
+lbl_4:                        nop
+                              lw $ra, -8($fp)  # Restore return address
+                              lw $fp, -4($fp)  # Restore frame pointer
+                              jr $ra # Return to caller
+
+
+global_assertBool:            nop
+                              sw $fp, -4($sp) # Save frame pointer
+                              move $fp, $sp  # Set new frame pointer
+                              sw $ra, -8($fp)  # Save return address
+                              # Function body:
+                              lw $t0, 0($fp)  # Getting argument \\"result\\"
+                              sw $t0, -12($fp)
+                              li $t2, 1 # Int Literal: 1
+                              sw $t2, -16($fp)
+                              lw $t1, global_totalCount
+                              add $t1, $t1, $t2
+                              sw $t1, global_totalCount
+                              la $a0, str_6  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              lw $a0, global_totalCount  # BEGIN Output
+                              addi $v0, $zero, 1
+                              syscall  # END Output
+                              la $a0, str_7  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              lw $t5, -12($fp)  # BEGIN if
+                              beq $zero, $t5, lbl_8
+                              # True Branch
+                              la $a0, str_8  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              j lbl_9
+                              # False Branch
+lbl_8:                        sll $zero $zero 0  # nop
+                              la $a0, str_9  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              li $t4, 1 # Int Literal: 1
+                              sw $t4, -20($fp)
+                              lw $t3, global_failCount
+                              add $t3, $t3, $t4
+                              sw $t3, global_failCount
+lbl_9:                        nop  # END if
+lbl_7:                        nop
+                              lw $ra, -8($fp)  # Restore return address
+                              lw $fp, -4($fp)  # Restore frame pointer
+                              jr $ra # Return to caller
+
+
+global_not:                   nop
+                              sw $fp, -4($sp) # Save frame pointer
+                              move $fp, $sp  # Set new frame pointer
+                              sw $ra, -8($fp)  # Save return address
+                              # Function body:
+                              lw $t0, 0($fp)  # Getting argument \\"a\\"
+                              sw $t0, -12($fp)
+                              lw $t3, -12($fp)  # Operation: NOT64  # Return
+                              sltiu $t1, $t3, 1
+                              andi $t1, $t1, 0x00ff
+                              sw $t1, -16($fp)
+                              lw $v0, -16($fp)
+lbl_10:                       nop
+                              lw $ra, -8($fp)  # Restore return address
+                              lw $fp, -4($fp)  # Restore frame pointer
+                              jr $ra # Return to caller
+
+
+global_assert:                nop
+                              sw $fp, -4($sp) # Save frame pointer
+                              move $fp, $sp  # Set new frame pointer
+                              sw $ra, -8($fp)  # Save return address
+                              # Function body:
+                              lw $t0, 4($fp)  # Getting argument \\"result\\"
+                              sw $t0, -12($fp)
+                              lw $t0, 0($fp)  # Getting argument \\"expected\\"
+                              sw $t0, -16($fp)
+                              li $t2, 1 # Int Literal: 1
+                              sw $t2, -20($fp)
+                              lw $t1, global_totalCount
+                              add $t1, $t1, $t2
+                              sw $t1, global_totalCount
+                              la $a0, str_6  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              lw $a0, global_totalCount  # BEGIN Output
+                              addi $v0, $zero, 1
+                              syscall  # END Output
+                              la $a0, str_7  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              lw $t4, -12($fp)  # Operation: EQ64  # BEGIN if
+                              lw $t5, -16($fp)
+                              xor $t3, $t4, $t5
+                              sltiu $t3, $t3, 1
+                              sw $t3, -24($fp)
+                              lw $t8, -24($fp)
+                              beq $zero, $t8, lbl_12
+                              # True Branch
+                              la $a0, str_8  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              j lbl_13
+                              # False Branch
+lbl_12:                       sll $zero $zero 0  # nop
+                              la $a0, str_10  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              la $a0, str_11  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              lw $a0, -16($fp)  # BEGIN Output
+                              addi $v0, $zero, 1
+                              syscall  # END Output
+                              la $a0, str_12  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              lw $a0, -12($fp)  # BEGIN Output
+                              addi $v0, $zero, 1
+                              syscall  # END Output
+                              la $a0, str_13  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              li $t7, 1 # Int Literal: 1
+                              sw $t7, -28($fp)
+                              lw $t6, global_failCount
+                              add $t6, $t6, $t7
+                              sw $t6, global_failCount
+lbl_13:                       nop  # END if
+lbl_11:                       nop
+                              lw $ra, -8($fp)  # Restore return address
+                              lw $fp, -4($fp)  # Restore frame pointer
+                              jr $ra # Return to caller
+
+
+global_printSummary:          nop
+                              sw $fp, -4($sp) # Save frame pointer
+                              move $fp, $sp  # Set new frame pointer
+                              sw $ra, -8($fp)  # Save return address
+                              # Function body:
+                              la $a0, str_14  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              lw $t2, global_totalCount  # Operation: SUB64  # BEGIN Output
+                              lw $t3, global_failCount
+                              sub $t1, $t2, $t3
+                              sw $t1, -12($fp)
+                              lw $a0, -12($fp)
+                              addi $v0, $zero, 1
+                              syscall  # END Output
+                              la $a0, str_15  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              lw $a0, global_totalCount  # BEGIN Output
+                              addi $v0, $zero, 1
+                              syscall  # END Output
+                              la $a0, str_16  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+lbl_14:                       nop
+                              lw $ra, -8($fp)  # Restore return address
+                              lw $fp, -4($fp)  # Restore frame pointer
+                              jr $ra # Return to caller
+
+
+global_testLoops:             nop
+                              sw $fp, -4($sp) # Save frame pointer
+                              move $fp, $sp  # Set new frame pointer
+                              sw $ra, -8($fp)  # Save return address
+                              # Function body:
+                              sw $zero, -12($fp)  # Initializing i
+lbl_16:                       sll $zero $zero 0  # nop
+                              li $t1, 10 # Int Literal: 10  # Operation: LT64  # BEGIN if
+                              sw $t1, -16($fp)
+                              lw $t3, -12($fp)
+                              lw $t4, -16($fp)
+                              slt $t2, $t3, $t4
+                              sw $t2, -20($fp)
+                              lw $t7, -20($fp)
+                              beq $zero, $t7, lbl_17
+                              # True Branch
+                              lw $a0, -12($fp)  # BEGIN Output
+                              addi $v0, $zero, 1
+                              syscall  # END Output
+                              la $a0, str_1  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              li $t6, 1 # Int Literal: 1
+                              sw $t6, -24($fp)
+                              lw $t5, -12($fp)
+                              add $t5, $t5, $t6
+                              sw $t5, -12($fp)
+                              j lbl_16
+lbl_17:                       nop  # END if
+                              sw $zero, -28($fp)  # Initializing b
+                              li $t9, 10 # Int Literal: 10
+                              sw $t9, -32($fp)
+                              lw $t8, -32($fp)
+                              sw $t8, -28($fp)  # BEGIN Assigning b
+                              # END Assigning b
+lbl_18:                       sll $zero $zero 0  # nop
+                              li $t0, 0 # Int Literal: 0  # Operation: GT64  # BEGIN if
+                              sw $t0, -36($fp)
+                              lw $t2, -28($fp)
+                              lw $t3, -36($fp)
+                              slt $t1, $t3, $t2
+                              sw $t1, -40($fp)
+                              lw $t6, -40($fp)
+                              beq $zero, $t6, lbl_19
+                              # True Branch
+                              lw $a0, -28($fp)  # BEGIN Output
+                              addi $v0, $zero, 1
+                              syscall  # END Output
+                              la $a0, str_1  # BEGIN Output
+                              addi $v0, $zero, 4
+                              syscall  # END Output
+                              li $t5, 1 # Int Literal: 1
+                              sw $t5, -44($fp)
+                              lw $t4, -28($fp)
+                              sub $t4, $t4, $t5
+                              sw $t4, -28($fp)
+                              j lbl_18
+lbl_19:                       nop  # END if
+lbl_15:                       nop
+                              lw $ra, -8($fp)  # Restore return address
+                              lw $fp, -4($fp)  # Restore frame pointer
+                              jr $ra # Return to caller
+
+
+global_testOperators:         nop
+                              sw $fp, -4($sp) # Save frame pointer
+                              move $fp, $sp  # Set new frame pointer
+                              sw $ra, -8($fp)  # Save return address
+                              # Function body:
+                              li $t1, 1 # Int Literal: 1  # Operation: AND64
+                              sw $t1, -12($fp)
+                              li $t2, 1 # Int Literal: 1
+                              sw $t2, -16($fp)
+                              lw $t4, -12($fp)
+                              lw $t5, -16($fp)
+                              and $t3, $t4, $t5
+                              sw $t3, -20($fp)
+                              lw $t6, -20($fp)  # Setting argument 1
+                              sw $t6, -24($fp)
+                              addi $sp, $fp, -24  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t7, 1 # Int Literal: 1  # Operation: OR64
+                              sw $t7, -28($fp)
+                              li $t8, 1 # Int Literal: 1
+                              sw $t8, -32($fp)
+                              lw $t0, -28($fp)
+                              lw $t1, -32($fp)
+                              or $t9, $t0, $t1
+                              sw $t9, -36($fp)
+                              lw $t2, -36($fp)  # Setting argument 1
+                              sw $t2, -40($fp)
+                              addi $sp, $fp, -40  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t3, 1 # Int Literal: 1  # Operation: AND64
+                              sw $t3, -44($fp)
+                              li $t4, 0 # Int Literal: 0
+                              sw $t4, -48($fp)
+                              lw $t6, -44($fp)
+                              lw $t7, -48($fp)
+                              and $t5, $t6, $t7
+                              sw $t5, -52($fp)
+                              lw $t8, -52($fp)  # Setting argument 1
+                              sw $t8, -56($fp)
+                              addi $sp, $fp, -56  # BEGIN Calling not
+                              jal global_not  # END Calling not
+                              sw $v0, -60($fp)
+                              lw $t9, -60($fp)  # Setting argument 1
+                              sw $t9, -64($fp)
+                              addi $sp, $fp, -64  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t0, 1 # Int Literal: 1  # Operation: OR64
+                              sw $t0, -68($fp)
+                              li $t1, 0 # Int Literal: 0
+                              sw $t1, -72($fp)
+                              lw $t3, -68($fp)
+                              lw $t4, -72($fp)
+                              or $t2, $t3, $t4
+                              sw $t2, -76($fp)
+                              lw $t5, -76($fp)  # Setting argument 1
+                              sw $t5, -80($fp)
+                              addi $sp, $fp, -80  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t6, 0 # Int Literal: 0  # Operation: AND64
+                              sw $t6, -84($fp)
+                              li $t7, 1 # Int Literal: 1
+                              sw $t7, -88($fp)
+                              lw $t9, -84($fp)
+                              lw $t0, -88($fp)
+                              and $t8, $t9, $t0
+                              sw $t8, -92($fp)
+                              lw $t1, -92($fp)  # Setting argument 1
+                              sw $t1, -96($fp)
+                              addi $sp, $fp, -96  # BEGIN Calling not
+                              jal global_not  # END Calling not
+                              sw $v0, -100($fp)
+                              lw $t2, -100($fp)  # Setting argument 1
+                              sw $t2, -104($fp)
+                              addi $sp, $fp, -104  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t3, 0 # Int Literal: 0  # Operation: OR64
+                              sw $t3, -108($fp)
+                              li $t4, 1 # Int Literal: 1
+                              sw $t4, -112($fp)
+                              lw $t6, -108($fp)
+                              lw $t7, -112($fp)
+                              or $t5, $t6, $t7
+                              sw $t5, -116($fp)
+                              lw $t8, -116($fp)  # Setting argument 1
+                              sw $t8, -120($fp)
+                              addi $sp, $fp, -120  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t9, 0 # Int Literal: 0  # Operation: AND64
+                              sw $t9, -124($fp)
+                              li $t0, 0 # Int Literal: 0
+                              sw $t0, -128($fp)
+                              lw $t2, -124($fp)
+                              lw $t3, -128($fp)
+                              and $t1, $t2, $t3
+                              sw $t1, -132($fp)
+                              lw $t4, -132($fp)  # Setting argument 1
+                              sw $t4, -136($fp)
+                              addi $sp, $fp, -136  # BEGIN Calling not
+                              jal global_not  # END Calling not
+                              sw $v0, -140($fp)
+                              lw $t5, -140($fp)  # Setting argument 1
+                              sw $t5, -144($fp)
+                              addi $sp, $fp, -144  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t6, 0 # Int Literal: 0  # Operation: OR64
+                              sw $t6, -148($fp)
+                              li $t7, 0 # Int Literal: 0
+                              sw $t7, -152($fp)
+                              lw $t9, -148($fp)
+                              lw $t0, -152($fp)
+                              or $t8, $t9, $t0
+                              sw $t8, -156($fp)
+                              lw $t1, -156($fp)  # Setting argument 1
+                              sw $t1, -160($fp)
+                              addi $sp, $fp, -160  # BEGIN Calling not
+                              jal global_not  # END Calling not
+                              sw $v0, -164($fp)
+                              lw $t2, -164($fp)  # Setting argument 1
+                              sw $t2, -168($fp)
+                              addi $sp, $fp, -168  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t3, 3 # Int Literal: 3  # Operation: GT64
+                              sw $t3, -172($fp)
+                              li $t4, 2 # Int Literal: 2
+                              sw $t4, -176($fp)
+                              lw $t6, -172($fp)
+                              lw $t7, -176($fp)
+                              slt $t5, $t7, $t6
+                              sw $t5, -180($fp)
+                              lw $t8, -180($fp)  # Setting argument 1
+                              sw $t8, -184($fp)
+                              addi $sp, $fp, -184  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t9, 2 # Int Literal: 2  # Operation: GT64
+                              sw $t9, -188($fp)
+                              li $t0, 2 # Int Literal: 2
+                              sw $t0, -192($fp)
+                              lw $t2, -188($fp)
+                              lw $t3, -192($fp)
+                              slt $t1, $t3, $t2
+                              sw $t1, -196($fp)
+                              lw $t4, -196($fp)  # Setting argument 1
+                              sw $t4, -200($fp)
+                              addi $sp, $fp, -200  # BEGIN Calling not
+                              jal global_not  # END Calling not
+                              sw $v0, -204($fp)
+                              lw $t5, -204($fp)  # Setting argument 1
+                              sw $t5, -208($fp)
+                              addi $sp, $fp, -208  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t6, 2 # Int Literal: 2  # Operation: GT64
+                              sw $t6, -212($fp)
+                              li $t7, 3 # Int Literal: 3
+                              sw $t7, -216($fp)
+                              lw $t9, -212($fp)
+                              lw $t0, -216($fp)
+                              slt $t8, $t0, $t9
+                              sw $t8, -220($fp)
+                              lw $t1, -220($fp)  # Setting argument 1
+                              sw $t1, -224($fp)
+                              addi $sp, $fp, -224  # BEGIN Calling not
+                              jal global_not  # END Calling not
+                              sw $v0, -228($fp)
+                              lw $t2, -228($fp)  # Setting argument 1
+                              sw $t2, -232($fp)
+                              addi $sp, $fp, -232  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t3, 3 # Int Literal: 3  # Operation: LT64
+                              sw $t3, -236($fp)
+                              li $t4, 2 # Int Literal: 2
+                              sw $t4, -240($fp)
+                              lw $t6, -236($fp)
+                              lw $t7, -240($fp)
+                              slt $t5, $t6, $t7
+                              sw $t5, -244($fp)
+                              lw $t8, -244($fp)  # Setting argument 1
+                              sw $t8, -248($fp)
+                              addi $sp, $fp, -248  # BEGIN Calling not
+                              jal global_not  # END Calling not
+                              sw $v0, -252($fp)
+                              lw $t9, -252($fp)  # Setting argument 1
+                              sw $t9, -256($fp)
+                              addi $sp, $fp, -256  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t0, 2 # Int Literal: 2  # Operation: LT64
+                              sw $t0, -260($fp)
+                              li $t1, 2 # Int Literal: 2
+                              sw $t1, -264($fp)
+                              lw $t3, -260($fp)
+                              lw $t4, -264($fp)
+                              slt $t2, $t3, $t4
+                              sw $t2, -268($fp)
+                              lw $t5, -268($fp)  # Setting argument 1
+                              sw $t5, -272($fp)
+                              addi $sp, $fp, -272  # BEGIN Calling not
+                              jal global_not  # END Calling not
+                              sw $v0, -276($fp)
+                              lw $t6, -276($fp)  # Setting argument 1
+                              sw $t6, -280($fp)
+                              addi $sp, $fp, -280  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t7, 2 # Int Literal: 2  # Operation: LT64
+                              sw $t7, -284($fp)
+                              li $t8, 3 # Int Literal: 3
+                              sw $t8, -288($fp)
+                              lw $t0, -284($fp)
+                              lw $t1, -288($fp)
+                              slt $t9, $t0, $t1
+                              sw $t9, -292($fp)
+                              lw $t2, -292($fp)  # Setting argument 1
+                              sw $t2, -296($fp)
+                              addi $sp, $fp, -296  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t3, 3 # Int Literal: 3  # Operation: GTE64
+                              sw $t3, -300($fp)
+                              li $t4, 2 # Int Literal: 2
+                              sw $t4, -304($fp)
+                              lw $t6, -300($fp)
+                              lw $t7, -304($fp)
+                              slt $t5, $t6, $t7
+                              xori $t5, $t5, 1
+                              sw $t5, -308($fp)
+                              lw $t8, -308($fp)  # Setting argument 1
+                              sw $t8, -312($fp)
+                              addi $sp, $fp, -312  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t9, 2 # Int Literal: 2  # Operation: GTE64
+                              sw $t9, -316($fp)
+                              li $t0, 2 # Int Literal: 2
+                              sw $t0, -320($fp)
+                              lw $t2, -316($fp)
+                              lw $t3, -320($fp)
+                              slt $t1, $t2, $t3
+                              xori $t1, $t1, 1
+                              sw $t1, -324($fp)
+                              lw $t4, -324($fp)  # Setting argument 1
+                              sw $t4, -328($fp)
+                              addi $sp, $fp, -328  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t5, 2 # Int Literal: 2  # Operation: GTE64
+                              sw $t5, -332($fp)
+                              li $t6, 3 # Int Literal: 3
+                              sw $t6, -336($fp)
+                              lw $t8, -332($fp)
+                              lw $t9, -336($fp)
+                              slt $t7, $t8, $t9
+                              xori $t7, $t7, 1
+                              sw $t7, -340($fp)
+                              lw $t0, -340($fp)  # Setting argument 1
+                              sw $t0, -344($fp)
+                              addi $sp, $fp, -344  # BEGIN Calling not
+                              jal global_not  # END Calling not
+                              sw $v0, -348($fp)
+                              lw $t1, -348($fp)  # Setting argument 1
+                              sw $t1, -352($fp)
+                              addi $sp, $fp, -352  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t2, 3 # Int Literal: 3  # Operation: LTE64
+                              sw $t2, -356($fp)
+                              li $t3, 2 # Int Literal: 2
+                              sw $t3, -360($fp)
+                              lw $t5, -356($fp)
+                              lw $t6, -360($fp)
+                              slt $t4, $t6, $t5
+                              xori $t4, $t4, 1
+                              sw $t4, -364($fp)
+                              lw $t7, -364($fp)  # Setting argument 1
+                              sw $t7, -368($fp)
+                              addi $sp, $fp, -368  # BEGIN Calling not
+                              jal global_not  # END Calling not
+                              sw $v0, -372($fp)
+                              lw $t8, -372($fp)  # Setting argument 1
+                              sw $t8, -376($fp)
+                              addi $sp, $fp, -376  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t9, 2 # Int Literal: 2  # Operation: LTE64
+                              sw $t9, -380($fp)
+                              li $t0, 2 # Int Literal: 2
+                              sw $t0, -384($fp)
+                              lw $t2, -380($fp)
+                              lw $t3, -384($fp)
+                              slt $t1, $t3, $t2
+                              xori $t1, $t1, 1
+                              sw $t1, -388($fp)
+                              lw $t4, -388($fp)  # Setting argument 1
+                              sw $t4, -392($fp)
+                              addi $sp, $fp, -392  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t5, 2 # Int Literal: 2  # Operation: LTE64
+                              sw $t5, -396($fp)
+                              li $t6, 3 # Int Literal: 3
+                              sw $t6, -400($fp)
+                              lw $t8, -396($fp)
+                              lw $t9, -400($fp)
+                              slt $t7, $t9, $t8
+                              xori $t7, $t7, 1
+                              sw $t7, -404($fp)
+                              lw $t0, -404($fp)  # Setting argument 1
+                              sw $t0, -408($fp)
+                              addi $sp, $fp, -408  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t1, 3 # Int Literal: 3  # Operation: EQ64
+                              sw $t1, -412($fp)
+                              li $t2, 2 # Int Literal: 2
+                              sw $t2, -416($fp)
+                              lw $t4, -412($fp)
+                              lw $t5, -416($fp)
+                              xor $t3, $t4, $t5
+                              sltiu $t3, $t3, 1
+                              sw $t3, -420($fp)
+                              lw $t6, -420($fp)  # Setting argument 1
+                              sw $t6, -424($fp)
+                              addi $sp, $fp, -424  # BEGIN Calling not
+                              jal global_not  # END Calling not
+                              sw $v0, -428($fp)
+                              lw $t7, -428($fp)  # Setting argument 1
+                              sw $t7, -432($fp)
+                              addi $sp, $fp, -432  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t8, 2 # Int Literal: 2  # Operation: EQ64
+                              sw $t8, -436($fp)
+                              li $t9, 2 # Int Literal: 2
+                              sw $t9, -440($fp)
+                              lw $t1, -436($fp)
+                              lw $t2, -440($fp)
+                              xor $t0, $t1, $t2
+                              sltiu $t0, $t0, 1
+                              sw $t0, -444($fp)
+                              lw $t3, -444($fp)  # Setting argument 1
+                              sw $t3, -448($fp)
+                              addi $sp, $fp, -448  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t4, 3 # Int Literal: 3  # Operation: NEQ64
+                              sw $t4, -452($fp)
+                              li $t5, 2 # Int Literal: 2
+                              sw $t5, -456($fp)
+                              lw $t7, -452($fp)
+                              lw $t8, -456($fp)
+                              xor $t6, $t7, $t8
+                              sltu $t6, $zero, $t6
+                              sw $t6, -460($fp)
+                              lw $t9, -460($fp)  # Setting argument 1
+                              sw $t9, -464($fp)
+                              addi $sp, $fp, -464  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t0, 2 # Int Literal: 2  # Operation: NEQ64
+                              sw $t0, -468($fp)
+                              li $t1, 2 # Int Literal: 2
+                              sw $t1, -472($fp)
+                              lw $t3, -468($fp)
+                              lw $t4, -472($fp)
+                              xor $t2, $t3, $t4
+                              sltu $t2, $zero, $t2
+                              sw $t2, -476($fp)
+                              lw $t5, -476($fp)  # Setting argument 1
+                              sw $t5, -480($fp)
+                              addi $sp, $fp, -480  # BEGIN Calling not
+                              jal global_not  # END Calling not
+                              sw $v0, -484($fp)
+                              lw $t6, -484($fp)  # Setting argument 1
+                              sw $t6, -488($fp)
+                              addi $sp, $fp, -488  # BEGIN Calling assertBool
+                              jal global_assertBool  # END Calling assertBool
+                              li $t7, 2 # Int Literal: 2  # Operation: ADD64
+                              sw $t7, -492($fp)
+                              li $t8, 3 # Int Literal: 3
+                              sw $t8, -496($fp)
+                              lw $t0, -492($fp)
+                              lw $t1, -496($fp)
+                              add $t9, $t0, $t1
+                              sw $t9, -500($fp)
+                              lw $t3, -500($fp)  # Setting argument 1
+                              sw $t3, -508($fp)
+                              li $t2, 5 # Int Literal: 5
+                              sw $t2, -504($fp)
+                              lw $t3, -504($fp)  # Setting argument 2
+                              sw $t3, -512($fp)
+                              addi $sp, $fp, -512  # BEGIN Calling assert
+                              jal global_assert  # END Calling assert
+                              li $t4, 2 # Int Literal: 2  # Operation: SUB64
+                              sw $t4, -516($fp)
+                              li $t5, 3 # Int Literal: 3
+                              sw $t5, -520($fp)
+                              lw $t7, -516($fp)
+                              lw $t8, -520($fp)
+                              sub $t6, $t7, $t8
+                              sw $t6, -524($fp)
+                              lw $t3, -524($fp)  # Setting argument 1
+                              sw $t3, -536($fp)
+                              li $t9, 1 # Int Literal: 1  # Operation: NEG64
+                              sw $t9, -528($fp)
+                              lw $t2, -528($fp)
+                              sub $t0, $zero, $t2
+                              sw $t0, -532($fp)
+                              lw $t3, -532($fp)  # Setting argument 2
+                              sw $t3, -540($fp)
+                              addi $sp, $fp, -540  # BEGIN Calling assert
+                              jal global_assert  # END Calling assert
+                              li $t4, 2 # Int Literal: 2  # Operation: MULT64
+                              sw $t4, -544($fp)
+                              li $t5, 3 # Int Literal: 3
+                              sw $t5, -548($fp)
+                              lw $t7, -544($fp)
+                              lw $t8, -548($fp)
+                              mult $t7, $t8
+                              mflo $t6
+                              sw $t6, -552($fp)
+                              lw $t0, -552($fp)  # Setting argument 1
+                              sw $t0, -560($fp)
+                              li $t9, 6 # Int Literal: 6
+                              sw $t9, -556($fp)
+                              lw $t0, -556($fp)  # Setting argument 2
+                              sw $t0, -564($fp)
+                              addi $sp, $fp, -564  # BEGIN Calling assert
+                              jal global_assert  # END Calling assert
+                              li $t1, 9 # Int Literal: 9  # Operation: DIV64
+                              sw $t1, -568($fp)
+                              li $t2, 4 # Int Literal: 4
+                              sw $t2, -572($fp)
+                              lw $t4, -568($fp)
+                              lw $t5, -572($fp)
+                              div $t4, $t5
+                              mflo $t3
+                              sw $t3, -576($fp)
+                              lw $t7, -576($fp)  # Setting argument 1
+                              sw $t7, -584($fp)
+                              li $t6, 2 # Int Literal: 2
+                              sw $t6, -580($fp)
+                              lw $t7, -580($fp)  # Setting argument 2
+                              sw $t7, -588($fp)
+                              addi $sp, $fp, -588  # BEGIN Calling assert
+                              jal global_assert  # END Calling assert
+lbl_20:                       nop
+                              lw $ra, -8($fp)  # Restore return address
+                              lw $fp, -4($fp)  # Restore frame pointer
+                              jr $ra # Return to caller
+
+
+global_main:                  nop
+                              sw $fp, -4($sp) # Save frame pointer
+                              move $fp, $sp  # Set new frame pointer
+                              sw $ra, -8($fp)  # Save return address
+                              # Function body:
+                              addi $sp, $fp, -8  # BEGIN Calling testLoops
+                              jal global_testLoops  # END Calling testLoops
+                              addi $sp, $fp, -8  # BEGIN Calling testOperators
+                              jal global_testOperators  # END Calling testOperators
+                              addi $sp, $fp, -8  # BEGIN Calling testFunctionPointers
+                              jal global_testFunctionPointers  # END Calling testFunctionPointers
+                              addi $sp, $fp, -8  # BEGIN Calling printSummary
+                              jal global_printSummary  # END Calling printSummary
+lbl_21:                       nop
+                              lw $ra, -8($fp)  # Restore return address
+                              lw $fp, -4($fp)  # Restore frame pointer
+                              jr $ra # Return to caller
+
+"
+`;

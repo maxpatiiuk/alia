@@ -1,4 +1,4 @@
-import { processInput } from '../process.js';
+import { processInput } from '../processInput.js';
 import { theories } from '../tests/utils.js';
 
 theories(processInput, [

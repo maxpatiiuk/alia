@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import fs from 'node:fs';
 import type { Interface } from 'node:readline/promises';
 
-import { handleInput, nameParse, run, typeCheckAst } from '../process.js';
+import { handleInput, nameParse, run, typeCheckAst } from '../processInput.js';
 import type { RA } from '../utils/types.js';
 import { AstNode } from '../ast/definitions/AstNode.js';
 import { ReturnValue } from '../ast/eval.js';

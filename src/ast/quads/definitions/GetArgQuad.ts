@@ -43,6 +43,14 @@ export class Register extends Quad {
     super();
   }
 
+  public toString() {
+    return [];
+  }
+
+  public toValue() {
+    return this.register;
+  }
+
   public toMips() {
     return [];
   }
