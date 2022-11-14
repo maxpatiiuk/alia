@@ -5,10 +5,13 @@ export class GlobalVarQuad extends Quad {
   private readonly name: string;
   private readonly mipsQuad: Quad | undefined;
 
-  public constructor(id: string, private readonly value: number | undefined) {
+  public constructor(
+    private readonly id: string,
+    private readonly value: number | undefined
+  ) {
     super();
 
-    this.name = formatGlobalVariable(id);
+    this.name = formatGlobalVariable(this.id);
     this.mipsQuad =
       typeof this.value === 'number'
         ? new LabelQuad(this.name, new MipsQuad(`.word ${this.value}`))
@@ -16,7 +19,7 @@ export class GlobalVarQuad extends Quad {
   }
 
   public toString() {
-    return [this.name];
+    return [this.id];
   }
 
   public toMips() {
@@ -25,3 +28,4 @@ export class GlobalVarQuad extends Quad {
 }
 
 export const formatGlobalVariable = (name: string): string => `global_${name}`;
+export const formatFunctionName = (name: string): string => `fun_${name}`;

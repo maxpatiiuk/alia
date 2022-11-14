@@ -4,6 +4,8 @@ import type { FormalQuad } from './FormalQuad.js';
 import { reg } from './IdQuad.js';
 import { addComment, mem, Quad } from './index.js';
 import { LoadQuad } from './LoadQuad.js';
+import { parseTempVar } from './FunctionQuad.js';
+import { formatTemp } from '../index.js';
 
 export class GetArgQuad extends Quad {
   private readonly loadQuad: LoadQuad;
@@ -48,7 +50,8 @@ export class Register extends Quad {
   }
 
   public toValue() {
-    return this.register;
+    const index = parseTempVar(this.register);
+    return mem(typeof index === 'number' ? formatTemp(index) : this.register);
   }
 
   public toMips() {

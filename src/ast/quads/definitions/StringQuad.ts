@@ -1,8 +1,8 @@
 import { TermQuad } from './TermQuad.js';
 
 export class StringQuad extends TermQuad {
-  public constructor(private readonly name: string, value: string) {
-    super(value);
+  public constructor(private readonly name: string) {
+    super(name);
   }
 
   public toMips() {

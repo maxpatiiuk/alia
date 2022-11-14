@@ -48,8 +48,10 @@ export class FunctionQuad extends Quad {
       requestTemp,
       getTempCount: () => this.tempsCount,
       declareVar: (name) => {
-        this.locals[name] = requestTemp();
-        return this.locals[name];
+        const tempIndex = requestTemp();
+        // Don't set local if current variable is a formal
+        if (Array.isArray(this.formals)) this.locals[name] = tempIndex;
+        return tempIndex;
       },
       requestTempRegister: () => {
         tempRegisterIndex += 1;
@@ -59,7 +61,7 @@ export class FunctionQuad extends Quad {
          * be safely called many times in large functions)
          */
         const resolvedIndex = tempRegisterIndex % tempRegisterCount;
-        return `$t${resolvedIndex}`;
+        return createTempVar(resolvedIndex);
       },
       returnLabel: context.requestLabel(),
     };
@@ -119,5 +121,15 @@ const formatLocal = (variableName: string): string =>
 
 const formatTemporary = (tempIndex: number): string =>
   `${formatTemp(tempIndex)} (tmp var of 8 bytes)`;
+
+const createTempVar = (index: number): string => `$t${index}`;
+
+const reTempVar = /^\$t(?<index>\d+)$/;
+
+export function parseTempVar(index: string): number | undefined {
+  const value = reTempVar.exec(index)?.groups?.index;
+  if (typeof value === 'string') return Number.parseInt(value);
+  else return undefined;
+}
 
 const tempRegisterCount = 10;
