@@ -41,8 +41,11 @@ export class GetArgQuad extends Quad {
 }
 
 export class Register extends Quad {
-  public constructor(private readonly register: string) {
+  private readonly amdRegister: string;
+
+  public constructor(private readonly register: string, amdRegister?: string) {
     super();
+    this.amdRegister = amdRegister ?? this.register;
   }
 
   public toString() {
@@ -60,5 +63,13 @@ export class Register extends Quad {
 
   public toMipsValue(): string {
     return this.register;
+  }
+
+  public toAmd() {
+    return [];
+  }
+
+  public toAmdValue(): string {
+    return this.amdRegister;
   }
 }

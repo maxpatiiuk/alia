@@ -32,9 +32,21 @@ export class IdQuad extends Quad {
 }
 
 /**
- * Resolve global variable name or temporary variable index into a register name
+ * Resolve global variable name or temporary variable index into a MIPS register
+ * name
  */
-export const reg = (tempVariable: string | number) =>
+export const reg = (tempVariable: string | number): string =>
   typeof tempVariable === 'string'
     ? formatGlobalVariable(tempVariable)
     : `${tempVariable > 0 ? '-' : ''}${Math.abs(tempVariable) * mipsSize}($fp)`;
+
+/**
+ * Resolve global variable name or temporary variable index into an x64 register
+ * name
+ */
+export const ref = (tempVariable: string | number): string =>
+  typeof tempVariable === 'string'
+    ? formatGlobalVariable(tempVariable)
+    : `${tempVariable > 0 ? '-' : ''}${
+        Math.abs(tempVariable) * mipsSize
+      }(%rsp)`;

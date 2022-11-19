@@ -1,6 +1,6 @@
 import type { RA } from '../../../utils/types.js';
 import { addComment, mem, Quad } from './index.js';
-import { reg } from './IdQuad.js';
+import { ref, reg } from './IdQuad.js';
 
 export class AssignQuad extends Quad {
   public constructor(
@@ -37,5 +37,20 @@ export class AssignQuad extends Quad {
 
   public toMipsValue() {
     return reg(this.tempVariable);
+  }
+
+  public toAmd() {
+    const amd = [
+      ...this.expression.flatMap((quad) => quad.toAmd()),
+      `movq ${this.expression.at(-1)!.toAmdValue()}, ${ref(this.tempVariable)}`,
+      ...(typeof this.id === 'string' ? [`# END Assigning ${this.id}`] : []),
+    ];
+    return typeof this.id === 'string'
+      ? addComment(amd, `BEGIN Assigning ${this.id}`)
+      : amd;
+  }
+
+  public toAmdValue() {
+    return ref(this.tempVariable);
   }
 }

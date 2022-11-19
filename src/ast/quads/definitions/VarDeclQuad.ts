@@ -11,7 +11,7 @@ export class VarDeclQuad extends Quad {
   ) {
     super();
     this.assignQuad = new AssignQuad(undefined, this.tempVariable, [
-      new Register('$zero'),
+      new Register('$zero', '$0'),
     ]);
   }
 
@@ -21,5 +21,9 @@ export class VarDeclQuad extends Quad {
 
   public toMips() {
     return addComment(this.assignQuad.toMips(), `Initializing ${this.id}`);
+  }
+
+  public toAmd() {
+    return addComment(this.assignQuad.toAmd(), `Initializing ${this.id}`);
   }
 }
