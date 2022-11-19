@@ -1,5 +1,5 @@
 import type { RA } from '../../../utils/types.js';
-import { GenericQuad, MipsQuad } from './GenericQuad.js';
+import { UniversalQuad, MipsQuad } from './UniversalQuad.js';
 import { GoToQuad } from './GoToQuad.js';
 import {
   addComment,
@@ -45,7 +45,7 @@ export class IfQuad extends Quad {
         : []),
       new LabelQuad(
         this.label,
-        new GenericQuad({
+        new UniversalQuad({
           quad: 'nop',
           mips: 'nop  # END if',
         })

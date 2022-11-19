@@ -1,4 +1,4 @@
-import { MipsQuad } from './GenericQuad.js';
+import { UniversalQuad } from './UniversalQuad.js';
 import { LabelQuad, Quad } from './index.js';
 
 export class StringDefQuad extends Quad {
@@ -10,7 +10,10 @@ export class StringDefQuad extends Quad {
   ) {
     super();
 
-    this.quad = new LabelQuad(this.name, new MipsQuad('.asciiz', this.value));
+    this.quad = new LabelQuad(
+      this.name,
+      new UniversalQuad(`.asciiz ${this.value}`)
+    );
   }
 
   public toString() {
@@ -19,6 +22,10 @@ export class StringDefQuad extends Quad {
 
   public toMips() {
     return this.quad.toMips();
+  }
+
+  public toAmd() {
+    return this.quad.toAmd();
   }
 }
 

@@ -1,6 +1,6 @@
 import type { QuadsContext } from '../index.js';
 import { AssignQuad } from './AssignQuad.js';
-import { GenericQuad, MipsQuad } from './GenericQuad.js';
+import { UniversalQuad, MipsQuad } from './UniversalQuad.js';
 import { Register } from './GetArgQuad.js';
 import { addComment, LabelQuad, mipsSize, Quad } from './index.js';
 import { formatFunctionName, formatGlobalVariable } from './GlobalVarQuad.js';
@@ -16,7 +16,7 @@ export class FunctionPrologueQuad extends Quad {
 
     this.quadEntry = new LabelQuad(
       formatFunctionName(this.id),
-      new GenericQuad({
+      new UniversalQuad({
         quad: `enter ${this.id}`,
       })
     );

@@ -37,10 +37,11 @@ program
     '-d, --diagramPath <string>',
     'path to the output diagram for the grammar in the DOT format'
   )
-  .option('-m, --mips <string>', 'compile the program down to MIPS')
+  .option('-m, --mips <string>', 'compile the program down to MIPS assembly')
+  .option('-o, --amd <string>', 'compile the program down to x64 assembly')
   .option(
     '-u, --unparse <string>',
-    'path to output file that would include preety-printed program'
+    'path to output file that would include pretty-printed program'
   );
 
 program.parse();
@@ -55,6 +56,7 @@ const {
   unparseMode = 'parseTree',
   diagramPath,
   mips,
+  amd,
 } = program.opts<{
   readonly tokensOutput?: string;
   readonly parser: string;
@@ -65,6 +67,7 @@ const {
   readonly assemble?: string;
   readonly diagramPath?: string;
   readonly mips?: string;
+  readonly amd?: string;
 }>();
 
 const parser = rawParser.toUpperCase().trim();
@@ -101,6 +104,7 @@ readFile()
       namedUnparse,
       assemble,
       mips,
+      amd,
     });
   })
   .catch(console.error);

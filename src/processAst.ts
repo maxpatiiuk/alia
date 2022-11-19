@@ -10,6 +10,7 @@ export async function processAst({
   namedUnparse,
   assemble,
   mips,
+  amd,
 }: {
   readonly ast: AstNode;
   readonly rawText: string;
@@ -17,6 +18,7 @@ export async function processAst({
   readonly namedUnparse?: string | undefined;
   readonly assemble?: string | undefined;
   readonly mips?: string | undefined;
+  readonly amd?: string | undefined;
 }): Promise<void> {
   const namedUnparseResults = nameParse(ast, debug);
   if (namedUnparseResults === undefined) return;
@@ -42,5 +44,11 @@ export async function processAst({
     await fs.promises.writeFile(
       mips,
       quads.flatMap((quad) => quad.toMips()).join('\n')
+    );
+
+  if (amd !== undefined)
+    await fs.promises.writeFile(
+      amd,
+      quads.flatMap((quad) => quad.toAmd()).join('\n')
     );
 }

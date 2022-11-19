@@ -17,8 +17,18 @@ export class Quad {
     throw new Error('Not implemented');
   }
 
-  /** Get the name of the temp register created by the mips instruction */
+  /** Get the name of the temp register created by the MIPS instruction */
   public toMipsValue(): string {
+    throw new Error('Not implemented');
+  }
+
+  /** Convert Quad to x64 instructions */
+  public toAmd(): RA<LabelQuad | string> {
+    throw new Error('Not implemented');
+  }
+
+  /** Get the name of the temp register created by the x64 instruction */
+  public toAmdValue(): string {
     throw new Error('Not implemented');
   }
 }
@@ -38,6 +48,15 @@ export const quadsToMips = (quads: RA<Quad | string>): RA<LabelQuad | string> =>
       ? quad
       : typeof quad === 'object'
       ? quad.toMips()
+      : [quad]
+  );
+
+export const quadsToAmd = (quads: RA<Quad | string>): RA<LabelQuad | string> =>
+  quads.flatMap((quad) =>
+    quad instanceof LabelQuad
+      ? quad
+      : typeof quad === 'object'
+      ? quad.toAmd()
       : [quad]
   );
 
@@ -70,6 +89,10 @@ export class LabelQuad extends Quad {
 
   public toMips(): RA<string> {
     return this.buildLine(this.quad.toMips());
+  }
+
+  public toAmd(): RA<string> {
+    return this.buildLine(this.quad.toAmd());
   }
 
   private buildLine(lines: RA<LabelQuad | string>): RA<string> {

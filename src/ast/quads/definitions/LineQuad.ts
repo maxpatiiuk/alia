@@ -17,4 +17,8 @@ export class LineQuad extends Quad {
   public toMips() {
     return this.toString();
   }
+
+  public toAmd() {
+    return this.toString();
+  }
 }

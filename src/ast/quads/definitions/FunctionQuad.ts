@@ -114,6 +114,11 @@ export class FunctionQuad extends Quad {
       )
       .flatMap((quad) => quad.toMips());
   }
+
+  public toAmd() {
+    // FIXME: implement
+    return [];
+  }
 }
 
 const formatLocal = (variableName: string): string =>

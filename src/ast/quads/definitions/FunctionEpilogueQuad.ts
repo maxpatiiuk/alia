@@ -1,4 +1,4 @@
-import { GenericQuad } from './GenericQuad.js';
+import { UniversalQuad } from './UniversalQuad.js';
 import { LabelQuad, Quad } from './index.js';
 import { reg } from './IdQuad.js';
 
@@ -10,7 +10,7 @@ export class FunctionEpilogueQuad extends Quad {
 
     this.leave = new LabelQuad(
       leaveLabel,
-      new GenericQuad({
+      new UniversalQuad({
         quad: `leave ${this.id}`,
         mips: 'nop',
       })

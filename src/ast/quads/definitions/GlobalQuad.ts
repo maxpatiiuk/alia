@@ -13,9 +13,15 @@ import {
   formatGlobalVariable,
   GlobalVarQuad as GlobalVariableQuad,
 } from './GlobalVarQuad.js';
-import { LabelQuad, Quad, quadsToMips, quadsToString } from './index.js';
+import {
+  LabelQuad,
+  Quad,
+  quadsToAmd,
+  quadsToMips,
+  quadsToString,
+} from './index.js';
 import { formatStringQuad, StringDefQuad } from './StringDefQuad.js';
-import { MipsQuad } from './GenericQuad.js';
+import { AmdQuad, MipsQuad } from './UniversalQuad.js';
 import { LineQuad } from './LineQuad.js';
 
 export class GlobalQuad extends Quad {
@@ -23,7 +29,9 @@ export class GlobalQuad extends Quad {
 
   private readonly functions: RA<Quad>;
 
-  private readonly bootloader: RA<Quad>;
+  private readonly mipsBootloader: RA<Quad>;
+
+  private readonly amdBootloader: RA<Quad>;
 
   public constructor(
     private readonly children: GlobalsNode['children'],
@@ -79,7 +87,7 @@ export class GlobalQuad extends Quad {
     );
     this.globalQuads = [...globalQuads, ...stringQuads];
 
-    this.bootloader = [
+    this.mipsBootloader = [
       new LabelQuad(
         startFunction,
         new MipsQuad(`jal ${formatGlobalVariable(mainFunction)}`)
@@ -94,6 +102,17 @@ export class GlobalQuad extends Quad {
         )
       ),
       new LineQuad('jr $ra'),
+    ];
+
+    this.amdBootloader = [
+      new LabelQuad(
+        startFunction,
+        new AmdQuad(`call ${formatGlobalVariable(mainFunction)}`)
+      ),
+      new LineQuad('movq $60, %rax  # Choose syscall exit'),
+      new LineQuad('movq $4, %rdi  # Set syscall argument - return code'),
+      new LineQuad('syscall'),
+      new LineQuad(''),
     ];
   }
 
@@ -120,7 +139,27 @@ export class GlobalQuad extends Quad {
       '.data',
       ...this.globalQuads,
       '.text',
-      ...this.bootloader.flatMap((quad) => quad.toMips()),
+      ...this.mipsBootloader.flatMap((quad) => quad.toMips()),
+      '',
+      ...this.functions,
+    ]);
+  }
+
+  public toAmd() {
+    const main = this.functions.find(
+      (quad): quad is FunctionQuad =>
+        quad instanceof FunctionQuad && quad.id === mainFunction
+    );
+    if (main === undefined)
+      throw new Error(
+        'Conversion to x64 requires there to be a main() function. Please define it'
+      );
+    return quadsToAmd([
+      `.globl ${startFunction}`,
+      '.data',
+      ...this.globalQuads,
+      '.text',
+      ...this.amdBootloader.flatMap((quad) => quad.toAmd()),
       '',
       ...this.functions,
     ]);

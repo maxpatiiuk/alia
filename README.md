@@ -28,7 +28,7 @@ To see available options, run the script with `--help` argument:
 Example call:
 
 ```sh
-./dgc infile.dg -m mips.asm 2> errors.txt
+./dgc infile.dg -o outfile.s
 ```
 
 > NOTE: when compiling to MIPS, registers are stored as 32-bit values to simplify
@@ -66,7 +66,7 @@ for debugging)
 First, create a `parser.dot` text file (in the DOT format):
 
 ```
-./dgc --diagramPath parser.dot
+./dgc infile.dg --diagramPath parser.dot
 ```
 
 Then, convert it into a `parser.svg` image (assuming dot is installed):
