@@ -2,7 +2,13 @@ import type { RA } from '../../../utils/types.js';
 import type { QuadsContext } from '../index.js';
 import { GoToQuad } from './GoToQuad.js';
 import { IfQuad } from './IfQuad.js';
-import { LabelQuad, Quad, quadsToMips, quadsToString } from './index.js';
+import {
+  LabelQuad,
+  Quad,
+  quadsToAmd,
+  quadsToMips,
+  quadsToString,
+} from './index.js';
 import { NopQuad } from './NopQuad.js';
 
 export class ForQuad extends Quad {
@@ -34,5 +40,9 @@ export class ForQuad extends Quad {
 
   public toMips(): RA<LabelQuad | string> {
     return quadsToMips(this.quads);
+  }
+
+  public toAmd(): RA<LabelQuad | string> {
+    return quadsToAmd(this.quads);
   }
 }

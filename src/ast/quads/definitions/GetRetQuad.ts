@@ -1,24 +1,24 @@
-import { mem, Quad } from './index.js';
-import { reg } from './IdQuad.js';
+import { Quad } from './index.js';
+import { TempVariable } from './IdQuad.js';
 import { AssignQuad } from './AssignQuad.js';
 import { Register } from './GetArgQuad.js';
 
 export class GetRetQuad extends Quad {
   private readonly assignQuad: AssignQuad;
 
-  public constructor(private readonly tempVariable: string | number) {
+  public constructor(private readonly tempVariable: TempVariable) {
     super();
     this.assignQuad = new AssignQuad(undefined, this.tempVariable, [
-      new Register('$v0'),
+      new Register('$v0', '%rax'),
     ]);
   }
 
   public toString() {
-    return [`getret ${mem(this.tempVariable)}`];
+    return [`getret ${this.tempVariable.toValue()}`];
   }
 
   public toValue() {
-    return mem(this.tempVariable);
+    return this.tempVariable.toValue();
   }
 
   public toMips() {
@@ -26,6 +26,6 @@ export class GetRetQuad extends Quad {
   }
 
   public toMipsValue() {
-    return reg(this.tempVariable);
+    return this.tempVariable.toMipsValue();
   }
 }

@@ -1,15 +1,17 @@
 import type { RA } from '../../utils/types.js';
 import type { AstNode } from '../definitions/AstNode.js';
 import type { Quad } from './definitions/index.js';
+import { Register } from './definitions/GetArgQuad.js';
+import { TempVariable } from './definitions/IdQuad.js';
 
 export type QuadsContext = {
   readonly requestLabel: () => string;
   readonly requestString: (value: string) => string;
-  readonly requestTemp: () => number;
+  readonly requestTemp: () => TempVariable;
   readonly getTempCount: () => number;
-  readonly declareVar: (name: string) => string | number;
+  readonly declareVar: (name: string) => TempVariable;
   readonly returnLabel: string;
-  readonly requestTempRegister: () => string;
+  readonly requestTempRegister: () => Register;
 };
 
 export function toQuads(ast: AstNode): RA<Quad> {
@@ -31,7 +33,7 @@ export function toQuads(ast: AstNode): RA<Quad> {
       throw new Error('Not Implemented');
     },
     declareVar(name: string) {
-      return name;
+      return new TempVariable(name);
     },
     returnLabel: 'ERROR: Return label is not defined',
   });

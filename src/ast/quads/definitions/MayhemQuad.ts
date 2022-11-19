@@ -1,17 +1,17 @@
-import { addComment, mem, Quad } from './index.js';
-import { reg } from './IdQuad.js';
+import { addComment, Quad } from './index.js';
+import { TempVariable } from './IdQuad.js';
 
 export class MayhemQuad extends Quad {
-  public constructor(private readonly tempVariable: string | number) {
+  public constructor(private readonly tempVariable: TempVariable) {
     super();
   }
 
   public toString() {
-    return [`MAYHEM ${mem(this.tempVariable)}`];
+    return [`MAYHEM ${this.tempVariable.toValue()}`];
   }
 
   public toValue() {
-    return mem(this.tempVariable);
+    return this.tempVariable.toValue();
   }
 
   public toMips() {
@@ -20,13 +20,13 @@ export class MayhemQuad extends Quad {
         'addi $v0, $zero, 41',
         'move $a0, $zero',
         'syscall',
-        `sw $a0, ${reg(this.tempVariable)} # END Mayhem`,
+        `sw $a0, ${this.tempVariable.toMipsValue()} # END Mayhem`,
       ],
       'BEGIN Mayhem'
     );
   }
 
   public toMipsValue() {
-    return reg(this.tempVariable);
+    return this.tempVariable.toMipsValue();
   }
 }

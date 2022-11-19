@@ -1,8 +1,8 @@
-import type { R, RA } from '../../../utils/types.js';
+import type { RA, WritableArray } from '../../../utils/types.js';
 import type { StatementList } from '../../definitions/statement/StatementList.js';
 import type { QuadsContext } from '../index.js';
 import type { FormalQuad } from './FormalQuad.js';
-import { GetArgQuad as GetArgumentQuad } from './GetArgQuad.js';
+import { GetArgQuad as GetArgumentQuad, Register } from './GetArgQuad.js';
 import { Quad } from './index.js';
 import { LineQuad } from './LineQuad.js';
 import { FunctionPrologueQuad } from './FunctionPrologueQuad.js';
@@ -10,6 +10,7 @@ import { FunctionEpilogueQuad } from './FunctionEpilogueQuad.js';
 import { formatTemp } from '../index.js';
 import { FormalsDeclNode } from '../../definitions/FormalsDeclNode.js';
 import { formatGlobalVariable } from './GlobalVarQuad.js';
+import { TempVariable } from './IdQuad.js';
 
 export class FunctionQuad extends Quad {
   private readonly enter: Quad;
@@ -20,7 +21,7 @@ export class FunctionQuad extends Quad {
 
   private readonly statements: RA<Quad>;
 
-  private readonly locals: R<number> = {};
+  private readonly locals: WritableArray<string> = [];
 
   // eslint-disable-next-line functional/prefer-readonly-type
   private tempsCount: number;
@@ -40,7 +41,7 @@ export class FunctionQuad extends Quad {
     this.tempsCount = 0;
     const requestTemp = () => {
       this.tempsCount += 1;
-      return this.tempsCount;
+      return new TempVariable(this.tempsCount);
     };
     let tempRegisterIndex = -1;
     const newContext: QuadsContext = {
@@ -50,7 +51,7 @@ export class FunctionQuad extends Quad {
       declareVar: (name) => {
         const tempIndex = requestTemp();
         // Don't set local if current variable is a formal
-        if (Array.isArray(this.formals)) this.locals[name] = tempIndex;
+        if (Array.isArray(this.formals)) this.locals.push(name);
         return tempIndex;
       },
       requestTempRegister: () => {
@@ -60,8 +61,11 @@ export class FunctionQuad extends Quad {
          * (operations would use 2 registers at most, thus this function can
          * be safely called many times in large functions)
          */
-        const resolvedIndex = tempRegisterIndex % tempRegisterCount;
-        return createTempVar(resolvedIndex);
+        const mipsIndex = tempRegisterIndex % tempRegisterCount;
+        const amdIndex = tempRegisterIndex % amdTempRegisters.length;
+        const mipsVar = createMipsTempVar(mipsIndex);
+        const amdVar = amdTempRegisters[amdIndex];
+        return new Register(mipsVar, amdVar);
       },
       returnLabel: context.requestLabel(),
     };
@@ -84,7 +88,7 @@ export class FunctionQuad extends Quad {
     return [
       `[BEGIN ${this.id} LOCALS]`,
       ...this.formals.flatMap((formal) => formal.toString()),
-      ...Object.keys(this.locals).map(formatLocal),
+      ...this.locals.map(formatLocal),
       ...Array.from({ length: this.tempsCount }, (_, index) =>
         formatTemporary(index)
       ),
@@ -137,7 +141,7 @@ const formatLocal = (variableName: string): string =>
 const formatTemporary = (tempIndex: number): string =>
   `${formatTemp(tempIndex)} (tmp var of 8 bytes)`;
 
-const createTempVar = (index: number): string => `$t${index}`;
+const createMipsTempVar = (index: number): string => `$t${index}`;
 
 const reTempVar = /^\$t(?<index>\d+)$/;
 
@@ -148,3 +152,19 @@ export function parseTempVar(index: string): number | undefined {
 }
 
 const tempRegisterCount = 10;
+const amdTempRegisters = [
+  '%rax',
+  '%rbx',
+  '%rcx',
+  '%rdx',
+  '%rsi',
+  '%rdi',
+  '%r8',
+  '%r9',
+  '%r10',
+  '%r11',
+  '%r12',
+  '%r13',
+  '%r14',
+  '%r15',
+];

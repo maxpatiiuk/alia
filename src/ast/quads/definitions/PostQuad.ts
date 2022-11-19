@@ -1,6 +1,6 @@
 import type { QuadsContext } from '../index.js';
 import { AssignQuad } from './AssignQuad.js';
-import { reg } from './IdQuad.js';
+import { TempVariable } from './IdQuad.js';
 import { mem, Quad } from './index.js';
 import { IntLiteralQuad } from './IntLiteralQuad.js';
 import { OpQuad } from './OperationQuad.js';
@@ -17,7 +17,7 @@ export class PostQuad extends Quad {
 
   public constructor(
     id: string,
-    tempVariable: number | string,
+    tempVariable: TempVariable,
     context: QuadsContext,
     type: '--' | '++'
   ) {
@@ -29,9 +29,14 @@ export class PostQuad extends Quad {
 
     const intRegister = context.requestTempRegister();
     this.intQuad = new IntLiteralQuad('1', intRegister, context.requestTemp());
-    this.loadQuad = new LoadQuad(tempRegister, reg(tempVariable));
+    this.loadQuad = new LoadQuad(tempRegister, tempVariable);
     this.mipsQuad = new AssignQuad(undefined, tempVariable, [
-      new OpQuad(this.loadQuad.toMipsValue(), type, intRegister, tempRegister),
+      new OpQuad(
+        this.loadQuad.toMipsValue(),
+        type,
+        intRegister.toMipsValue(),
+        tempRegister
+      ),
     ]);
   }
 

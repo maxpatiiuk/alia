@@ -1,33 +1,37 @@
 import type { RA } from '../../../utils/types.js';
+import type { TempVariable } from './IdQuad.js';
 import { addComment, mem, Quad } from './index.js';
-import { ref, reg } from './IdQuad.js';
 
 export class AssignQuad extends Quad {
+  private readonly tempValue: string;
+
   public constructor(
     public readonly id: string | undefined,
-    private readonly tempVariable: string | number,
+    private readonly tempVariable: TempVariable,
     private readonly expression: RA<Quad>
   ) {
     super();
+    this.tempValue =
+      typeof this.id === 'string' ? mem(this.id) : this.tempVariable.toValue();
   }
 
   public toString() {
     return [
       ...this.expression.flatMap((quad) => quad.toString()),
-      `${mem(this.id ?? this.tempVariable)} := ${this.expression
-        .at(-1)!
-        .toValue()}`,
+      `${this.tempValue} := ${this.expression.at(-1)!.toValue()}`,
     ];
   }
 
   public toValue(): string {
-    return mem(this.id ?? this.tempVariable);
+    return this.tempValue;
   }
 
   public toMips() {
     const mips = [
       ...this.expression.flatMap((quad) => quad.toMips()),
-      `sw ${this.expression.at(-1)!.toMipsValue()}, ${reg(this.tempVariable)}`,
+      `sw ${this.expression
+        .at(-1)!
+        .toMipsValue()}, ${this.tempVariable.toMipsValue()}`,
       ...(typeof this.id === 'string' ? [`# END Assigning ${this.id}`] : []),
     ];
     return typeof this.id === 'string'
@@ -36,13 +40,15 @@ export class AssignQuad extends Quad {
   }
 
   public toMipsValue() {
-    return reg(this.tempVariable);
+    return this.tempVariable.toMipsValue();
   }
 
   public toAmd() {
     const amd = [
       ...this.expression.flatMap((quad) => quad.toAmd()),
-      `movq ${this.expression.at(-1)!.toAmdValue()}, ${ref(this.tempVariable)}`,
+      `movq ${this.expression
+        .at(-1)!
+        .toAmdValue()}, ${this.tempVariable.toAmdValue()}`,
       ...(typeof this.id === 'string' ? [`# END Assigning ${this.id}`] : []),
     ];
     return typeof this.id === 'string'
@@ -51,6 +57,6 @@ export class AssignQuad extends Quad {
   }
 
   public toAmdValue() {
-    return ref(this.tempVariable);
+    return this.tempVariable.toAmdValue();
   }
 }

@@ -1,11 +1,11 @@
 import type { RA } from '../../../utils/types.js';
+import type { TempVariable } from './IdQuad.js';
 import { addComment, mem, Quad } from './index.js';
-import { reg } from './IdQuad.js';
 
 export class ReceiveQuad extends Quad {
   public constructor(
     private readonly id: string,
-    private readonly tempVariable: string | number
+    private readonly tempVariable: TempVariable
   ) {
     super();
   }
@@ -19,7 +19,7 @@ export class ReceiveQuad extends Quad {
       [
         'addi $v0, $zero, 5',
         'syscall',
-        `sw $v0, ${reg(this.tempVariable)}  # END input ${this.id}`,
+        `sw $v0, ${this.tempVariable.toMipsValue()}  # END input ${this.id}`,
       ],
       `BEGIN input ${this.id}`
     );

@@ -1,5 +1,6 @@
 import { AssignQuad } from './AssignQuad.js';
 import { Register } from './GetArgQuad.js';
+import type { TempVariable } from './IdQuad.js';
 import { addComment, Quad } from './index.js';
 
 export class VarDeclQuad extends Quad {
@@ -7,7 +8,7 @@ export class VarDeclQuad extends Quad {
 
   public constructor(
     private readonly id: string,
-    private readonly tempVariable: number | string
+    private readonly tempVariable: TempVariable
   ) {
     super();
     this.assignQuad = new AssignQuad(undefined, this.tempVariable, [

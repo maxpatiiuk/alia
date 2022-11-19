@@ -2,7 +2,7 @@ import type { Tokens } from '../../../tokenize/tokens.js';
 import type { EvalContext } from '../../eval.js';
 import type { NameAnalysisContext } from '../../nameAnalysis.js';
 import { findDeclaration } from '../../nameAnalysis.js';
-import { IdQuad } from '../../quads/definitions/IdQuad.js';
+import { IdQuad, TempVariable } from '../../quads/definitions/IdQuad.js';
 import type { TypeCheckContext } from '../../typing.js';
 import { BoolType, IntType } from '../../typing.js';
 import type { PrintContext } from '../../unparse.js';
@@ -88,11 +88,11 @@ export class IdNode extends Term {
     else return declaration;
   }
 
-  public getTempVariable() {
+  public getTempVariable(): TempVariable {
     const variable = this.getDeclaration()!;
     return variable instanceof FunctionDeclaration ||
-      variable.tempVariable === -1
-      ? this.getName()
+      variable.tempVariable.variable === -1
+      ? new TempVariable(this.getName())
       : variable.tempVariable;
   }
 

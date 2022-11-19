@@ -11,6 +11,7 @@ import {
 import { NopQuad } from './NopQuad.js';
 import { QuadsContext } from '../index.js';
 import { LoadQuad } from './LoadQuad.js';
+import { Register } from './GetArgQuad.js';
 
 export class IfQuad extends Quad {
   private readonly quads: RA<Quad>;
@@ -67,7 +68,7 @@ class IfzQuad extends Quad {
   public constructor(
     private readonly condition: string,
     mipsCondition: string,
-    tempRegister: string,
+    tempRegister: Register,
     private readonly label: string
   ) {
     super();

@@ -3,6 +3,7 @@ import { AssignQuad } from './AssignQuad.js';
 import { addComment, Quad, quadsToMips } from './index.js';
 import { QuadsContext } from '../index.js';
 import { LoadQuad } from './LoadQuad.js';
+import { Register } from './GetArgQuad.js';
 
 const operationTranslations = {
   '--': 'SUB64',
@@ -28,7 +29,7 @@ export class OpQuad extends Quad {
     private readonly left: string,
     private readonly type: keyof typeof operationTranslations,
     private readonly right: string,
-    private readonly tempRegister: string
+    private readonly tempRegister: Register
   ) {
     super();
   }
@@ -44,62 +45,62 @@ export class OpQuad extends Quad {
   }
 
   public toMips() {
+    const temp = this.tempRegister.toMipsValue();
     if (this.type === '--' || this.type === '-')
-      return [`sub ${this.tempRegister}, ${this.left}, ${this.right}`];
+      return [`sub ${temp}, ${this.left}, ${this.right}`];
     else if (this.type === '++' || this.type === '+')
-      return [`add ${this.tempRegister}, ${this.left}, ${this.right}`];
+      return [`add ${temp}, ${this.left}, ${this.right}`];
     else if (this.type === '*')
       return [
         `mult ${this.left}, ${this.right}`,
         // Note: this does not check for overflow
-        `mflo ${this.tempRegister}`,
+        `mflo ${temp}`,
       ];
     else if (this.type === '/')
       return [
         `div ${this.left}, ${this.right}`,
         // Note: this discards the remainder
-        `mflo ${this.tempRegister}`,
+        `mflo ${temp}`,
       ];
     else if (this.type === 'or')
-      return [`or ${this.tempRegister}, ${this.left}, ${this.right}`];
+      return [`or ${temp}, ${this.left}, ${this.right}`];
     else if (this.type === 'and')
-      return [`and ${this.tempRegister}, ${this.left}, ${this.right}`];
+      return [`and ${temp}, ${this.left}, ${this.right}`];
     else if (this.type === '<')
-      return [`slt ${this.tempRegister}, ${this.left}, ${this.right}`];
+      return [`slt ${temp}, ${this.left}, ${this.right}`];
     else if (this.type === '>')
-      return [`slt ${this.tempRegister}, ${this.right}, ${this.left}`];
+      return [`slt ${temp}, ${this.right}, ${this.left}`];
     else if (this.type === '<=')
       return [
-        `slt ${this.tempRegister}, ${this.right}, ${this.left}`,
-        `xori ${this.tempRegister}, ${this.tempRegister}, 1`,
+        `slt ${temp}, ${this.right}, ${this.left}`,
+        `xori ${temp}, ${temp}, 1`,
       ];
     else if (this.type === '>=')
       return [
-        `slt ${this.tempRegister}, ${this.left}, ${this.right}`,
-        `xori ${this.tempRegister}, ${this.tempRegister}, 1`,
+        `slt ${temp}, ${this.left}, ${this.right}`,
+        `xori ${temp}, ${temp}, 1`,
       ];
     else if (this.type === '==')
       return [
-        `xor ${this.tempRegister}, ${this.left}, ${this.right}`,
-        `sltiu ${this.tempRegister}, ${this.tempRegister}, 1`,
+        `xor ${temp}, ${this.left}, ${this.right}`,
+        `sltiu ${temp}, ${temp}, 1`,
       ];
     else if (this.type === '!=')
       return [
-        `xor ${this.tempRegister}, ${this.left}, ${this.right}`,
-        `sltu ${this.tempRegister}, $zero, ${this.tempRegister}`,
+        `xor ${temp}, ${this.left}, ${this.right}`,
+        `sltu ${temp}, $zero, ${temp}`,
       ];
     else if (this.type === '!')
       return [
-        `sltiu ${this.tempRegister}, ${this.right}, 1`,
-        `andi ${this.tempRegister}, ${this.tempRegister}, 0x00ff`,
+        `sltiu ${temp}, ${this.right}, 1`,
+        `andi ${temp}, ${temp}, 0x00ff`,
       ];
-    else if (this.type === 'neg')
-      return [`sub ${this.tempRegister}, $zero, ${this.right}`];
+    else if (this.type === 'neg') return [`sub ${temp}, $zero, ${this.right}`];
     else throw new Error(`Unknown operation ${this.type}`);
   }
 
   public toMipsValue() {
-    return this.tempRegister;
+    return this.tempRegister.toMipsValue();
   }
 }
 

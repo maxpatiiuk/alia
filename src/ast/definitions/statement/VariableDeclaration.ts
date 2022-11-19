@@ -13,11 +13,12 @@ import { Statement } from './index.js';
 import { QuadsContext } from '../../quads/index.js';
 import { FunctionDeclaration } from '../FunctionDeclaration.js';
 import { VarDeclQuad } from '../../quads/definitions/VarDeclQuad.js';
+import { TempVariable } from '../../quads/definitions/IdQuad.js';
 
 export class VariableDeclaration extends Statement {
   // eslint-disable-next-line functional/prefer-readonly-type
   public value: EvalValue;
-  public tempVariable: string | number = -1;
+  public tempVariable: TempVariable = new TempVariable(-1);
 
   public constructor(
     public readonly type: TypeNode,

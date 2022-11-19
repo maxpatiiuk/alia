@@ -12,7 +12,7 @@ export class SetArgQuad extends Quad {
     private readonly index: number,
     private readonly value: string,
     mipsVariable: string | Register,
-    tempRegister: string,
+    tempRegister: Register,
     tempVariable: number
   ) {
     super();
@@ -21,11 +21,7 @@ export class SetArgQuad extends Quad {
         ? new LoadQuad(tempRegister, mipsVariable)
         : undefined;
     this.assignQuad = new AssignQuad(undefined, tempVariable, [
-      new Register(
-        mipsVariable instanceof Register
-          ? mipsVariable.toMipsValue()
-          : tempRegister
-      ),
+      mipsVariable instanceof Register ? mipsVariable : tempRegister,
     ]);
   }
 

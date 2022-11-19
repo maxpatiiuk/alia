@@ -1,10 +1,11 @@
 import type { RA } from '../../../utils/types.js';
+import type { TempVariable } from './IdQuad.js';
 import { Quad } from './index.js';
 
 export class FormalQuad extends Quad {
   public constructor(
     public readonly id: string,
-    public readonly tempVariable: number
+    public readonly tempVariable: TempVariable
   ) {
     super();
   }

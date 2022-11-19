@@ -4,7 +4,7 @@ import { SetArgQuad as SetArgumentQuad } from './SetArgQuad.js';
 import { QuadsContext } from '../index.js';
 import { formatGlobalVariable } from './GlobalVarQuad.js';
 import { getPcHelper } from './GlobalQuad.js';
-import { reg } from './IdQuad.js';
+import { TempVariable } from './IdQuad.js';
 
 export class CallQuad extends Quad {
   private readonly quads: RA<Quad>;
@@ -14,7 +14,7 @@ export class CallQuad extends Quad {
     context: QuadsContext,
     actuals: RA<RA<Quad>>,
     private readonly name: string,
-    private readonly dynamicTempVariable: string | number | undefined
+    private readonly dynamicTempVariable: TempVariable | undefined
   ) {
     super();
     const tempRegister = context.requestTempRegister();
@@ -50,11 +50,16 @@ export class CallQuad extends Quad {
               `jal ${getPcHelper}`,
               'move $ra, $v0',
               `addi $ra, $ra, ${4 * mipsSize}  # Offset the return position`,
-              `lw $v0, ${reg(this.dynamicTempVariable)}`,
+              `lw $v0, ${this.dynamicTempVariable.toMips()}`,
               'jr $v0',
             ],
             'Calling function by pointer'
           )),
     ]);
+  }
+
+  public toAmd() {
+    // FIXME: Implement
+    return [];
   }
 }
