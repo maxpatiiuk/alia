@@ -61,10 +61,16 @@ export const quadsToAmd = (quads: RA<Quad | string>): RA<LabelQuad | string> =>
   );
 
 /**
- * Number of bites used for a single value.
+ * Number of bytes used for a single value in MIPS architecture
  * 4*8 = 32 bits
  */
 export const mipsSize = 4;
+
+/**
+ * Number of bytes used for a single value in x64 architecture
+ * 8*8 = 64 bits
+ */
+export const amdSize = 8;
 
 /**
  * NOTE: this stateful variable needs to be reset before running compiler

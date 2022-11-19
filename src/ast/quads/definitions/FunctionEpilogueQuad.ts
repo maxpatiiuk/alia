@@ -1,6 +1,6 @@
-import { UniversalQuad } from './UniversalQuad.js';
-import { LabelQuad, Quad } from './index.js';
 import { reg } from './IdQuad.js';
+import { amdSize, LabelQuad, Quad } from './index.js';
+import { UniversalQuad } from './UniversalQuad.js';
 
 export class FunctionEpilogueQuad extends Quad {
   private readonly leave: LabelQuad;
@@ -13,6 +13,7 @@ export class FunctionEpilogueQuad extends Quad {
       new UniversalQuad({
         quad: `leave ${this.id}`,
         mips: 'nop',
+        amd: 'nop',
       })
     );
   }
@@ -29,5 +30,9 @@ export class FunctionEpilogueQuad extends Quad {
       'jr $ra # Return to caller',
       '',
     ];
+  }
+
+  public toAmd() {
+    return [this.leave, `addq $${amdSize * 2}, %rsp`, 'popq %rbp', 'retq', ''];
   }
 }

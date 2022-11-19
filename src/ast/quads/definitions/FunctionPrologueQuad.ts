@@ -1,13 +1,13 @@
 import type { QuadsContext } from '../index.js';
 import { AssignQuad } from './AssignQuad.js';
-import { UniversalQuad, MipsQuad } from './UniversalQuad.js';
+import { UniversalQuad } from './UniversalQuad.js';
 import { Register } from './GetArgQuad.js';
-import { addComment, LabelQuad, mipsSize, Quad } from './index.js';
+import { addComment, amdSize, LabelQuad, mipsSize, Quad } from './index.js';
 import { formatFunctionName, formatGlobalVariable } from './GlobalVarQuad.js';
 
 export class FunctionPrologueQuad extends Quad {
   private readonly quadEntry: LabelQuad;
-  private readonly mipsEntry: LabelQuad;
+  private readonly universalEntry: LabelQuad;
 
   private readonly setRa: Quad;
 
@@ -20,9 +20,9 @@ export class FunctionPrologueQuad extends Quad {
         quad: `enter ${this.id}`,
       })
     );
-    this.mipsEntry = new LabelQuad(
+    this.universalEntry = new LabelQuad(
       formatGlobalVariable(this.id),
-      new MipsQuad('nop')
+      new UniversalQuad('nop')
     );
 
     // Allocate stack space for the function pointer
@@ -38,10 +38,20 @@ export class FunctionPrologueQuad extends Quad {
 
   public toMips() {
     return [
-      this.mipsEntry,
+      this.universalEntry,
       `sw $fp, -${mipsSize}($sp) # Save frame pointer`,
       `move $fp, $sp  # Set new frame pointer`,
       ...addComment(this.setRa.toMips(), 'Save return address'),
+      '# Function body:',
+    ];
+  }
+
+  public toAmd() {
+    return [
+      this.universalEntry,
+      'pushq %rbp',
+      'movq %rsp, %rbp',
+      `addq $${amdSize * 2}, %rbp`,
       '# Function body:',
     ];
   }

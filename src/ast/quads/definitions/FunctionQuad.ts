@@ -116,8 +116,18 @@ export class FunctionQuad extends Quad {
   }
 
   public toAmd() {
-    // FIXME: implement
-    return [];
+    return [
+      ...this.enter.toAmd(),
+      ...[...this.getArgs, ...this.statements].flatMap((statement) =>
+        statement.toAmd()
+      ),
+      ...this.leave.toAmd(),
+      '',
+    ]
+      .map((formatted) =>
+        typeof formatted === 'string' ? new LineQuad(formatted) : formatted
+      )
+      .flatMap((quad) => quad.toAmd());
   }
 }
 
