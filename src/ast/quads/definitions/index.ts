@@ -76,34 +76,28 @@ export const labelPadding = 2;
 export const getLongestLabel = () => longestLabel;
 
 export class LabelQuad extends Quad {
-  public constructor(
-    private readonly label: string,
-    private readonly quad: Quad
-  ) {
+  public constructor(private readonly label: string) {
     super();
     longestLabel = Math.max(longestLabel, label.length);
   }
 
-  public toString(): RA<string> {
-    return this.buildLine(this.quad.toString());
-  }
-
-  public toMips(): RA<string> {
-    return this.buildLine(this.quad.toMips());
-  }
-
-  public toAmd(): RA<string> {
-    return this.buildLine(this.quad.toAmd());
-  }
-
-  private buildLine(lines: RA<LabelQuad | string>): RA<string> {
+  public inline(line: string): string {
     const label = `${this.label}:${' '.repeat(
       Math.max(0, longestLabel - this.label.length) + labelPadding
     )}`;
-    if (lines.length === 0) return [label];
-    if (lines.length !== 1 || typeof lines[0] !== 'string')
-      throw new Error('LabelQuad called on invalid quad');
-    return [`${label}${lines[0] ?? ''}`];
+    return `${label}${line}`;
+  }
+
+  public toString() {
+    return [this];
+  }
+
+  public toMips() {
+    return [this];
+  }
+
+  public toAmd() {
+    return [this];
   }
 }
 

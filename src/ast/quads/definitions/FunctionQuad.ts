@@ -1,16 +1,15 @@
 import type { RA, WritableArray } from '../../../utils/types.js';
+import type { FormalsDeclNode } from '../../definitions/FormalsDeclNode.js';
 import type { StatementList } from '../../definitions/statement/StatementList.js';
 import type { QuadsContext } from '../index.js';
-import type { FormalQuad } from './FormalQuad.js';
-import { GetArgQuad as GetArgumentQuad } from './GetArgQuad.js';
-import { Quad } from './index.js';
-import { LineQuad } from './LineQuad.js';
-import { FunctionPrologueQuad } from './FunctionPrologueQuad.js';
-import { FunctionEpilogueQuad } from './FunctionEpilogueQuad.js';
 import { formatTemp } from '../index.js';
-import { FormalsDeclNode } from '../../definitions/FormalsDeclNode.js';
+import type { FormalQuad } from './FormalQuad.js';
+import { FunctionEpilogueQuad } from './FunctionEpilogueQuad.js';
+import { FunctionPrologueQuad } from './FunctionPrologueQuad.js';
+import { GetArgQuad as GetArgumentQuad } from './GetArgQuad.js';
 import { formatGlobalVariable } from './GlobalVarQuad.js';
 import { TempVariable } from './IdQuad.js';
+import { Quad } from './index.js';
 import { Register } from './Register.js';
 
 export class FunctionQuad extends Quad {
@@ -95,12 +94,9 @@ export class FunctionQuad extends Quad {
       ),
       `[END ${this.id} LOCALS]`,
       ...this.enter.toString(),
-      ...[...this.getArgs, ...this.statements]
-        .flatMap((quad) => quad.toString())
-        .map((formatted) =>
-          typeof formatted === 'string' ? new LineQuad(formatted) : formatted
-        )
-        .flatMap((quad) => quad.toString()),
+      ...[...this.getArgs, ...this.statements].flatMap((quad) =>
+        quad.toString()
+      ),
       ...this.leave.toString(),
     ];
   }
@@ -113,11 +109,7 @@ export class FunctionQuad extends Quad {
       ),
       ...this.leave.toMips(),
       '',
-    ]
-      .map((formatted) =>
-        typeof formatted === 'string' ? new LineQuad(formatted) : formatted
-      )
-      .flatMap((quad) => quad.toMips());
+    ];
   }
 
   public toAmd() {
@@ -128,11 +120,7 @@ export class FunctionQuad extends Quad {
       ),
       ...this.leave.toAmd(),
       '',
-    ]
-      .map((formatted) =>
-        typeof formatted === 'string' ? new LineQuad(formatted) : formatted
-      )
-      .flatMap((quad) => quad.toAmd());
+    ];
   }
 }
 
@@ -148,8 +136,7 @@ const reTempVar = /^\$t(?<index>\d+)$/;
 
 export function parseTempVar(index: string): number | undefined {
   const value = reTempVar.exec(index)?.groups?.index;
-  if (typeof value === 'string') return Number.parseInt(value);
-  else return undefined;
+  return typeof value === 'string' ? Number.parseInt(value) : undefined;
 }
 
 const tempRegisterCount = 10;

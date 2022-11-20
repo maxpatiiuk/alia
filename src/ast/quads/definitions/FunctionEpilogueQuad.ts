@@ -1,6 +1,5 @@
 import { reg } from './IdQuad.js';
 import { amdSize, LabelQuad, Quad } from './index.js';
-import { UniversalQuad } from './UniversalQuad.js';
 
 export class FunctionEpilogueQuad extends Quad {
   private readonly leave: LabelQuad;
@@ -8,18 +7,11 @@ export class FunctionEpilogueQuad extends Quad {
   public constructor(leaveLabel: string, private readonly id: string) {
     super();
 
-    this.leave = new LabelQuad(
-      leaveLabel,
-      new UniversalQuad({
-        quad: `leave ${this.id}`,
-        mips: 'nop',
-        amd: 'nop',
-      })
-    );
+    this.leave = new LabelQuad(leaveLabel);
   }
 
   public toString() {
-    return this.leave.toString();
+    return [...this.leave.toString(), `leave ${this.id}`];
   }
 
   public toMips() {

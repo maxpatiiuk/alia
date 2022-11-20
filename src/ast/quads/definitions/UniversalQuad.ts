@@ -30,19 +30,3 @@ export class UniversalQuad extends Quad {
     return typeof this.data.amd === 'string' ? [this.data.amd] : [];
   }
 }
-
-export class MipsQuad extends UniversalQuad {
-  public constructor(name: string, operation?: string) {
-    super({
-      mips: `${name}${operation === undefined ? '' : ` ${operation}`}`,
-    });
-  }
-}
-
-export class AmdQuad extends UniversalQuad {
-  public constructor(name: string, operation?: string) {
-    super({
-      amd: `${name}${operation === undefined ? '' : ` ${operation}`}`,
-    });
-  }
-}

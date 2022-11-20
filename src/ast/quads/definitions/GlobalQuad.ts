@@ -21,7 +21,7 @@ import {
   quadsToString,
 } from './index.js';
 import { formatStringQuad, StringDefQuad } from './StringDefQuad.js';
-import { AmdQuad, MipsQuad } from './UniversalQuad.js';
+import { UniversalQuad } from './UniversalQuad.js';
 import { LineQuad } from './LineQuad.js';
 
 export class GlobalQuad extends Quad {
@@ -29,9 +29,9 @@ export class GlobalQuad extends Quad {
 
   private readonly functions: RA<Quad>;
 
-  private readonly mipsBootloader: RA<Quad>;
+  private readonly mipsBootloader: RA<Quad | string>;
 
-  private readonly amdBootloader: RA<Quad>;
+  private readonly amdBootloader: RA<Quad | string>;
 
   public constructor(
     private readonly children: GlobalsNode['children'],
@@ -88,41 +88,37 @@ export class GlobalQuad extends Quad {
     this.globalQuads = [...globalQuads, ...stringQuads];
 
     this.mipsBootloader = [
-      new LabelQuad(
-        startFunction,
-        new MipsQuad(`jal ${formatGlobalVariable(mainFunction)}`)
+      new LabelQuad(startFunction),
+      new UniversalQuad(`jal ${formatGlobalVariable(mainFunction)}`),
+      'li $v0, 10  # Exit syscall',
+      'syscall',
+      '',
+      new LabelQuad(getPcHelper),
+      new UniversalQuad(
+        'move $v0, $ra  # A helper function for getting current PC'
       ),
-      new LineQuad('li $v0, 10  # Exit syscall'),
-      new LineQuad('syscall'),
-      new LineQuad(''),
-      new LabelQuad(
-        getPcHelper,
-        new MipsQuad(
-          'move $v0, $ra  # A helper function for getting current PC'
-        )
-      ),
-      new LineQuad('jr $ra'),
+      'jr $ra',
     ];
 
     this.amdBootloader = [
-      new LabelQuad(
-        startFunction,
-        new AmdQuad(`call ${formatGlobalVariable(mainFunction)}`)
-      ),
-      new LineQuad('movq $60, %rax  # Choose syscall exit'),
-      new LineQuad('movq $4, %rdi  # Set syscall argument - return code'),
-      new LineQuad('syscall'),
-      new LineQuad(''),
+      new LabelQuad(startFunction),
+      new UniversalQuad(`call ${formatGlobalVariable(mainFunction)}`),
+      'movq $60, %rax  # Choose syscall exit',
+      'movq $4, %rdi  # Set syscall argument - return code',
+      'syscall',
+      '',
     ];
   }
 
   public toString() {
-    return quadsToString([
-      '[BEGIN GLOBALS]',
-      ...this.globalQuads,
-      '[END GLOBALS]',
-      ...this.functions,
-    ]);
+    return inlineLabels(
+      quadsToString([
+        '[BEGIN GLOBALS]',
+        ...this.globalQuads,
+        '[END GLOBALS]',
+        ...this.functions,
+      ])
+    );
   }
 
   public toMips() {
@@ -134,15 +130,15 @@ export class GlobalQuad extends Quad {
       throw new Error(
         'Conversion to MIPS requires there to be a main() function. Please define it'
       );
-    return quadsToMips([
+    return [
       `.globl ${startFunction}`,
       '.data',
-      ...this.globalQuads,
+      ...inlineLabels(quadsToMips(this.globalQuads)),
       '.text',
-      ...this.mipsBootloader.flatMap((quad) => quad.toMips()),
-      '',
-      ...this.functions,
-    ]);
+      ...inlineLabels(
+        quadsToMips([...this.mipsBootloader, '', ...this.functions])
+      ),
+    ];
   }
 
   public toAmd() {
@@ -154,18 +150,38 @@ export class GlobalQuad extends Quad {
       throw new Error(
         'Conversion to x64 requires there to be a main() function. Please define it'
       );
-    return quadsToAmd([
+    return [
       `.globl ${startFunction}`,
       '.data',
-      ...this.globalQuads,
+      ...inlineLabels(quadsToAmd(this.globalQuads)),
       '.text',
-      ...this.amdBootloader.flatMap((quad) => quad.toAmd()),
-      '',
-      ...this.functions,
-    ]);
+      ...inlineLabels(
+        quadsToAmd([...this.amdBootloader, '', ...this.functions])
+      ),
+    ];
   }
 }
 
 const startFunction = '_start';
 const mainFunction = 'main';
 export const getPcHelper = '_get_pc';
+
+function inlineLabels(lines: RA<LabelQuad | string>): RA<string> {
+  let currentLabel: LabelQuad | undefined = undefined;
+  const newLines = filterArray(
+    lines.flatMap((line) => {
+      if (line instanceof LabelQuad) {
+        if (currentLabel !== undefined)
+          throw new Error('Cannot have two labels in a row');
+        currentLabel = line;
+        return undefined;
+      }
+      if (currentLabel === undefined) return new LineQuad(line).toString();
+      const fullLine = currentLabel.inline(line);
+      currentLabel = undefined;
+      return [fullLine];
+    })
+  );
+  if (currentLabel !== undefined) throw new Error('Unexpected trailing label');
+  return newLines;
+}

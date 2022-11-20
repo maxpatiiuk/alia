@@ -9,7 +9,6 @@ import {
   quadsToMips,
   quadsToString,
 } from './index.js';
-import { NopQuad } from './NopQuad.js';
 import { QuadsContext } from '../index.js';
 import { LoadQuad } from './LoadQuad.js';
 import { Register } from './Register.js';
@@ -50,17 +49,11 @@ export class IfQuad extends Quad {
               mips: '# False Branch',
               amd: '# False Branch',
             }),
-            new LabelQuad(falseCase.label, new NopQuad()),
+            new LabelQuad(falseCase.label),
             ...falseCase.quads,
           ]
         : []),
-      new LabelQuad(
-        this.label,
-        new UniversalQuad({
-          quad: 'nop',
-          mips: 'nop  # END if',
-        })
-      ),
+      new LabelQuad(this.label),
     ];
   }
 

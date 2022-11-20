@@ -9,7 +9,6 @@ import {
   quadsToMips,
   quadsToString,
 } from './index.js';
-import { NopQuad } from './NopQuad.js';
 
 export class ForQuad extends Quad {
   private readonly quads: RA<Quad>;
@@ -24,7 +23,7 @@ export class ForQuad extends Quad {
     const startLabel = context.requestLabel();
     this.quads = [
       ...this.declaration,
-      new LabelQuad(startLabel, new NopQuad()),
+      new LabelQuad(startLabel),
       new IfQuad(
         this.condition,
         [...this.statements, new GoToQuad(startLabel)],

@@ -1,8 +1,7 @@
-import { UniversalQuad } from './UniversalQuad.js';
 import { LabelQuad, Quad } from './index.js';
 
 export class StringDefQuad extends Quad {
-  private readonly quad: Quad;
+  private readonly label: LabelQuad;
 
   public constructor(
     private readonly name: string,
@@ -10,10 +9,7 @@ export class StringDefQuad extends Quad {
   ) {
     super();
 
-    this.quad = new LabelQuad(
-      this.name,
-      new UniversalQuad(`.asciiz ${this.value}`)
-    );
+    this.label = new LabelQuad(this.name);
   }
 
   public toString() {
@@ -21,11 +17,11 @@ export class StringDefQuad extends Quad {
   }
 
   public toMips() {
-    return this.quad.toMips();
+    return [this.label, `.asciiz ${this.value}`];
   }
 
   public toAmd() {
-    return this.quad.toAmd();
+    return [this.label, `.asciiz ${this.value}`];
   }
 }
 
