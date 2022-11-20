@@ -29,4 +29,6 @@ export class MayhemQuad extends Quad {
   public toMipsValue() {
     return this.tempVariable.toMipsValue();
   }
+
+  // FIXME: implement
 }

@@ -23,6 +23,7 @@ export class CallQuad extends Quad {
       new SetArgumentQuad(
         index + 1,
         actual?.at(-1)!.toValue(),
+        // FIXME: Resolve the inconsistency
         actual?.at(-1)!.toMipsValue(),
         tempRegister,
         context.requestTemp()

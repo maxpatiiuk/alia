@@ -12,4 +12,8 @@ export class GoToQuad extends Quad {
   public toMips() {
     return [`j ${this.label}`];
   }
+
+  public toAmd() {
+    return [`jmp ${this.label}`];
+  }
 }

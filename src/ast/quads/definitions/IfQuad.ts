@@ -1,5 +1,5 @@
 import type { RA } from '../../../utils/types.js';
-import { UniversalQuad, MipsQuad } from './UniversalQuad.js';
+import { UniversalQuad } from './UniversalQuad.js';
 import { GoToQuad } from './GoToQuad.js';
 import {
   addComment,
@@ -30,16 +30,25 @@ export class IfQuad extends Quad {
       ...this.condition,
       new IfzQuad(
         this.condition.at(-1)!.toValue(),
-        this.condition.at(-1)!.toMipsValue(),
+        new Register(
+          this.condition.at(-1)!.toMipsValue(),
+          this.condition.at(-1)!.toAmdValue()
+        ),
         context.requestTempRegister(),
         falseCase?.label ?? this.label
       ),
-      new MipsQuad('# True Branch'),
+      new UniversalQuad({
+        mips: '# True Branch',
+        amd: '# True Branch',
+      }),
       ...this.trueQuads,
       ...(typeof falseCase === 'object'
         ? [
             new GoToQuad(this.label),
-            new MipsQuad('# False Branch'),
+            new UniversalQuad({
+              mips: '# False Branch',
+              amd: '# False Branch',
+            }),
             new LabelQuad(falseCase.label, new NopQuad()),
             ...falseCase.quads,
           ]
@@ -65,9 +74,10 @@ export class IfQuad extends Quad {
 
 class IfzQuad extends Quad {
   private readonly loadQuad: LoadQuad;
+
   public constructor(
     private readonly condition: string,
-    mipsCondition: string,
+    mipsCondition: Register,
     tempRegister: Register,
     private readonly label: string
   ) {
@@ -83,6 +93,13 @@ class IfzQuad extends Quad {
     return [
       ...this.loadQuad.toMips(),
       `beq $zero, ${this.loadQuad.toMipsValue()}, ${this.label}`,
+    ];
+  }
+
+  public toAmd() {
+    return [
+      ...this.loadQuad.toAmd(),
+      `jz ${this.loadQuad.toAmdValue()}, ${this.label}`,
     ];
   }
 }

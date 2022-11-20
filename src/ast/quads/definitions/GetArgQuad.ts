@@ -7,7 +7,6 @@ import { LoadQuad } from './LoadQuad.js';
 import { parseTempVar } from './FunctionQuad.js';
 import { formatTemp } from '../index.js';
 
-// FIXME: finish this
 export class GetArgQuad extends Quad {
   private readonly loadQuad: LoadQuad;
 
@@ -20,8 +19,8 @@ export class GetArgQuad extends Quad {
     length: number
   ) {
     super();
-    const index = -(length - this.index) + 1;
-    const tempVariable = new TempVariable(index);
+    const resolvedIndex = -(length - this.index) + 1;
+    const tempVariable = new TempVariable(resolvedIndex);
     this.loadQuad = new LoadQuad(tempRegister, tempVariable);
     this.assignQuad = new AssignQuad(undefined, this.formal.tempVariable, [
       tempRegister,
@@ -39,6 +38,16 @@ export class GetArgQuad extends Quad {
         `Getting argument "${this.formal.id}"`
       ),
       ...this.assignQuad.toMips(),
+    ];
+  }
+
+  public toAmd() {
+    return [
+      ...addComment(
+        this.loadQuad.toAmd(),
+        `Getting argument "${this.formal.id}"`
+      ),
+      ...this.assignQuad.toAmd(),
     ];
   }
 }

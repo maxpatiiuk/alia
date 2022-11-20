@@ -1,8 +1,10 @@
 import { AssignQuad } from './AssignQuad.js';
 import { Register } from './GetArgQuad.js';
+import { TempVariable } from './IdQuad.js';
 import { addComment, Quad } from './index.js';
 import { LoadQuad } from './LoadQuad.js';
 
+// FIXME: implement
 export class SetArgQuad extends Quad {
   private readonly loadQuad: LoadQuad | undefined;
 
@@ -11,17 +13,17 @@ export class SetArgQuad extends Quad {
   public constructor(
     private readonly index: number,
     private readonly value: string,
-    mipsVariable: string | Register,
+    mipsVariable: Register | TempVariable,
     tempRegister: Register,
-    tempVariable: number
+    tempVariable: TempVariable
   ) {
     super();
     this.loadQuad =
-      typeof mipsVariable === 'string'
+      mipsVariable instanceof TempVariable
         ? new LoadQuad(tempRegister, mipsVariable)
         : undefined;
     this.assignQuad = new AssignQuad(undefined, tempVariable, [
-      mipsVariable instanceof Register ? mipsVariable : tempRegister,
+      mipsVariable instanceof TempVariable ? tempRegister : mipsVariable,
     ]);
   }
 

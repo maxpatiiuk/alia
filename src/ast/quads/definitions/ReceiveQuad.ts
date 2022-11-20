@@ -24,4 +24,6 @@ export class ReceiveQuad extends Quad {
       `BEGIN input ${this.id}`
     );
   }
+
+  // FIXME: implement
 }

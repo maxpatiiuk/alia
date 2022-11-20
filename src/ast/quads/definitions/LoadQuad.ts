@@ -5,7 +5,7 @@ import { Quad } from './index.js';
 export class LoadQuad extends Quad {
   public constructor(
     private readonly tempRegister: Register,
-    private readonly tempVariable: TempVariable,
+    private readonly tempVariable: Register | TempVariable,
     private readonly isFunction = false
   ) {
     super();
@@ -17,6 +17,7 @@ export class LoadQuad extends Quad {
 
   public toMips() {
     return [
+      ...this.tempRegister.toMips(),
       `${
         this.isFunction ? 'la' : 'lw'
       } ${this.tempRegister.toMipsValue()}, ${this.tempVariable.toMipsValue()}`,
@@ -29,6 +30,7 @@ export class LoadQuad extends Quad {
 
   public toAmd() {
     return [
+      ...this.tempRegister.toAmd(),
       `movq ${this.tempRegister.toAmdValue()}, ${this.tempVariable.toAmdValue()}`,
     ];
   }

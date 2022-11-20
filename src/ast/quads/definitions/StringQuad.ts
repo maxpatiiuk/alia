@@ -12,4 +12,12 @@ export class StringQuad extends TermQuad {
   public toMipsValue() {
     return this.name;
   }
+
+  public toAmd() {
+    return [];
+  }
+
+  public toAmdValue() {
+    return `.${this.name}`;
+  }
 }

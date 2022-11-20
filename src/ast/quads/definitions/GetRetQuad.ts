@@ -28,4 +28,12 @@ export class GetRetQuad extends Quad {
   public toMipsValue() {
     return this.tempVariable.toMipsValue();
   }
+
+  public toAmd() {
+    return this.assignQuad.toAmd();
+  }
+
+  public toAmdValue() {
+    return this.tempVariable.toAmdValue();
+  }
 }

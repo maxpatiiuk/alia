@@ -6,6 +6,10 @@ export class NopQuad extends Quad {
   }
 
   public toMips() {
-    return ['sll $zero $zero 0  # nop'];
+    return ['nop'];
+  }
+
+  public toAmd() {
+    return ['nop'];
   }
 }

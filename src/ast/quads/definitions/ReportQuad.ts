@@ -27,4 +27,6 @@ export class ReportQuad extends Quad {
       'BEGIN Output'
     );
   }
+
+  // FIXME: implement
 }
