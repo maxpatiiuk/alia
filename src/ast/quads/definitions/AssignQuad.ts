@@ -1,6 +1,7 @@
 import type { RA } from '../../../utils/types.js';
 import type { TempVariable } from './IdQuad.js';
-import { addComment, mem, Quad } from './index.js';
+import { addComment, Quad } from './index.js';
+import { mem } from './IdQuad.js';
 
 export class AssignQuad extends Quad {
   private readonly tempValue: string;

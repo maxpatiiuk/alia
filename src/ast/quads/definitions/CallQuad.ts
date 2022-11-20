@@ -12,7 +12,7 @@ import { QuadsContext } from '../index.js';
 import { formatGlobalVariable } from './GlobalVarQuad.js';
 import { getPcHelper } from './GlobalQuad.js';
 import { TempVariable } from './IdQuad.js';
-import { Register } from './GetArgQuad.js';
+import { Register } from './Register.js';
 
 export class CallQuad extends Quad {
   private readonly quads: RA<Quad>;
@@ -80,7 +80,10 @@ export class CallQuad extends Quad {
       ...(this.dynamicTempVariable === undefined
         ? [`call ${formatGlobalVariable(this.name)}`]
         : addComment(
-            [`movq ${this.dynamicTempVariable.toAmdValue()}, %rax`, `call rax`],
+            [
+              `movq $${this.dynamicTempVariable.toAmdValue()}, %rax`,
+              `call rax`,
+            ],
             'Calling function by pointer'
           )),
       `subq $${stackSize}, %rsp  # END Calling ${this.name}`,

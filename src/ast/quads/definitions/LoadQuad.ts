@@ -1,6 +1,6 @@
-import type { Register } from './GetArgQuad.js';
 import type { TempVariable } from './IdQuad.js';
 import { Quad } from './index.js';
+import { Register } from './Register.js';
 
 export class LoadQuad extends Quad {
   public constructor(
@@ -31,7 +31,7 @@ export class LoadQuad extends Quad {
   public toAmd() {
     return [
       ...this.tempRegister.toAmd(),
-      `movq ${this.tempRegister.toAmdValue()}, ${this.tempVariable.toAmdValue()}`,
+      `movq ${this.tempVariable.toAmdValue()}, ${this.tempRegister.toAmdValue()}`,
     ];
   }
 

@@ -5,13 +5,14 @@ import {
   addComment,
   LabelQuad,
   Quad,
+  quadsToAmd,
   quadsToMips,
   quadsToString,
 } from './index.js';
 import { NopQuad } from './NopQuad.js';
 import { QuadsContext } from '../index.js';
 import { LoadQuad } from './LoadQuad.js';
-import { Register } from './GetArgQuad.js';
+import { Register } from './Register.js';
 
 export class IfQuad extends Quad {
   private readonly quads: RA<Quad>;
@@ -69,6 +70,10 @@ export class IfQuad extends Quad {
 
   public toMips() {
     return addComment(quadsToMips(this.quads), 'BEGIN if');
+  }
+
+  public toAmd() {
+    return addComment(quadsToAmd(this.quads), 'BEGIN if');
   }
 }
 

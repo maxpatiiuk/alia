@@ -68,7 +68,7 @@ export class VariableDeclaration extends Statement {
   public toQuads(context: QuadsContext): RA<Quad> {
     const name = this.id.getName();
     this.tempVariable = context.declareVar(name);
-    return typeof this.tempVariable === 'number'
+    return typeof this.tempVariable.variable === 'number'
       ? [new VarDeclQuad(name, this.tempVariable)]
       : [];
   }

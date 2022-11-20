@@ -8,6 +8,7 @@ import type { TokenNode } from '../TokenNode.js';
 import { assertToken } from '../TokenNode.js';
 import { Expression } from './index.js';
 import { OperationQuad } from '../../quads/definitions/OperationQuad.js';
+import { IntLiteralNode } from '../term/IntLiteralNode.js';
 
 export class DecimalOperator extends Expression {
   public readonly operator: '-' | '*' | '/' | '+';
@@ -61,13 +62,31 @@ export class DecimalOperator extends Expression {
   }
 
   public toQuads(context: QuadsContext) {
-    return [
-      new OperationQuad(
-        this.left.toQuads(context),
-        this.operator,
-        this.right.toQuads(context),
-        context
-      ),
-    ];
+    const leftQuads = this.left.toQuads(context);
+    const intLiteral =
+      this.right instanceof IntLiteralNode ? this.right : undefined;
+    const isUseless =
+      typeof intLiteral === 'object' &&
+      uselessActions.some(
+        ([operator, value]) =>
+          operator === this.operator && value.toString() === intLiteral.pretty()
+      );
+    return isUseless
+      ? leftQuads
+      : [
+          new OperationQuad(
+            leftQuads,
+            this.operator,
+            this.right.toQuads(context),
+            context
+          ),
+        ];
   }
 }
+
+const uselessActions = [
+  ['-', 0],
+  ['*', 1],
+  ['/', 1],
+  ['+', 0],
+] as const;

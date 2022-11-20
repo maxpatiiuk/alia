@@ -2,7 +2,7 @@ import type { RA, WritableArray } from '../../../utils/types.js';
 import type { StatementList } from '../../definitions/statement/StatementList.js';
 import type { QuadsContext } from '../index.js';
 import type { FormalQuad } from './FormalQuad.js';
-import { GetArgQuad as GetArgumentQuad, Register } from './GetArgQuad.js';
+import { GetArgQuad as GetArgumentQuad } from './GetArgQuad.js';
 import { Quad } from './index.js';
 import { LineQuad } from './LineQuad.js';
 import { FunctionPrologueQuad } from './FunctionPrologueQuad.js';
@@ -11,6 +11,7 @@ import { formatTemp } from '../index.js';
 import { FormalsDeclNode } from '../../definitions/FormalsDeclNode.js';
 import { formatGlobalVariable } from './GlobalVarQuad.js';
 import { TempVariable } from './IdQuad.js';
+import { Register } from './Register.js';
 
 export class FunctionQuad extends Quad {
   private readonly enter: Quad;

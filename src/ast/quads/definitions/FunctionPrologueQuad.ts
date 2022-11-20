@@ -1,9 +1,9 @@
 import type { QuadsContext } from '../index.js';
 import { AssignQuad } from './AssignQuad.js';
 import { UniversalQuad } from './UniversalQuad.js';
-import { Register } from './GetArgQuad.js';
 import { addComment, amdSize, LabelQuad, mipsSize, Quad } from './index.js';
 import { formatFunctionName, formatGlobalVariable } from './GlobalVarQuad.js';
+import { Register } from './Register.js';
 
 export class FunctionPrologueQuad extends Quad {
   private readonly quadEntry: LabelQuad;

@@ -1,8 +1,8 @@
 import type { RA } from '../../../utils/types.js';
 import { filterArray } from '../../../utils/types.js';
-import { Register } from './GetArgQuad.js';
 import { addComment, Quad } from './index.js';
 import { LoadQuad } from './LoadQuad.js';
+import { Register } from './Register.js';
 
 export class ReturnQuad extends Quad {
   private readonly loadQuad: LoadQuad;
@@ -19,7 +19,7 @@ export class ReturnQuad extends Quad {
             this.quads.at(-1)!.toMipsValue(),
             this.quads.at(-1)!.toAmdValue()
           );
-    this.loadQuad = new LoadQuad(new Register('$v0', '$rax'), tempVariable);
+    this.loadQuad = new LoadQuad(new Register('$v0', '%rax'), tempVariable);
   }
 
   public toString() {

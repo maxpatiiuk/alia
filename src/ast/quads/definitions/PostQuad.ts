@@ -1,11 +1,11 @@
 import type { QuadsContext } from '../index.js';
 import { AssignQuad } from './AssignQuad.js';
-import { Register } from './GetArgQuad.js';
 import type { TempVariable } from './IdQuad.js';
 import { Quad } from './index.js';
 import { IntLiteralQuad } from './IntLiteralQuad.js';
 import { LoadQuad } from './LoadQuad.js';
 import { OpQuad } from './OperationQuad.js';
+import { Register } from './Register.js';
 
 export class PostQuad extends Quad {
   private readonly quad: AssignQuad;

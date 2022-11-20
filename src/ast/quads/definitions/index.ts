@@ -1,5 +1,4 @@
 import type { RA } from '../../../utils/types.js';
-import { formatTemp } from '../index.js';
 
 export class Quad {
   /** Convert quad to a printable string */
@@ -32,10 +31,6 @@ export class Quad {
     throw new Error('Not implemented');
   }
 }
-
-/** Wrap an identifier in square brackets (indicates memory access) */
-export const mem = (id: number | string): string =>
-  `[${typeof id === 'number' ? formatTemp(id) : id}]`;
 
 export const quadsToString = (
   quads: RA<Quad | string>

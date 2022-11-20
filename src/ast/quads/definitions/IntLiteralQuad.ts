@@ -1,7 +1,7 @@
-import type { Register } from './GetArgQuad.js';
 import type { TempVariable } from './IdQuad.js';
 import { Quad } from './index.js';
 import { TermQuad } from './TermQuad.js';
+import { Register } from './Register.js';
 
 export class IntLiteralQuad extends Quad {
   private readonly termQuad: TermQuad;

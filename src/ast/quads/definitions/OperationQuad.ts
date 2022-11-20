@@ -3,7 +3,7 @@ import { AssignQuad } from './AssignQuad.js';
 import { addComment, Quad, quadsToAmd, quadsToMips } from './index.js';
 import { QuadsContext } from '../index.js';
 import { LoadQuad } from './LoadQuad.js';
-import { Register } from './GetArgQuad.js';
+import { Register } from './Register.js';
 
 const operationTranslations = {
   '--': 'SUB64',

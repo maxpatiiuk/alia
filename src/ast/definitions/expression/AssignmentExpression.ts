@@ -12,8 +12,8 @@ import { token } from '../TokenNode.js';
 import { Expression } from './index.js';
 import { AssignQuad } from '../../quads/definitions/AssignQuad.js';
 import { LoadQuad } from '../../quads/definitions/LoadQuad.js';
-import { Register } from '../../quads/definitions/GetArgQuad.js';
 import { IdQuad, TempVariable } from '../../quads/definitions/IdQuad.js';
+import { Register } from '../../quads/definitions/Register.js';
 
 export class AssignmentExpression extends Expression {
   public constructor(

@@ -1,7 +1,8 @@
-import { mem, mipsSize, Quad } from './index.js';
+import { amdSize, mipsSize, Quad } from './index.js';
 import { TermQuad } from './TermQuad.js';
 import { formatGlobalVariable } from './GlobalVarQuad.js';
-import { Register } from './GetArgQuad.js';
+import { formatTemp } from '../index.js';
+import { Register } from './Register.js';
 
 export class IdQuad extends Quad {
   private readonly quad: Quad;
@@ -66,6 +67,8 @@ export const reg = (tempVariable: string | number): string =>
 const ref = (tempVariable: string | number): string =>
   typeof tempVariable === 'string'
     ? formatGlobalVariable(tempVariable)
-    : `${tempVariable > 0 ? '-' : ''}${
-        Math.abs(tempVariable) * mipsSize
-      }(%rsp)`;
+    : `${tempVariable > 0 ? '-' : ''}${Math.abs(tempVariable) * amdSize}(%rsp)`;
+
+/** Wrap an identifier in square brackets (indicates memory access) */
+export const mem = (id: number | string): string =>
+  `[${typeof id === 'number' ? formatTemp(id) : id}]`;
