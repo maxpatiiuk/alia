@@ -153,10 +153,8 @@ export function parseTempVar(index: string): number | undefined {
 
 const tempRegisterCount = 10;
 const amdTempRegisters = [
-  '%rax',
   '%rbx',
   '%rcx',
-  '%rdx',
   '%rsi',
   '%rdi',
   '%r8',

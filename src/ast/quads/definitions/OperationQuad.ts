@@ -1,6 +1,6 @@
 import type { RA } from '../../../utils/types.js';
 import { AssignQuad } from './AssignQuad.js';
-import { addComment, Quad, quadsToMips } from './index.js';
+import { addComment, Quad, quadsToAmd, quadsToMips } from './index.js';
 import { QuadsContext } from '../index.js';
 import { LoadQuad } from './LoadQuad.js';
 import { Register } from './GetArgQuad.js';
@@ -85,13 +85,64 @@ export class OpQuad extends Quad {
   public toMipsValue() {
     return this.tempRegister.toMipsValue();
   }
+
+  public toAmd() {
+    const left = this.left?.toAmdValue() ?? '';
+    const right = this.right.toAmdValue();
+    const temp = this.tempRegister.toAmdValue();
+    if (this.type === '--' || this.type === '-')
+      return [`movq ${left}, ${temp}`, `subq ${right}, ${temp}`];
+    else if (this.type === '++' || this.type === '+')
+      return [`movq ${left}, ${temp}`, `addq ${right}, ${temp}`];
+    else if (this.type === '*')
+      return [
+        `movq ${left}, ${temp}`,
+        `movq ${right}, %rax`,
+        `imulq %rax`,
+        // Note: this does not check for overflow
+        `movq %rax, ${temp}`,
+      ];
+    else if (this.type === '/')
+      return [
+        `movq $0, %rdx`,
+        `movq ${left}, %rax`,
+        `idivq ${right}`,
+        `movq %rax, ${temp}`,
+        // Note: this discards the remainder
+      ];
+    else if (this.type === 'or')
+      return [`movq ${left}, ${temp}`, `orq ${right}, ${temp}`];
+    else if (this.type === 'and')
+      return [`movq ${left}, ${temp}`, `andq ${right}, ${temp}`];
+    else if (this.type === '<')
+      return [`movq ${left}, ${temp}`, `setl ${right}, ${temp}`];
+    else if (this.type === '>')
+      return [`movq ${left}, ${temp}`, `setg ${right}, ${temp}`];
+    else if (this.type === '<=')
+      return [`movq ${left}, ${temp}`, `setle ${right}, ${temp}`];
+    else if (this.type === '>=')
+      return [`movq ${left}, ${temp}`, `setge ${right}, ${temp}`];
+    else if (this.type === '==')
+      return [`movq ${left}, ${temp}`, `sete ${right}, ${temp}`];
+    else if (this.type === '!=')
+      return [`movq ${left}, ${temp}`, `setne ${right}, ${temp}`];
+    else if (this.type === '!')
+      return [`movq ${right}, ${temp}`, `not ${temp}`];
+    else if (this.type === 'neg')
+      return [`movq ${right}, ${temp}`, `neg ${temp}`];
+    else throw new Error(`Unknown operation ${this.type}`);
+  }
+
+  public toAmdValue() {
+    return this.tempRegister.toAmdValue();
+  }
 }
 
 export class OperationQuad extends Quad {
   private readonly assignQuad: AssignQuad;
-  private readonly assignMips: AssignQuad;
-  private readonly leftMips: LoadQuad | undefined;
-  private readonly rightMips: LoadQuad;
+  private readonly assignUniversal: AssignQuad;
+  private readonly leftLoad: LoadQuad | undefined;
+  private readonly rightLoad: LoadQuad;
 
   public constructor(
     private readonly left: RA<Quad> | undefined,
@@ -120,12 +171,12 @@ export class OperationQuad extends Quad {
             this.left?.at(-1)!.toMipsValue(),
             this.left?.at(-1)!.toAmdValue()
           );
-    this.leftMips =
+    this.leftLoad =
       leftRegister === undefined
         ? undefined
         : new LoadQuad(leftTemp, leftRegister);
 
-    this.rightMips = new LoadQuad(
+    this.rightLoad = new LoadQuad(
       context.requestTempRegister(),
       new Register(
         this.right.at(-1)!.toMipsValue(),
@@ -134,12 +185,12 @@ export class OperationQuad extends Quad {
     );
 
     const opMips = new OpQuad(
-      this.leftMips,
+      this.leftLoad,
       this.type,
-      this.rightMips,
+      this.rightLoad,
       tempRegister
     );
-    this.assignMips = new AssignQuad(undefined, tempVariable, [opMips]);
+    this.assignUniversal = new AssignQuad(undefined, tempVariable, [opMips]);
   }
 
   public toString() {
@@ -159,21 +210,32 @@ export class OperationQuad extends Quad {
       quadsToMips([
         ...(this.left ?? []),
         ...this.right,
-        ...(this.leftMips?.toMips() ?? []),
-        this.rightMips,
-        this.assignMips,
+        ...(this.leftLoad?.toMips() ?? []),
+        this.rightLoad,
+        this.assignUniversal,
       ]),
       `Operation: ${operationTranslations[this.type]}`
     );
   }
 
   public toMipsValue() {
-    return this.assignMips.toMipsValue();
+    return this.assignUniversal.toMipsValue();
   }
 
-  // FIXME: implement toAmd
+  public toAmd() {
+    return addComment(
+      quadsToAmd([
+        ...(this.left ?? []),
+        ...this.right,
+        ...(this.leftLoad?.toAmd() ?? []),
+        this.rightLoad,
+        this.assignUniversal,
+      ]),
+      `Operation: ${operationTranslations[this.type]}`
+    );
+  }
 
   public toAmdValue() {
-    return this.assignMips.toAmdValue();
+    return this.assignUniversal.toAmdValue();
   }
 }
