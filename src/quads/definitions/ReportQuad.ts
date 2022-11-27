@@ -32,7 +32,7 @@ export class ReportQuad extends Quad {
       new (isString ? La : Lw)('$a0', value),
       new Addi('$v0', '$zero', isString ? 4 : 1),
       new Syscall(),
-      new PrevComment('BEGIN Output'),
+      new PrevComment('END Output'),
     ];
   }
 
@@ -42,9 +42,10 @@ export class ReportQuad extends Quad {
     const isBool = quad instanceof IdQuad && quad.type === 'bool';
     const value = quad.toAmdValue();
     return [
-      new NextComment('Output'),
+      new NextComment('BEGIN Output'),
       new MovQ(value, '%rdi'),
       new CallQ(isString ? 'printString' : isBool ? 'printBool' : 'printInt'),
+      new PrevComment('END Output'),
     ];
   }
 }

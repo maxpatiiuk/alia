@@ -23,6 +23,7 @@ export class FunctionEpilogueQuad extends Quad {
 
   public toMips() {
     return [
+      new NextComment('END Function body'),
       this.leave,
       new NextComment('Restore return address'),
       new Lw('$ra', reg(2)),
@@ -35,6 +36,12 @@ export class FunctionEpilogueQuad extends Quad {
   }
 
   public toAmd() {
-    return [this.leave, new Leave(), new RetQ(), new BlankLine()];
+    return [
+      new NextComment('END Function body'),
+      this.leave,
+      new Leave(),
+      new RetQ(),
+      new BlankLine(),
+    ];
   }
 }

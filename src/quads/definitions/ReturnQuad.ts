@@ -48,10 +48,11 @@ export class ReturnQuad extends Quad {
 
   public toAmd() {
     return [
-      new NextComment('Return'),
+      new NextComment('BEGIN Return'),
       ...(this.quads ?? []).flatMap((quad) => quad.toAmd()),
       ...this.loadQuad.toAmd(),
       new Jmp(this.returnLabel),
+      new PrevComment('END Return'),
     ];
   }
 }

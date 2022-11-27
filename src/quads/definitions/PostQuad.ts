@@ -8,6 +8,8 @@ import { IntLiteralQuad } from './IntLiteralQuad.js';
 import { LoadQuad } from './LoadQuad.js';
 import { OpQuad } from './OperationQuad.js';
 import { Register } from './Register.js';
+import { NextComment } from '../../instructions/definitions/NextComment.js';
+import { PrevComment } from '../../instructions/definitions/PrevComment.js';
 
 export class PostQuad extends Quad {
   private readonly quad: AssignQuad;
@@ -26,22 +28,29 @@ export class PostQuad extends Quad {
     private readonly id: string,
     tempVariable: TempVariable,
     context: QuadsContext,
-    type: '--' | '++'
+    private readonly type: '--' | '++'
   ) {
     super();
     const tempRegister = context.requestTempRegister();
     this.quad = new AssignQuad(this.id, tempVariable, [
-      new OpQuad(new Register(this.id), type, new Register('1'), tempRegister),
+      new OpQuad(
+        new Register(this.id),
+        this.type,
+        new Register('1'),
+        tempRegister
+      ),
     ]);
 
     const intRegister = context.requestTempRegister();
     this.intQuad = new IntLiteralQuad(1, intRegister, context.requestTemp());
     this.loadQuad = new LoadQuad(tempRegister, tempVariable);
     this.mipsQuad = new AssignQuad(undefined, tempVariable, [
-      new OpQuad(this.loadQuad, type, intRegister, tempRegister),
+      new OpQuad(this.loadQuad, this.type, intRegister, tempRegister),
     ]);
 
-    this.amdOp = new (type === '--' ? DecQ : IncQ)(tempRegister.toAmdValue());
+    this.amdOp = new (this.type === '--' ? DecQ : IncQ)(
+      tempRegister.toAmdValue()
+    );
     this.amdQuad = new AssignQuad(undefined, tempVariable, [tempRegister]);
   }
 
@@ -55,9 +64,11 @@ export class PostQuad extends Quad {
 
   public toMips() {
     return [
+      new NextComment(`BEGIN Post${this.type === '--' ? 'Dec' : 'Inc'}`),
       ...this.intQuad.toMips(),
       ...this.loadQuad.toMips(),
       ...this.mipsQuad.toMips(),
+      new PrevComment(`END Post${this.type === '--' ? 'Dec' : 'Inc'}`),
     ];
   }
 
@@ -66,7 +77,13 @@ export class PostQuad extends Quad {
   }
 
   public toAmd() {
-    return [...this.loadQuad.toAmd(), this.amdOp, ...this.amdQuad.toAmd()];
+    return [
+      new NextComment(`BEGIN Post${this.type === '--' ? 'Dec' : 'Inc'}`),
+      ...this.loadQuad.toAmd(),
+      this.amdOp,
+      ...this.amdQuad.toAmd(),
+      new PrevComment(`END Post${this.type === '--' ? 'Dec' : 'Inc'}`),
+    ];
   }
 
   public toAmdValue() {

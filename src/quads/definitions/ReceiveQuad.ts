@@ -25,19 +25,20 @@ export class ReceiveQuad extends Quad {
 
   public toMips() {
     return [
-      new NextComment(`BEGIN Output ${this.id}`),
+      new NextComment(`BEGIN Input ${this.id}`),
       new Addi('$v0', '$zero', 5),
       new Syscall(),
       new Sw('$v0', this.tempVariable.toMipsValue()),
-      new PrevComment(`END Output ${this.id}`),
+      new PrevComment(`END Input ${this.id}`),
     ];
   }
 
   public toAmd() {
     return [
-      new NextComment('Input'),
+      new NextComment(`BEGIN Input ${this.id}`),
       new CallQ(this.type === 'bool' ? 'getBool' : 'getInt'),
       new MovQ('%rax', this.tempVariable.toAmdValue()),
+      new PrevComment(`END Input ${this.id}`),
     ];
   }
 }

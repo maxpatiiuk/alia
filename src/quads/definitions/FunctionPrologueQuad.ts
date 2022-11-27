@@ -49,7 +49,7 @@ export class FunctionPrologueQuad extends Quad {
       new Move('$fp', '$sp'),
       new NextComment('Save return address'),
       ...this.setRa.toMips(),
-      new PrevComment('Function body:'),
+      new PrevComment('BEGIN Function body'),
     ];
   }
 
@@ -59,7 +59,7 @@ export class FunctionPrologueQuad extends Quad {
       new PushQ('%rbp'),
       new MovQ('%rsp', '%rbp'),
       new SubQ(`$${amdSize * 2}`, '%rsp'),
-      new PrevComment('Function body:'),
+      new PrevComment('BEGIN Function body'),
     ];
   }
 }

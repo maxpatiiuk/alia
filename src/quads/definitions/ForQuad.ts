@@ -4,6 +4,8 @@ import { GoToQuad } from './GoToQuad.js';
 import { IfQuad } from './IfQuad.js';
 import { Quad, quadsToAmd, quadsToMips, quadsToString } from './index.js';
 import { Label } from '../../instructions/definitions/Label.js';
+import { PrevComment } from '../../instructions/definitions/PrevComment.js';
+import { NextComment } from '../../instructions/definitions/NextComment.js';
 
 export class ForQuad extends Quad {
   private readonly instructions: RA<Quad | Label>;
@@ -33,7 +35,11 @@ export class ForQuad extends Quad {
   }
 
   public toMips() {
-    return quadsToMips(this.instructions);
+    return [
+      new NextComment('BEGIN for loop'),
+      ...quadsToMips(this.instructions),
+      new PrevComment('END for loop'),
+    ];
   }
 
   public toAmd() {
