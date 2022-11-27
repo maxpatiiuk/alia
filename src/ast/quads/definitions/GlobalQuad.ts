@@ -15,19 +15,26 @@ import {
 } from './GlobalVarQuad.js';
 import { Quad, quadsToAmd, quadsToMips, quadsToString } from './index.js';
 import { formatStringQuad, StringDefQuad } from './StringDefQuad.js';
-import { LineQuad } from './LineQuad.js';
-import { Globl } from '../../../instructions/Globl.js';
-import { DataSection } from '../../../instructions/DataSection.js';
-import { TextSection } from '../../../instructions/TextSection.js';
-import { Label } from '../../../instructions/Label.js';
-import { Jr } from '../../../instructions/mips/Jr.js';
-import { Syscall } from '../../../instructions/Syscall.js';
-import { BlankLine } from '../../../instructions/amd/BlankLink.js';
-import { Jal } from '../../../instructions/mips/Jal.js';
-import { Instruction } from '../../../instructions/index.js';
-import { NextComment } from '../../../instructions/NextComment.js';
-import { Li } from '../../../instructions/mips/Li.js';
-import { Move } from '../../../instructions/mips/Move.js';
+import { Globl } from '../../../instructions/definitions/Globl.js';
+import { DataSection } from '../../../instructions/definitions/DataSection.js';
+import { TextSection } from '../../../instructions/definitions/TextSection.js';
+import {
+  getLongestLabel,
+  Label,
+} from '../../../instructions/definitions/Label.js';
+import { Jr } from '../../../instructions/definitions/mips/Jr.js';
+import { Syscall } from '../../../instructions/definitions/Syscall.js';
+import { BlankLine } from '../../../instructions/definitions/amd/BlankLink.js';
+import { Jal } from '../../../instructions/definitions/mips/Jal.js';
+import { Instruction } from '../../../instructions/definitions/index.js';
+import { NextComment } from '../../../instructions/definitions/NextComment.js';
+import { Li } from '../../../instructions/definitions/mips/Li.js';
+import { Move } from '../../../instructions/definitions/mips/Move.js';
+import {
+  instructionsToLines,
+  linesToString,
+} from '../../../instructions/index.js';
+import { optimizeInstructions } from '../../../instructions/optimize/index.js';
 
 // FIXME: add tests
 // FIXME: do manual test using the mips test program
@@ -119,7 +126,7 @@ export class GlobalQuad extends Quad {
     );
   }
 
-  public toMips() {
+  public convertToMips(): string {
     const main = this.functions.find(
       (quad): quad is FunctionQuad =>
         quad instanceof FunctionQuad && quad.id === mainFunction
@@ -128,18 +135,35 @@ export class GlobalQuad extends Quad {
       throw new Error(
         'Conversion to MIPS requires there to be a main() function. Please define it'
       );
-    return [
+
+    const headerInstructions = [
       new Globl([startFunction]),
       new DataSection(),
-      ...inlineLabels(quadsToMips(this.globalQuads)),
+      ...quadsToMips(this.globalQuads),
       new TextSection(),
-      ...inlineLabels(
-        quadsToMips([...this.mipsBootloader, '', ...this.functions])
-      ),
+      ...quadsToMips(this.mipsBootloader),
+      new BlankLine(),
     ];
+    const functionInstructions = this.functions.map((quad) => quad.toMips());
+
+    const longestLabel = getLongestLabel([
+      ...headerInstructions,
+      ...functionInstructions.flat(),
+    ]);
+
+    return linesToString(
+      [
+        ...instructionsToLines(headerInstructions),
+        ...functionInstructions.flatMap((quad) =>
+          // Optimize each function in isolation
+          optimizeInstructions(instructionsToLines(quad))
+        ),
+      ],
+      longestLabel
+    );
   }
 
-  public toAmd() {
+  public convertToAmd(): string {
     const main = this.functions.find(
       (quad): quad is FunctionQuad =>
         quad instanceof FunctionQuad && quad.id === mainFunction
@@ -148,13 +172,30 @@ export class GlobalQuad extends Quad {
       throw new Error(
         'Conversion to x64 requires there to be a main() function. Please define it'
       );
-    return [
+
+    const headerInstructions = [
       new Globl([mainFunction]),
       new DataSection(),
-      ...inlineLabels(quadsToAmd(this.globalQuads)),
+      ...quadsToAmd(this.globalQuads),
       new TextSection(),
-      ...inlineLabels(quadsToAmd(this.functions)),
     ];
+    const functionInstructions = this.functions.map((quad) => quad.toAmd());
+
+    const longestLabel = getLongestLabel([
+      ...headerInstructions,
+      ...functionInstructions.flat(),
+    ]);
+
+    return linesToString(
+      [
+        ...instructionsToLines(headerInstructions),
+        ...functionInstructions.flatMap((quad) =>
+          // Optimize each function in isolation
+          optimizeInstructions(instructionsToLines(quad))
+        ),
+      ],
+      longestLabel
+    );
   }
 }
 
@@ -162,23 +203,11 @@ const startFunction = '_start';
 export const mainFunction = 'main';
 export const getPcHelper = '_get_pc';
 
-// FIXME: refactor this
-function inlineLabels(lines: RA<LabelQuad | string>): RA<string> {
-  let currentLabel: LabelQuad | undefined = undefined;
-  const newLines = filterArray(
-    lines.flatMap((line) => {
-      if (line instanceof LabelQuad) {
-        if (currentLabel !== undefined)
-          throw new Error('Cannot have two labels in a row');
-        currentLabel = line;
-        return undefined;
-      }
-      if (currentLabel === undefined) return new LineQuad(line).toString();
-      const fullLine = currentLabel.inline(line);
-      currentLabel = undefined;
-      return [fullLine];
-    })
+function inlineLabels(lines: RA<Label | string>): RA<string> {
+  const longestLabel = getLongestLabel(lines);
+  return lines.map((line) =>
+    line instanceof Label
+      ? `${`${line.label}:`.padEnd(longestLabel, ' ')}nop`
+      : `${''.padEnd(longestLabel + 1, ' ')}${line}`
   );
-  if (currentLabel !== undefined) throw new Error('Unexpected trailing label');
-  return newLines;
 }

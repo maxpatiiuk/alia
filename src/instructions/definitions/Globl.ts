@@ -1,4 +1,4 @@
-import { RA } from '../utils/types.js';
+import { RA } from '../../utils/types.js';
 import { Instruction } from './index.js';
 
 export class Globl extends Instruction {

@@ -1,7 +1,7 @@
-import { Jmp } from '../../../instructions/amd/Jmp.js';
-import { J } from '../../../instructions/mips/J.js';
-import { NextComment } from '../../../instructions/NextComment.js';
-import { PrevComment } from '../../../instructions/PrevComment.js';
+import { Jmp } from '../../../instructions/definitions/amd/Jmp.js';
+import { J } from '../../../instructions/definitions/mips/J.js';
+import { NextComment } from '../../../instructions/definitions/NextComment.js';
+import { PrevComment } from '../../../instructions/definitions/PrevComment.js';
 import type { RA } from '../../../utils/types.js';
 import { filterArray } from '../../../utils/types.js';
 import { Quad } from './index.js';

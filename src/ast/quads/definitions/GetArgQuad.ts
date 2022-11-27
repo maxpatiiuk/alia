@@ -5,7 +5,7 @@ import { mem, TempVariable } from './IdQuad.js';
 import { Quad } from './index.js';
 import { LoadQuad } from './LoadQuad.js';
 import type { Register } from './Register.js';
-import { NextComment } from '../../../instructions/NextComment.js';
+import { NextComment } from '../../../instructions/definitions/NextComment.js';
 
 export class GetArgQuad extends Quad {
   private readonly loadQuad: LoadQuad;

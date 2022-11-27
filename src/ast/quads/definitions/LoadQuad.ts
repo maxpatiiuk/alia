@@ -1,9 +1,9 @@
 import type { TempVariable } from './IdQuad.js';
 import { Quad } from './index.js';
 import { Register } from './Register.js';
-import { MovQ } from '../../../instructions/amd/MovQ.js';
-import { La } from '../../../instructions/mips/La.js';
-import { Lw } from '../../../instructions/mips/Lw.js';
+import { MovQ } from '../../../instructions/definitions/amd/MovQ.js';
+import { La } from '../../../instructions/definitions/mips/La.js';
+import { Lw } from '../../../instructions/definitions/mips/Lw.js';
 
 export class LoadQuad extends Quad {
   public constructor(

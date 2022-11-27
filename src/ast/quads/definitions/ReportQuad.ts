@@ -2,14 +2,14 @@ import type { RA } from '../../../utils/types.js';
 import { Quad } from './index.js';
 import { StringQuad } from './StringQuad.js';
 import { IdQuad } from './IdQuad.js';
-import { NextComment } from '../../../instructions/NextComment.js';
-import { CallQ } from '../../../instructions/amd/CallQ.js';
-import { MovQ } from '../../../instructions/amd/MovQ.js';
-import { La } from '../../../instructions/mips/La.js';
-import { Addi } from '../../../instructions/mips/Addi.js';
-import { Syscall } from '../../../instructions/Syscall.js';
-import { PrevComment } from '../../../instructions/PrevComment.js';
-import { Lw } from '../../../instructions/mips/Lw.js';
+import { NextComment } from '../../../instructions/definitions/NextComment.js';
+import { CallQ } from '../../../instructions/definitions/amd/CallQ.js';
+import { MovQ } from '../../../instructions/definitions/amd/MovQ.js';
+import { La } from '../../../instructions/definitions/mips/La.js';
+import { Addi } from '../../../instructions/definitions/mips/Addi.js';
+import { Syscall } from '../../../instructions/definitions/Syscall.js';
+import { PrevComment } from '../../../instructions/definitions/PrevComment.js';
+import { Lw } from '../../../instructions/definitions/mips/Lw.js';
 
 export class ReportQuad extends Quad {
   public constructor(private readonly quads: RA<Quad>) {

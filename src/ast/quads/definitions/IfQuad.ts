@@ -4,11 +4,11 @@ import { Quad, quadsToAmd, quadsToMips, quadsToString } from './index.js';
 import { QuadsContext } from '../index.js';
 import { LoadQuad } from './LoadQuad.js';
 import { Register } from './Register.js';
-import { NextComment } from '../../../instructions/NextComment.js';
-import { PrevComment } from '../../../instructions/PrevComment.js';
-import { Jz } from '../../../instructions/amd/Jz.js';
-import { Beq } from '../../../instructions/mips/Beq.js';
-import { Label } from '../../../instructions/Label.js';
+import { NextComment } from '../../../instructions/definitions/NextComment.js';
+import { PrevComment } from '../../../instructions/definitions/PrevComment.js';
+import { Jz } from '../../../instructions/definitions/amd/Jz.js';
+import { Beq } from '../../../instructions/definitions/mips/Beq.js';
+import { Label } from '../../../instructions/definitions/Label.js';
 
 export class IfQuad extends Quad {
   private readonly quads: RA<Quad | NextComment | PrevComment | Label>;

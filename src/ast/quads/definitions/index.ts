@@ -1,9 +1,9 @@
-import type { AmdInstruction } from '../../../instructions/amd/index.js';
-import type { MipsInstruction } from '../../../instructions/mips/index.js';
+import type { AmdInstruction } from '../../../instructions/definitions/amd/index.js';
+import type { MipsInstruction } from '../../../instructions/definitions/mips/index.js';
 import type { RA } from '../../../utils/types.js';
-import { Label } from '../../../instructions/Label.js';
-import { NextComment } from '../../../instructions/NextComment.js';
-import { PrevComment } from '../../../instructions/PrevComment.js';
+import { Label } from '../../../instructions/definitions/Label.js';
+import { NextComment } from '../../../instructions/definitions/NextComment.js';
+import { PrevComment } from '../../../instructions/definitions/PrevComment.js';
 
 export class Quad {
   /** Convert quad to a printable string */
@@ -69,37 +69,3 @@ export const mipsSize = 4;
  * 8*8 = 64 bits
  */
 export const amdSize = 8;
-
-/**
- * NOTE: this stateful variable needs to be reset before running compiler
- * the second time
- */
-let longestLabel = 5;
-export const labelPadding = 2;
-export const getLongestLabel = () => longestLabel;
-
-export class LabelQuad extends Quad {
-  public constructor(private readonly label: string) {
-    super();
-    longestLabel = Math.max(longestLabel, label.length);
-  }
-
-  public inline(line: string): string {
-    const label = `${this.label}:${' '.repeat(
-      Math.max(0, longestLabel - this.label.length) + labelPadding
-    )}`;
-    return `${label}${line}`;
-  }
-
-  public toString() {
-    return [this];
-  }
-
-  public toMips() {
-    return [this];
-  }
-
-  public toAmd() {
-    return [this];
-  }
-}

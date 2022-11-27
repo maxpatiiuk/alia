@@ -1,12 +1,12 @@
 import { reg } from './IdQuad.js';
 import { Quad } from './index.js';
-import { Leave } from '../../../instructions/amd/Leave.js';
-import { RetQ } from '../../../instructions/amd/RetQ.js';
-import { BlankLine } from '../../../instructions/amd/BlankLink.js';
-import { Lw } from '../../../instructions/mips/Lw.js';
-import { NextComment } from '../../../instructions/NextComment.js';
-import { Jr } from '../../../instructions/mips/Jr.js';
-import { Label } from '../../../instructions/Label.js';
+import { Leave } from '../../../instructions/definitions/amd/Leave.js';
+import { RetQ } from '../../../instructions/definitions/amd/RetQ.js';
+import { BlankLine } from '../../../instructions/definitions/amd/BlankLink.js';
+import { Lw } from '../../../instructions/definitions/mips/Lw.js';
+import { NextComment } from '../../../instructions/definitions/NextComment.js';
+import { Jr } from '../../../instructions/definitions/mips/Jr.js';
+import { Label } from '../../../instructions/definitions/Label.js';
 
 export class FunctionEpilogueQuad extends Quad {
   private readonly leave: Label;
@@ -30,7 +30,7 @@ export class FunctionEpilogueQuad extends Quad {
       new Lw('$fp', reg(1)),
       new NextComment('Return to caller'),
       new Jr('$ra'),
-      '',
+      new BlankLine(),
     ];
   }
 

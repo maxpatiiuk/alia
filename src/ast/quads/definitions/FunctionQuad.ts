@@ -11,7 +11,7 @@ import { formatGlobalVariable } from './GlobalVarQuad.js';
 import { TempVariable } from './IdQuad.js';
 import { Quad } from './index.js';
 import { Register } from './Register.js';
-import { BlankLine } from '../../../instructions/amd/BlankLink.js';
+import { BlankLine } from '../../../instructions/definitions/amd/BlankLink.js';
 
 export class FunctionQuad extends Quad {
   private readonly enter: Quad;
@@ -120,7 +120,7 @@ export class FunctionQuad extends Quad {
         statement.toAmd()
       ),
       ...this.leave.toAmd(),
-      '',
+      new BlankLine(),
     ];
   }
 }

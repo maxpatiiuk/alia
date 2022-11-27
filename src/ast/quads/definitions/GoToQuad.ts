@@ -1,6 +1,6 @@
 import { Quad } from './index.js';
-import { Jmp } from '../../../instructions/amd/Jmp.js';
-import { J } from '../../../instructions/mips/J.js';
+import { Jmp } from '../../../instructions/definitions/amd/Jmp.js';
+import { J } from '../../../instructions/definitions/mips/J.js';
 
 export class GoToQuad extends Quad {
   public constructor(private readonly label: string) {

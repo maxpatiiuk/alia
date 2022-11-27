@@ -1,7 +1,7 @@
 import { Quad } from './index.js';
-import { QuadGlobal } from '../../../instructions/amd/QuadGlobal.js';
-import { WordGlobal } from '../../../instructions/mips/WordGlobal.js';
-import { Label } from '../../../instructions/Label.js';
+import { QuadGlobal } from '../../../instructions/definitions/amd/QuadGlobal.js';
+import { WordGlobal } from '../../../instructions/definitions/mips/WordGlobal.js';
+import { Label } from '../../../instructions/definitions/Label.js';
 
 export class GlobalVarQuad extends Quad {
   private readonly name: string;

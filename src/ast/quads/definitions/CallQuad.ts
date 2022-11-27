@@ -6,15 +6,15 @@ import { formatGlobalVariable } from './GlobalVarQuad.js';
 import { getPcHelper } from './GlobalQuad.js';
 import { TempVariable } from './IdQuad.js';
 import { Register } from './Register.js';
-import { NextComment } from '../../../instructions/NextComment.js';
-import { MovQ } from '../../../instructions/amd/MovQ.js';
-import { CallQ } from '../../../instructions/amd/CallQ.js';
-import { Addi } from '../../../instructions/mips/Addi.js';
-import { Jal } from '../../../instructions/mips/Jal.js';
-import { Move } from '../../../instructions/mips/Move.js';
-import { Lw } from '../../../instructions/mips/Lw.js';
-import { Jr } from '../../../instructions/mips/Jr.js';
-import { PrevComment } from '../../../instructions/PrevComment.js';
+import { NextComment } from '../../../instructions/definitions/NextComment.js';
+import { MovQ } from '../../../instructions/definitions/amd/MovQ.js';
+import { CallQ } from '../../../instructions/definitions/amd/CallQ.js';
+import { Addi } from '../../../instructions/definitions/mips/Addi.js';
+import { Jal } from '../../../instructions/definitions/mips/Jal.js';
+import { Move } from '../../../instructions/definitions/mips/Move.js';
+import { Lw } from '../../../instructions/definitions/mips/Lw.js';
+import { Jr } from '../../../instructions/definitions/mips/Jr.js';
+import { PrevComment } from '../../../instructions/definitions/PrevComment.js';
 
 export class CallQuad extends Quad {
   private readonly quads: RA<Quad>;

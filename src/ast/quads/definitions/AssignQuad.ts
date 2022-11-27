@@ -2,10 +2,10 @@ import type { RA } from '../../../utils/types.js';
 import type { TempVariable } from './IdQuad.js';
 import { Quad } from './index.js';
 import { mem } from './IdQuad.js';
-import { MovQ } from '../../../instructions/amd/MovQ.js';
-import { NextComment } from '../../../instructions/NextComment.js';
-import { PrevComment } from '../../../instructions/PrevComment.js';
-import { Sw } from '../../../instructions/mips/Sw.js';
+import { MovQ } from '../../../instructions/definitions/amd/MovQ.js';
+import { NextComment } from '../../../instructions/definitions/NextComment.js';
+import { PrevComment } from '../../../instructions/definitions/PrevComment.js';
+import { Sw } from '../../../instructions/definitions/mips/Sw.js';
 
 export class AssignQuad extends Quad {
   private readonly tempValue: string;

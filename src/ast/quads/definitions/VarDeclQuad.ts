@@ -2,7 +2,7 @@ import { AssignQuad } from './AssignQuad.js';
 import type { TempVariable } from './IdQuad.js';
 import { Quad } from './index.js';
 import { Register } from './Register.js';
-import { NextComment } from '../../../instructions/NextComment.js';
+import { NextComment } from '../../../instructions/definitions/NextComment.js';
 
 export class VarDeclQuad extends Quad {
   public readonly assignQuad: AssignQuad;
@@ -31,7 +31,7 @@ export class VarDeclQuad extends Quad {
   public toAmd() {
     return [
       new NextComment(`Initializing ${this.id}`),
-      this.assignQuad.toAmd(),
+      ...this.assignQuad.toAmd(),
     ];
   }
 }

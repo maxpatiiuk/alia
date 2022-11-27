@@ -1,7 +1,9 @@
-import { nameParse, typeCheckAst } from './processInput.js';
 import fs from 'node:fs';
+
+import type { AstNode } from './ast/definitions/AstNode.js';
+import { GlobalQuad } from './ast/quads/definitions/GlobalQuad.js';
 import { toQuads } from './ast/quads/index.js';
-import { AstNode } from './ast/definitions/AstNode.js';
+import { nameParse, typeCheckAst } from './processInput.js';
 
 export async function processAst({
   ast,
@@ -40,15 +42,14 @@ export async function processAst({
       quads.flatMap((quad) => quad.toString()).join('\n')
     );
 
+  if (quads.length !== 1) throw new Error('Found more than one global quad');
+  const globalQuad = quads[0];
+  if (!(globalQuad instanceof GlobalQuad))
+    throw new Error('Top level quad must be an instance of GlobalQuad');
+
   if (mips !== undefined)
-    await fs.promises.writeFile(
-      mips,
-      quads.flatMap((quad) => quad.toMips()).join('\n')
-    );
+    await fs.promises.writeFile(mips, globalQuad.convertToMips());
 
   if (amd !== undefined)
-    await fs.promises.writeFile(
-      amd,
-      quads.flatMap((quad) => quad.toAmd()).join('\n')
-    );
+    await fs.promises.writeFile(amd, globalQuad.convertToAmd());
 }

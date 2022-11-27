@@ -2,7 +2,8 @@ import { MipsInstruction } from './index.js';
 
 export class J extends MipsInstruction {
   public constructor(
-    public readonly label: string,
+    // eslint-disable-next-line functional/prefer-readonly-type
+    public label: string
   ) {
     super();
   }

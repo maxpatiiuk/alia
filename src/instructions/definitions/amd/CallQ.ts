@@ -1,8 +1,9 @@
-import {AmdInstruction} from './index.js';
+import { AmdInstruction } from './index.js';
 
 export class CallQ extends AmdInstruction {
   public constructor(
-    public readonly label: string,
+    // eslint-disable-next-line functional/prefer-readonly-type
+    public label: string
   ) {
     super();
   }

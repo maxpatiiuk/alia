@@ -1,7 +1,8 @@
 import { AmdInstruction } from './index.js';
 
 export class Jmp extends AmdInstruction {
-  public constructor(public readonly label: string) {
+  // eslint-disable-next-line functional/prefer-readonly-type
+  public constructor(public label: string) {
     super();
   }
 
