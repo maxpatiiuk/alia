@@ -1,5 +1,5 @@
 import { reg } from './IdQuad.js';
-import { amdSize, LabelQuad, Quad } from './index.js';
+import { LabelQuad, Quad } from './index.js';
 
 export class FunctionEpilogueQuad extends Quad {
   private readonly leave: LabelQuad;
@@ -25,6 +25,6 @@ export class FunctionEpilogueQuad extends Quad {
   }
 
   public toAmd() {
-    return [this.leave, `addq $${amdSize * 2}, %rsp`, 'popq %rbp', 'retq', ''];
+    return [this.leave, 'leave', 'retq', ''];
   }
 }

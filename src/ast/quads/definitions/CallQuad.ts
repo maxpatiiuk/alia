@@ -78,11 +78,11 @@ export class CallQuad extends Quad {
       ...this.quads,
       `addq $${stackSize}, %rsp  # BEGIN Calling ${this.name}`,
       ...(this.dynamicTempVariable === undefined
-        ? [`call ${formatGlobalVariable(this.name)}`]
+        ? [`callq ${formatGlobalVariable(this.name)}`]
         : addComment(
             [
               `movq $${this.dynamicTempVariable.toAmdValue()}, %rax`,
-              `call rax`,
+              `callq rax`,
             ],
             'Calling function by pointer'
           )),

@@ -38,7 +38,7 @@ export class IntLiteralQuad extends Quad {
 
   public toAmd() {
     return [
-      `movq $${this.value} ${this.tempVariable.toAmdValue()}, # Int Literal: ${
+      `movq $${this.value}, ${this.tempVariable.toAmdValue()}  # Int Literal: ${
         this.value
       }`,
     ];

@@ -1,18 +1,25 @@
 import type { QuadsContext } from '../index.js';
 import { AssignQuad } from './AssignQuad.js';
 import { addComment, amdSize, LabelQuad, mipsSize, Quad } from './index.js';
-import { formatFunctionName } from './GlobalVarQuad.js';
+import { formatFunctionName, formatGlobalVariable } from './GlobalVarQuad.js';
 import { Register } from './Register.js';
+import { mainFunction } from './GlobalQuad.js';
 
 export class FunctionPrologueQuad extends Quad {
-  private readonly entry: LabelQuad;
+  private readonly entryQuad: LabelQuad;
+  private readonly entryMips: LabelQuad;
+  private readonly entryAmd: LabelQuad;
 
   private readonly setRa: Quad;
 
   public constructor(private readonly id: string, context: QuadsContext) {
     super();
 
-    this.entry = new LabelQuad(formatFunctionName(this.id));
+    this.entryQuad = new LabelQuad(formatFunctionName(this.id));
+    this.entryMips = new LabelQuad(formatGlobalVariable(this.id));
+    this.entryAmd = new LabelQuad(
+      this.id === mainFunction ? mainFunction : formatGlobalVariable(this.id)
+    );
 
     // Allocate stack space for the function pointer
     context.requestTemp();
@@ -22,12 +29,12 @@ export class FunctionPrologueQuad extends Quad {
   }
 
   public toString() {
-    return [this.entry, `enter ${this.id}`];
+    return [this.entryQuad, `enter ${this.id}`];
   }
 
   public toMips() {
     return [
-      this.entry,
+      this.entryMips,
       `sw $fp, -${mipsSize}($sp) # Save frame pointer`,
       `move $fp, $sp  # Set new frame pointer`,
       ...addComment(this.setRa.toMips(), 'Save return address'),
@@ -37,10 +44,10 @@ export class FunctionPrologueQuad extends Quad {
 
   public toAmd() {
     return [
-      this.entry,
+      this.entryAmd,
       'pushq %rbp',
       'movq %rsp, %rbp',
-      `addq $${amdSize * 2}, %rbp`,
+      `subq $${amdSize * 2}, %rsp`,
       '# Function body:',
     ];
   }

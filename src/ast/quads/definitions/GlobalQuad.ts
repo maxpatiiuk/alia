@@ -24,14 +24,16 @@ import { formatStringQuad, StringDefQuad } from './StringDefQuad.js';
 import { UniversalQuad } from './UniversalQuad.js';
 import { LineQuad } from './LineQuad.js';
 
+// FIXME: add tests
+// FIXME: do manual test using the mips test program
+// FIXME: fix failing tests
+// FIXME: do the optimization for t7
 export class GlobalQuad extends Quad {
   private readonly globalQuads: RA<Quad>;
 
   private readonly functions: RA<Quad>;
 
   private readonly mipsBootloader: RA<Quad | string>;
-
-  private readonly amdBootloader: RA<Quad | string>;
 
   public constructor(
     private readonly children: GlobalsNode['children'],
@@ -99,15 +101,6 @@ export class GlobalQuad extends Quad {
       ),
       'jr $ra',
     ];
-
-    this.amdBootloader = [
-      new LabelQuad(startFunction),
-      new UniversalQuad(`call ${formatGlobalVariable(mainFunction)}`),
-      'movq $60, %rax  # Choose syscall exit',
-      'movq $4, %rdi  # Set syscall argument - return code',
-      'syscall',
-      '',
-    ];
   }
 
   public toString() {
@@ -151,19 +144,17 @@ export class GlobalQuad extends Quad {
         'Conversion to x64 requires there to be a main() function. Please define it'
       );
     return [
-      `.globl ${startFunction}`,
+      `.globl ${mainFunction}`,
       '.data',
       ...inlineLabels(quadsToAmd(this.globalQuads)),
       '.text',
-      ...inlineLabels(
-        quadsToAmd([...this.amdBootloader, '', ...this.functions])
-      ),
+      ...inlineLabels(quadsToAmd(this.functions)),
     ];
   }
 }
 
 const startFunction = '_start';
-const mainFunction = 'main';
+export const mainFunction = 'main';
 export const getPcHelper = '_get_pc';
 
 function inlineLabels(lines: RA<LabelQuad | string>): RA<string> {

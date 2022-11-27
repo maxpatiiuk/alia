@@ -48,7 +48,7 @@ export class ReturnQuad extends Quad {
       [
         ...(this.quads ?? []).flatMap((quad) => quad.toAmd()),
         ...this.loadQuad.toAmd(),
-        `j ${this.returnLabel}`,
+        `jmp ${this.returnLabel}`,
       ],
       `Return`
     );

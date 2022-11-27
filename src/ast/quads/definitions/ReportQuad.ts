@@ -29,4 +29,5 @@ export class ReportQuad extends Quad {
   }
 
   // FIXME: implement
+  // https://stackoverflow.com/questions/27594297/how-to-print-a-string-to-the-terminal-in-x86-64-assembly-nasm-without-syscall
 }

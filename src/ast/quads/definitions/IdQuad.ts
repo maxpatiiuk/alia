@@ -67,7 +67,7 @@ export const reg = (tempVariable: string | number): string =>
 const ref = (tempVariable: string | number): string =>
   typeof tempVariable === 'string'
     ? formatGlobalVariable(tempVariable)
-    : `${tempVariable > 0 ? '-' : ''}${Math.abs(tempVariable) * amdSize}(%rsp)`;
+    : `${tempVariable > 0 ? '-' : ''}${Math.abs(tempVariable) * amdSize}(%rbp)`;
 
 /** Wrap an identifier in square brackets (indicates memory access) */
 export const mem = (id: number | string): string =>
