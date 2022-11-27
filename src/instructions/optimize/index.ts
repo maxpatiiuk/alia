@@ -7,6 +7,7 @@ import { MovQ } from '../definitions/amd/MovQ.js';
 import { filterArray } from '../../utils/types.js';
 import { Sw } from '../definitions/mips/Sw.js';
 import { Lw } from '../definitions/mips/Lw.js';
+import { Move } from '../definitions/mips/Move.js';
 
 /** A typescript helper for increased type safety */
 const define = <
@@ -63,16 +64,25 @@ const peepHoleOptimizations: RA<ReturnType<typeof define>> = [
         ]
       : lines;
   }),
+  // FIXME: test a=b (including global to global)
+  // FIXME: test temporary dead zone
+  // Get rid of useless movq
+  define(MovQ, (instruction, lines) =>
+    instruction.destination === instruction.source ? lines.slice(1) : lines
+  ),
+  // Get rid of useless move
+  define(Move, (instruction, lines) =>
+    instruction.destination === instruction.source ? lines.slice(1) : lines
+  ),
 ];
 
 export function optimizeInstructions(lines: RA<Line>): RA<Line> {
   const optimizedLines: WritableArray<Line> = [];
   let rawLines = lines.slice();
   while (rawLines.length > 0) {
-    const line = rawLines[0];
     peepHoleOptimizations.forEach(({ instruction, callback }) => {
-      if (line.instruction instanceof instruction)
-        rawLines = callback(line.instruction, rawLines);
+      if (rawLines[0].instruction instanceof instruction)
+        rawLines = callback(rawLines[0].instruction, rawLines);
     });
     const nextLine = rawLines.shift();
     if (nextLine !== undefined) optimizedLines.push(nextLine);

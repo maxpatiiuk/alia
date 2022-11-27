@@ -13,6 +13,7 @@ export async function processAst({
   assemble,
   mips,
   amd,
+  optimize = true,
 }: {
   readonly ast: AstNode;
   readonly rawText: string;
@@ -21,6 +22,7 @@ export async function processAst({
   readonly assemble?: string | undefined;
   readonly mips?: string | undefined;
   readonly amd?: string | undefined;
+  readonly optimize?: boolean;
 }): Promise<void> {
   const namedUnparseResults = nameParse(ast, debug);
   if (namedUnparseResults === undefined) return;
@@ -35,7 +37,7 @@ export async function processAst({
   errors.forEach((errorMessage) => console.error(errorMessage));
   if (errors.length > 0) console.error('Type Analysis Failed');
 
-  const quads = toQuads(ast);
+  const quads = toQuads(ast, optimize);
   if (assemble !== undefined)
     await fs.promises.writeFile(
       assemble,

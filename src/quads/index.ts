@@ -5,6 +5,7 @@ import type { Quad } from './definitions/index.js';
 import type { Register } from './definitions/Register.js';
 
 export type QuadsContext = {
+  readonly optimize: boolean;
   readonly requestLabel: () => string;
   readonly requestString: (value: string) => string;
   readonly requestTemp: () => TempVariable;
@@ -14,10 +15,11 @@ export type QuadsContext = {
   readonly requestTempRegister: () => Register;
 };
 
-export function toQuads(ast: AstNode): RA<Quad> {
+export function toQuads(ast: AstNode, optimize = true): RA<Quad> {
   let labelIndex = -1;
 
   return ast.toQuads({
+    optimize,
     requestLabel() {
       labelIndex += 1;
       return `lbl_${labelIndex}`;

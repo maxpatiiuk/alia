@@ -47,11 +47,15 @@ export class GlobalQuad extends Quad {
 
   private readonly mipsBootloader: RA<Instruction>;
 
+  private readonly optimize: boolean;
+
   public constructor(
     private readonly children: GlobalsNode['children'],
     context: QuadsContext
   ) {
     super();
+
+    this.optimize = context.optimize;
 
     const strings: WritableArray<string> = [];
 
@@ -154,10 +158,11 @@ export class GlobalQuad extends Quad {
     return linesToString(
       [
         ...instructionsToLines(headerInstructions),
-        ...functionInstructions.flatMap((quad) =>
+        ...functionInstructions.flatMap((quad) => {
+          const lines = instructionsToLines(quad);
           // Optimize each function in isolation
-          optimizeInstructions(instructionsToLines(quad))
-        ),
+          return this.optimize ? optimizeInstructions(lines) : lines;
+        }),
       ],
       longestLabel
     );
@@ -189,10 +194,11 @@ export class GlobalQuad extends Quad {
     return linesToString(
       [
         ...instructionsToLines(headerInstructions),
-        ...functionInstructions.flatMap((quad) =>
+        ...functionInstructions.flatMap((quad) => {
+          const lines = instructionsToLines(quad);
           // Optimize each function in isolation
-          optimizeInstructions(instructionsToLines(quad))
-        ),
+          return this.optimize ? optimizeInstructions(lines) : lines;
+        }),
       ],
       longestLabel
     );

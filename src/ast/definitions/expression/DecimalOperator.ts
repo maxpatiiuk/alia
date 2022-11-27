@@ -68,6 +68,7 @@ export class DecimalOperator extends Expression {
     const rightInt = this.right;
     const leftInt = this.right;
     if (
+      context.optimize &&
       leftInt instanceof IntLiteralNode &&
       uselessActions.some(
         ([operator, value]) =>
@@ -75,7 +76,7 @@ export class DecimalOperator extends Expression {
       )
     )
       return rightQuads;
-    else if (rightInt instanceof IntLiteralNode) {
+    else if (context.optimize && rightInt instanceof IntLiteralNode) {
       if (
         uselessActions.some(
           ([operator, value]) =>
@@ -92,13 +93,14 @@ export class DecimalOperator extends Expression {
             : undefined;
         if (typeof mappedOperator === 'string') {
           const tempVariable = context.requestTemp();
-          // FIXME: test this
-          return new PostQuad(
-            tempVariable.toValue(),
-            tempVariable,
-            context,
-            mappedOperator
-          );
+          return [
+            new PostQuad(
+              tempVariable.toValue(),
+              tempVariable,
+              context,
+              mappedOperator
+            ),
+          ];
         }
       }
     }
@@ -106,6 +108,7 @@ export class DecimalOperator extends Expression {
   }
 }
 
+// FIXME: debug var decl
 // FIXME: test that this is removed
 const uselessActions = [
   ['-', 0],
