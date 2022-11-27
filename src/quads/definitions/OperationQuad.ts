@@ -32,6 +32,7 @@ import { Slt } from '../../instructions/definitions/mips/Slt.js';
 import { SltiU } from '../../instructions/definitions/mips/SltiU.js';
 import { Xor } from '../../instructions/definitions/mips/Xor.js';
 import { Andi } from '../../instructions/definitions/mips/Andi.js';
+import { CmpQ } from '../../instructions/definitions/amd/CmpQ.js';
 
 const operationTranslations = {
   '--': 'SUB64',
@@ -118,6 +119,9 @@ export class OpQuad extends Quad {
     const left = this.left?.toAmdValue() ?? '';
     const right = this.right.toAmdValue();
     const temp = this.tempRegister.toAmdValue();
+    const lowTemp = lowRegisterMapping[temp];
+    if (lowTemp === undefined)
+      throw new Error(`Using a register with no 8-bit mapping: ${temp}`);
     if (this.type === '--' || this.type === '-')
       return [new MovQ(left, temp), new SubQ(right, temp)];
     else if (this.type === '++' || this.type === '+')
@@ -143,17 +147,17 @@ export class OpQuad extends Quad {
     else if (this.type === 'and')
       return [new MovQ(left, temp), new AndQ(right, temp)];
     else if (this.type === '<')
-      return [new MovQ(left, temp), new SetL(right, temp)];
+      return [new CmpQ(left, right), new SetL(lowTemp)];
     else if (this.type === '>')
-      return [new MovQ(right, temp), new SetG(right, temp)];
+      return [new CmpQ(left, right), new SetG(lowTemp)];
     else if (this.type === '<=')
-      return [new MovQ(right, temp), new SetLe(right, temp)];
+      return [new CmpQ(left, right), new SetLe(lowTemp)];
     else if (this.type === '>=')
-      return [new MovQ(left, temp), new SetGe(right, temp)];
+      return [new CmpQ(left, right), new SetGe(lowTemp)];
     else if (this.type === '==')
-      return [new MovQ(left, temp), new SetE(right, temp)];
+      return [new CmpQ(left, right), new SetE(lowTemp)];
     else if (this.type === '!=')
-      return [new MovQ(left, temp), new SetNe(right, temp)];
+      return [new CmpQ(left, right), new SetNe(lowTemp)];
     else if (this.type === '!') return [new MovQ(right, temp), new Not(temp)];
     else if (this.type === 'neg') return [new MovQ(right, temp), new Neg(temp)];
     else throw new Error(`Unknown operation ${this.type}`);
@@ -263,3 +267,12 @@ export class OperationQuad extends Quad {
     return this.assignUniversal.toAmdValue();
   }
 }
+
+const lowRegisterMapping = {
+  '%rax': '%al',
+  '%rbx': '%bl',
+  '%r12': '%r12b',
+  '%r13': '%r13b',
+  '%r14': '%r14b',
+  '%r15': '%r15b',
+};

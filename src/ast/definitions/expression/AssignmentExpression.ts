@@ -92,8 +92,3 @@ export class AssignmentExpression extends Expression {
     ];
   }
 }
-
-// TEST: add test a = a + b + c + d + e + f
-// TEST: add test a = (a + b) + (c + d) + (e + f)
-// TEST: add test for temporal dead zone
-// TEST: add test output a; output "\n"; output a; output "\n"; ...

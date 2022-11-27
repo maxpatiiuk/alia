@@ -9,6 +9,8 @@ import { PrevComment } from '../../instructions/definitions/PrevComment.js';
 import { Jz } from '../../instructions/definitions/amd/Jz.js';
 import { Beq } from '../../instructions/definitions/mips/Beq.js';
 import { Label } from '../../instructions/definitions/Label.js';
+import { OpQuad } from './OperationQuad.js';
+import { MovQ } from '../../instructions/definitions/amd/MovQ.js';
 
 export class IfQuad extends Quad {
   private readonly quads: RA<Quad | NextComment | PrevComment | Label>;
@@ -24,16 +26,13 @@ export class IfQuad extends Quad {
     this.label = context.requestLabel();
 
     this.quads = [
-      ...this.condition,
+      new NextComment('BEGIN If Condition'),
       new IfzQuad(
-        this.condition.at(-1)!.toValue(),
-        new Register(
-          this.condition.at(-1)!.toMipsValue(),
-          this.condition.at(-1)!.toAmdValue()
-        ),
+        this.condition,
         context.requestTempRegister(),
         falseCase?.label ?? this.label
       ),
+      new PrevComment('END If Condition'),
       new NextComment('BEGIN True Branch'),
       ...this.trueQuads,
       new PrevComment('END True Branch'),
@@ -75,30 +74,44 @@ class IfzQuad extends Quad {
   private readonly loadQuad: LoadQuad;
 
   public constructor(
-    private readonly condition: string,
-    mipsCondition: Register,
+    private readonly condition: RA<Quad>,
     tempRegister: Register,
     private readonly label: string
   ) {
     super();
-    this.loadQuad = new LoadQuad(tempRegister, mipsCondition);
+    this.loadQuad = new LoadQuad(
+      tempRegister,
+      new Register(
+        this.condition.at(-1)!.toMipsValue(),
+        this.condition.at(-1)!.toAmdValue()
+      )
+    );
   }
 
   public toString() {
-    return [`IFZ ${this.condition} GOTO ${this.label}`];
+    return [`IFZ ${this.condition.at(-1)!.toValue()} GOTO ${this.label}`];
   }
 
   public toMips() {
-    return [
-      ...this.loadQuad.toMips(),
+    return quadsToMips([
+      ...this.condition,
+      this.loadQuad,
       new Beq('$zero', this.loadQuad.toMipsValue(), this.label),
-    ];
+    ]);
   }
 
   public toAmd() {
-    return [
-      ...this.loadQuad.toAmd(),
-      new Jz(this.loadQuad.toAmdValue(), this.label),
-    ];
+    return quadsToAmd([
+      ...this.condition,
+      this.loadQuad,
+      new MovQ('$0', '%rax'),
+      new OpQuad(
+        this.loadQuad,
+        '==',
+        new Register('%rax'),
+        new Register('%rax')
+      ),
+      new Jz(this.label),
+    ]);
   }
 }

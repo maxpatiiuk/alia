@@ -90,16 +90,19 @@ export class CallQuad extends Quad {
   public toAmd() {
     const stackSize = this.tempsCount * amdSize;
     return quadsToAmd([
+      new NextComment(`BEGIN Calling ${this.name}`),
       ...this.quads,
       new SubQ(`$${stackSize}`, '%rsp'),
       ...(this.dynamicTempVariable === undefined
         ? [new CallQ(this.formattedName)]
         : [
+            // FIXME: add provisions for saving temps to stack
             new NextComment('Calling function by pointer'),
-            new MovQ(`$${this.dynamicTempVariable.toAmdValue()}`, '%rax'),
-            new CallQ('rax'),
+            new MovQ(this.dynamicTempVariable.toAmdValue(), '%rax'),
+            new CallQ('%rax'),
           ]),
       new AddQ(`$${stackSize}`, '%rsp'),
+      new PrevComment(`END Calling ${this.name}`),
     ]);
   }
 }
