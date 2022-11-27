@@ -32,6 +32,6 @@ export class StringLiteralNode extends Term {
   public toQuads(context: QuadsContext) {
     const value = this.pretty();
     const name = context.requestString(value);
-    return [new StringQuad(name)];
+    return [new StringQuad(name, value)];
   }
 }

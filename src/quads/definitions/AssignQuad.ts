@@ -6,13 +6,14 @@ import { MovQ } from '../../instructions/definitions/amd/MovQ.js';
 import { NextComment } from '../../instructions/definitions/NextComment.js';
 import { PrevComment } from '../../instructions/definitions/PrevComment.js';
 import { Sw } from '../../instructions/definitions/mips/Sw.js';
+import { Register } from './Register.js';
 
 export class AssignQuad extends Quad {
   private readonly tempValue: string;
 
   public constructor(
     public readonly id: string | undefined,
-    private readonly tempVariable: TempVariable,
+    private readonly tempVariable: TempVariable | Register,
     private readonly expression: RA<Quad>
   ) {
     super();

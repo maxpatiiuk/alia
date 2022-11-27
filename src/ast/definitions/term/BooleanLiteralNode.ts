@@ -25,7 +25,7 @@ export class BooleanLiteralNode extends Term {
   public toQuads(context: QuadsContext) {
     return [
       new BoolLiteralQuad(
-        this.token.token.type === 'TRUE' ? '1' : '0',
+        this.token.token.type === 'TRUE' ? 1 : 0,
         context.requestTempRegister(),
         context.requestTemp()
       ),

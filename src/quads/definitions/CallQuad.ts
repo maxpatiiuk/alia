@@ -1,5 +1,5 @@
 import type { RA } from '../../utils/types.js';
-import { mipsSize, Quad, quadsToAmd, quadsToMips } from './index.js';
+import { amdSize, mipsSize, Quad, quadsToAmd, quadsToMips } from './index.js';
 import { SetArgQuad as SetArgumentQuad } from './SetArgQuad.js';
 import { QuadsContext } from '../index.js';
 import { formatGlobalVariable } from './GlobalVarQuad.js';
@@ -15,19 +15,31 @@ import { Move } from '../../instructions/definitions/mips/Move.js';
 import { Lw } from '../../instructions/definitions/mips/Lw.js';
 import { Jr } from '../../instructions/definitions/mips/Jr.js';
 import { PrevComment } from '../../instructions/definitions/PrevComment.js';
+import { AddQ } from '../../instructions/definitions/amd/AddQ.js';
+import { SubQ } from '../../instructions/definitions/amd/SubQ.js';
 
 export class CallQuad extends Quad {
   private readonly quads: RA<Quad>;
   private readonly tempsCount: number;
+  private readonly formattedName: string;
 
   public constructor(
     context: QuadsContext,
     actuals: RA<RA<Quad>>,
     private readonly name: string,
+    isExternal: boolean,
     private readonly dynamicTempVariable: TempVariable | undefined
   ) {
     super();
-    const tempRegister = context.requestTempRegister();
+    this.formattedName = isExternal
+      ? this.name
+      : formatGlobalVariable(this.name);
+
+    let tempRegister: undefined | Register = undefined;
+    function getTempRegister() {
+      tempRegister ??= context.requestTempRegister();
+      return tempRegister;
+    }
     this.quads = actuals.flatMap((actual, index) => [
       ...(actual ?? []),
       new SetArgumentQuad(
@@ -39,7 +51,7 @@ export class CallQuad extends Quad {
               actual.at(-1)!.toMipsValue(),
               actual.at(-1)!.toAmdValue()
             ),
-        tempRegister,
+        getTempRegister(),
         context.requestTemp()
       ),
     ]);
@@ -60,7 +72,7 @@ export class CallQuad extends Quad {
       new NextComment(`BEGIN Calling ${this.name}`),
       new Addi('$sp', '$sp', -stackSize),
       ...(this.dynamicTempVariable === undefined
-        ? [new Jal(formatGlobalVariable(this.name))]
+        ? [new Jal(this.formattedName)]
         : [
             new NextComment('Calling function by pointer'),
             new Jal(getPcHelper),
@@ -76,15 +88,18 @@ export class CallQuad extends Quad {
   }
 
   public toAmd() {
+    const stackSize = this.tempsCount * amdSize;
     return quadsToAmd([
       ...this.quads,
+      new SubQ(`$${stackSize}`, '%rsp'),
       ...(this.dynamicTempVariable === undefined
-        ? [new CallQ(formatGlobalVariable(this.name))]
+        ? [new CallQ(this.formattedName)]
         : [
             new NextComment('Calling function by pointer'),
             new MovQ(`$${this.dynamicTempVariable.toAmdValue()}`, '%rax'),
             new CallQ('rax'),
           ]),
+      new AddQ(`$${stackSize}`, '%rsp'),
     ]);
   }
 }

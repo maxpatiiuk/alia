@@ -1,12 +1,16 @@
 import { TermQuad } from './TermQuad.js';
+import { NextComment } from '../../instructions/definitions/NextComment.js';
 
 export class StringQuad extends TermQuad {
-  public constructor(private readonly name: string) {
+  public constructor(
+    private readonly name: string,
+    private readonly value: string
+  ) {
     super(name);
   }
 
   public toMips() {
-    return [];
+    return [new NextComment(`String Literal: ${this.value}`)];
   }
 
   public toMipsValue() {
@@ -14,7 +18,7 @@ export class StringQuad extends TermQuad {
   }
 
   public toAmd() {
-    return [];
+    return [new NextComment(`String Literal: ${this.value}`)];
   }
 
   public toAmdValue() {

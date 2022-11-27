@@ -1,17 +1,24 @@
-import { Quad } from './index.js';
-import { TempVariable } from './IdQuad.js';
-import { NextComment } from '../../instructions/definitions/NextComment.js';
-import { PrevComment } from '../../instructions/definitions/PrevComment.js';
-import { CallQ } from '../../instructions/definitions/amd/CallQ.js';
 import { MovQ } from '../../instructions/definitions/amd/MovQ.js';
 import { Addi } from '../../instructions/definitions/mips/Addi.js';
 import { Move } from '../../instructions/definitions/mips/Move.js';
-import { Syscall } from '../../instructions/definitions/Syscall.js';
 import { Sw } from '../../instructions/definitions/mips/Sw.js';
+import { NextComment } from '../../instructions/definitions/NextComment.js';
+import { PrevComment } from '../../instructions/definitions/PrevComment.js';
+import { Syscall } from '../../instructions/definitions/Syscall.js';
+import type { QuadsContext } from '../index.js';
+import { CallQuad } from './CallQuad.js';
+import type { TempVariable } from './IdQuad.js';
+import { Quad } from './index.js';
 
 export class MayhemQuad extends Quad {
-  public constructor(private readonly tempVariable: TempVariable) {
+  private readonly tempVariable: TempVariable;
+
+  private readonly callQuad: CallQuad;
+
+  public constructor(context: QuadsContext) {
     super();
+    this.tempVariable = context.requestTemp();
+    this.callQuad = new CallQuad(context, [], 'mayhem', true, undefined);
   }
 
   public toString() {
@@ -39,10 +46,8 @@ export class MayhemQuad extends Quad {
 
   public toAmd() {
     return [
-      new NextComment('BEGIN Mayhem'),
-      new CallQ('mayhem'),
+      ...this.callQuad.toAmd(),
       new MovQ('%rax', this.tempVariable.toAmdValue()),
-      new PrevComment('END Mayhem'),
     ];
   }
 

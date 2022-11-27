@@ -66,7 +66,7 @@ export class DecimalOperator extends Expression {
     const leftQuads = this.left.toQuads(context);
     const rightQuads = this.right.toQuads(context);
     const rightInt = this.right;
-    const leftInt = this.right;
+    const leftInt = this.left;
     if (
       context.optimize &&
       leftInt instanceof IntLiteralNode &&
@@ -108,8 +108,6 @@ export class DecimalOperator extends Expression {
   }
 }
 
-// FIXME: debug var decl
-// FIXME: test that this is removed
 const uselessActions = [
   ['-', 0],
   ['*', 1],

@@ -9,6 +9,7 @@ import { PrimaryTypeNode } from '../../types/PrimaryTypeNode.js';
 import { VariableDeclaration } from '../VariableDeclaration.js';
 import { LineStatement } from './index.js';
 import { ReceiveQuad } from '../../../../quads/definitions/ReceiveQuad.js';
+import { QuadsContext } from '../../../../quads/index.js';
 
 export class InputNode extends LineStatement {
   public constructor(
@@ -42,12 +43,13 @@ export class InputNode extends LineStatement {
     return declaration.value;
   }
 
-  public toQuads() {
+  public toQuads(context: QuadsContext) {
     return [
       new ReceiveQuad(
         this.id.getName(),
         this.id.getTempVariable(),
-        this.id.getDeclaration()!.type.children[0].toString()
+        this.id.getDeclaration()!.type.children[0].toString(),
+        context
       ),
     ];
   }

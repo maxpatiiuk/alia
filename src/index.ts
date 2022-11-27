@@ -38,9 +38,9 @@ program
     'path to the output diagram for the grammar in the DOT format'
   )
   .option(
-    '-s, --optimize',
-    'run peephole optimization and dead code removal',
-    true
+    '-r, --dontOptimize',
+    "don't run peephole optimization or dead code removal",
+    false
   )
   .option('-m, --mips <string>', 'compile the program down to MIPS assembly')
   .option('-o, --amd <string>', 'compile the program down to x64 assembly')
@@ -62,7 +62,7 @@ const {
   diagramPath,
   mips,
   amd,
-  optimize,
+  dontOptimize,
 } = program.opts<{
   readonly tokensOutput?: string;
   readonly parser: string;
@@ -74,7 +74,7 @@ const {
   readonly diagramPath?: string;
   readonly mips?: string;
   readonly amd?: string;
-  readonly optimize: boolean;
+  readonly dontOptimize: boolean;
 }>();
 
 const parser = rawParser.toUpperCase().trim();
@@ -112,7 +112,7 @@ readFile()
       assemble,
       mips,
       amd,
-      optimize,
+      optimize: !dontOptimize,
     });
   })
   .catch(console.error);

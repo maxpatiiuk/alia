@@ -51,6 +51,6 @@ export class OutputNode extends LineStatement {
   }
 
   public toQuads(context: QuadsContext) {
-    return [new ReportQuad(this.expression.toQuads(context))];
+    return [new ReportQuad(this.expression.toQuads(context), context)];
   }
 }

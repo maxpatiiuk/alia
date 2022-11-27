@@ -7,6 +7,6 @@ export class Jmp extends AmdInstruction {
   }
 
   public toString(): string {
-    return `.jmp ${this.label}`;
+    return `jmp ${this.label}`;
   }
 }

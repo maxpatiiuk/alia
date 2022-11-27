@@ -80,8 +80,8 @@ export class AssignmentExpression extends Expression {
     const quads = this.expression.toQuads(context);
     const lastQuad = quads.at(-1)!;
     const isFunction = lastQuad instanceof IdQuad && lastQuad.isFunction;
-    const mipsValue = quads.at(-1)!.toMipsValue();
-    const amdValue = quads.at(-1)!.toAmdValue();
+    const mipsValue = lastQuad.toMipsValue();
+    const amdValue = lastQuad.toAmdValue();
     const register = new Register(mipsValue, amdValue) as TempVariable;
     return [
       ...quads,
@@ -92,3 +92,8 @@ export class AssignmentExpression extends Expression {
     ];
   }
 }
+
+// TEST: add test a = a + b + c + d + e + f
+// TEST: add test a = (a + b) + (c + d) + (e + f)
+// TEST: add test for temporal dead zone
+// TEST: add test output a; output "\n"; output a; output "\n"; ...

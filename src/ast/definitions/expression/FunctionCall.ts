@@ -97,6 +97,7 @@ export class FunctionCall extends Expression {
           expression?.toQuads(context)
         ),
         this.id.getName(),
+        false,
         declaration instanceof VariableDeclaration
           ? declaration.tempVariable
           : undefined

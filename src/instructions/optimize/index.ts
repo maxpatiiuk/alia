@@ -25,8 +25,6 @@ const define = <
   ) => WritableArray<Line>,
 });
 
-// FIXME: test all of these optimizations
-// FIXME: add optimizations for movq movq and sw lw
 const peepHoleOptimizations: RA<ReturnType<typeof define>> = [
   // Remove jumps to next instruction
   define(J, (instruction, lines) =>
@@ -40,7 +38,10 @@ const peepHoleOptimizations: RA<ReturnType<typeof define>> = [
   define(MovQ, (instruction, lines) => {
     const nextInstruction = lines.at(1)?.instruction;
     return nextInstruction instanceof MovQ &&
-      instruction.destination === nextInstruction.source
+      instruction.destination === nextInstruction.source &&
+      isAmdRegister(instruction.destination) &&
+      (isAmdRegister(instruction.source) ||
+        isAmdRegister(nextInstruction.destination))
       ? [
           mergeLines(
             lines.slice(0, 2),
@@ -54,7 +55,10 @@ const peepHoleOptimizations: RA<ReturnType<typeof define>> = [
   define(Sw, (instruction, lines) => {
     const nextInstruction = lines.at(1)?.instruction;
     return nextInstruction instanceof Lw &&
-      instruction.destination === nextInstruction.source
+      instruction.destination === nextInstruction.source &&
+      isMipsRegister(instruction.destination) &&
+      (isMipsRegister(instruction.source) ||
+        isMipsRegister(nextInstruction.destination))
       ? [
           mergeLines(
             lines.slice(0, 2),
@@ -64,8 +68,6 @@ const peepHoleOptimizations: RA<ReturnType<typeof define>> = [
         ]
       : lines;
   }),
-  // FIXME: test a=b (including global to global)
-  // FIXME: test temporary dead zone
   // Get rid of useless movq
   define(MovQ, (instruction, lines) =>
     instruction.destination === instruction.source ? lines.slice(1) : lines
@@ -76,14 +78,24 @@ const peepHoleOptimizations: RA<ReturnType<typeof define>> = [
   ),
 ];
 
+const isAmdRegister = (name: string): boolean =>
+  name.startsWith('%') || name.startsWith('$');
+const isMipsRegister = (name: string): boolean => name.startsWith('$');
+
 export function optimizeInstructions(lines: RA<Line>): RA<Line> {
   const optimizedLines: WritableArray<Line> = [];
   let rawLines = lines.slice();
   while (rawLines.length > 0) {
+    let changed = false;
     peepHoleOptimizations.forEach(({ instruction, callback }) => {
-      if (rawLines[0].instruction instanceof instruction)
-        rawLines = callback(rawLines[0].instruction, rawLines);
+      if (rawLines[0].instruction instanceof instruction) {
+        const newLines = callback(rawLines[0].instruction, rawLines);
+        changed ||= newLines !== rawLines;
+        rawLines = newLines;
+      }
     });
+    // Redo the optimization if we changed something
+    if (changed) continue;
     const nextLine = rawLines.shift();
     if (nextLine !== undefined) optimizedLines.push(nextLine);
   }

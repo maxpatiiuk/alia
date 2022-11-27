@@ -7,6 +7,6 @@ export class Globl extends Instruction {
   }
 
   public toString(): string {
-    return `globl ${this.labels.join(', ')}`;
+    return `.globl ${this.labels.join(', ')}`;
   }
 }

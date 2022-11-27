@@ -19,10 +19,10 @@ export class MayhemNode extends Term {
   }
 
   public async evaluate(_context: EvalContext) {
-    return Math.random() * 1024;
+    return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
   }
 
   public toQuads(context: QuadsContext) {
-    return [new MayhemQuad(context.requestTemp())];
+    return [new MayhemQuad(context)];
   }
 }
