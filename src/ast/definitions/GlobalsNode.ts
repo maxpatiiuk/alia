@@ -1,8 +1,8 @@
 import type { RA } from '../../utils/types.js';
 import type { EvalContext } from '../eval.js';
 import { evalList } from '../eval.js';
-import type { Quad } from '../quads/definitions/index.js';
-import type { QuadsContext } from '../quads/index.js';
+import type { Quad } from '../../quads/definitions/index.js';
+import type { QuadsContext } from '../../quads/index.js';
 import type { LanguageType, TypeCheckContext } from '../typing.js';
 import { VoidType } from '../typing.js';
 import type { PrintContext } from '../unparse.js';
@@ -12,7 +12,7 @@ import { FunctionDeclaration } from './FunctionDeclaration.js';
 import { StatementList } from './statement/StatementList.js';
 import { VariableDeclaration } from './statement/VariableDeclaration.js';
 import { token } from './TokenNode.js';
-import { GlobalQuad } from '../quads/definitions/GlobalQuad.js';
+import { GlobalQuad } from '../../quads/definitions/GlobalQuad.js';
 
 export class GlobalsNode extends AstNode {
   public constructor(

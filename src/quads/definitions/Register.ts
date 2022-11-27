@@ -1,4 +1,4 @@
-import type { RA } from '../../../utils/types.js';
+import type { RA } from '../../utils/types.js';
 import { formatTemp } from '../index.js';
 import { parseTempVar } from './FunctionQuad.js';
 import { mem } from './IdQuad.js';

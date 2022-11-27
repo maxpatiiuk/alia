@@ -11,10 +11,10 @@ import type { TokenNode } from '../../TokenNode.js';
 import { token } from '../../TokenNode.js';
 import type { StatementList } from '../StatementList.js';
 import { BlockStatement } from './index.js';
-import { Quad } from '../../../quads/definitions/index.js';
-import { QuadsContext } from '../../../quads/index.js';
+import { Quad } from '../../../../quads/definitions/index.js';
+import { QuadsContext } from '../../../../quads/index.js';
 import { RA } from '../../../../utils/types.js';
-import { ForQuad } from '../../../quads/definitions/ForQuad.js';
+import { ForQuad } from '../../../../quads/definitions/ForQuad.js';
 
 export class WhileNode extends BlockStatement {
   public constructor(

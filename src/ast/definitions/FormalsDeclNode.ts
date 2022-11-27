@@ -5,8 +5,8 @@ import type { PrintContext } from '../unparse.js';
 import { AstNode } from './AstNode.js';
 import type { FormalDeclNode } from './statement/FormalDeclNode.js';
 import { token } from './TokenNode.js';
-import { FormalQuad } from '../quads/definitions/FormalQuad.js';
-import { QuadsContext } from '../quads/index.js';
+import { FormalQuad } from '../../quads/definitions/FormalQuad.js';
+import { QuadsContext } from '../../quads/index.js';
 
 export class FormalsDeclNode extends AstNode {
   public constructor(public readonly children: RA<FormalDeclNode>) {

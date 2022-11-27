@@ -1,13 +1,13 @@
 import { Quad } from './index.js';
 import { TempVariable } from './IdQuad.js';
-import { NextComment } from '../../../instructions/definitions/NextComment.js';
-import { PrevComment } from '../../../instructions/definitions/PrevComment.js';
-import { CallQ } from '../../../instructions/definitions/amd/CallQ.js';
-import { MovQ } from '../../../instructions/definitions/amd/MovQ.js';
-import { Addi } from '../../../instructions/definitions/mips/Addi.js';
-import { Move } from '../../../instructions/definitions/mips/Move.js';
-import { Syscall } from '../../../instructions/definitions/Syscall.js';
-import { Sw } from '../../../instructions/definitions/mips/Sw.js';
+import { NextComment } from '../../instructions/definitions/NextComment.js';
+import { PrevComment } from '../../instructions/definitions/PrevComment.js';
+import { CallQ } from '../../instructions/definitions/amd/CallQ.js';
+import { MovQ } from '../../instructions/definitions/amd/MovQ.js';
+import { Addi } from '../../instructions/definitions/mips/Addi.js';
+import { Move } from '../../instructions/definitions/mips/Move.js';
+import { Syscall } from '../../instructions/definitions/Syscall.js';
+import { Sw } from '../../instructions/definitions/mips/Sw.js';
 
 export class MayhemQuad extends Quad {
   public constructor(private readonly tempVariable: TempVariable) {

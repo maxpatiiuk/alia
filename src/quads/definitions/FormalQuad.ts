@@ -1,4 +1,4 @@
-import type { RA } from '../../../utils/types.js';
+import type { RA } from '../../utils/types.js';
 import type { TempVariable } from './IdQuad.js';
 import { Quad } from './index.js';
 

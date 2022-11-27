@@ -1,6 +1,6 @@
-import type { RA, WritableArray } from '../../../utils/types.js';
-import type { FormalsDeclNode } from '../../definitions/FormalsDeclNode.js';
-import type { StatementList } from '../../definitions/statement/StatementList.js';
+import type { RA, WritableArray } from '../../utils/types.js';
+import type { FormalsDeclNode } from '../../ast/definitions/FormalsDeclNode.js';
+import type { StatementList } from '../../ast/definitions/statement/StatementList.js';
 import type { QuadsContext } from '../index.js';
 import { formatTemp } from '../index.js';
 import type { FormalQuad } from './FormalQuad.js';
@@ -11,7 +11,7 @@ import { formatGlobalVariable } from './GlobalVarQuad.js';
 import { TempVariable } from './IdQuad.js';
 import { Quad } from './index.js';
 import { Register } from './Register.js';
-import { BlankLine } from '../../../instructions/definitions/amd/BlankLink.js';
+import { BlankLine } from '../../instructions/definitions/amd/BlankLink.js';
 
 export class FunctionQuad extends Quad {
   private readonly enter: Quad;

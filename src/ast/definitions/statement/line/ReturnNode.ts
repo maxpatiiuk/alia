@@ -1,6 +1,6 @@
 import type { EvalContext } from '../../../eval.js';
 import { ReturnValue } from '../../../eval.js';
-import type { QuadsContext } from '../../../quads/index.js';
+import type { QuadsContext } from '../../../../quads/index.js';
 import type { LanguageType, TypeCheckContext } from '../../../typing.js';
 import { ErrorType, VoidType } from '../../../typing.js';
 import type { PrintContext } from '../../../unparse.js';
@@ -9,7 +9,7 @@ import { FunctionDeclaration } from '../../FunctionDeclaration.js';
 import type { TokenNode } from '../../TokenNode.js';
 import { token } from '../../TokenNode.js';
 import { LineStatement } from './index.js';
-import { ReturnQuad } from '../../../quads/definitions/ReturnQuad.js';
+import { ReturnQuad } from '../../../../quads/definitions/ReturnQuad.js';
 
 export class ReturnNode extends LineStatement {
   public constructor(

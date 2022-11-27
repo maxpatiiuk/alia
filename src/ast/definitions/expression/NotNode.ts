@@ -1,6 +1,6 @@
 import type { EvalContext } from '../../eval.js';
-import { OperationQuad } from '../../quads/definitions/OperationQuad.js';
-import type { QuadsContext } from '../../quads/index.js';
+import { OperationQuad } from '../../../quads/definitions/OperationQuad.js';
+import type { QuadsContext } from '../../../quads/index.js';
 import type { TypeCheckContext } from '../../typing.js';
 import { assertType } from '../../typing.js';
 import type { PrintContext } from '../../unparse.js';

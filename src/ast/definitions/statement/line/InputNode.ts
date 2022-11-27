@@ -8,7 +8,7 @@ import { token } from '../../TokenNode.js';
 import { PrimaryTypeNode } from '../../types/PrimaryTypeNode.js';
 import { VariableDeclaration } from '../VariableDeclaration.js';
 import { LineStatement } from './index.js';
-import { ReceiveQuad } from '../../../quads/definitions/ReceiveQuad.js';
+import { ReceiveQuad } from '../../../../quads/definitions/ReceiveQuad.js';
 
 export class InputNode extends LineStatement {
   public constructor(

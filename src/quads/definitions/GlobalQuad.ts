@@ -1,12 +1,12 @@
-import type { RA, WritableArray } from '../../../utils/types.js';
-import { filterArray } from '../../../utils/types.js';
-import { FunctionDeclaration } from '../../definitions/FunctionDeclaration.js';
-import type { GlobalsNode } from '../../definitions/GlobalsNode.js';
-import { StatementList } from '../../definitions/statement/StatementList.js';
+import type { RA, WritableArray } from '../../utils/types.js';
+import { filterArray } from '../../utils/types.js';
+import { FunctionDeclaration } from '../../ast/definitions/FunctionDeclaration.js';
+import type { GlobalsNode } from '../../ast/definitions/GlobalsNode.js';
+import { StatementList } from '../../ast/definitions/statement/StatementList.js';
 import {
   toPrimitiveValue,
   VariableDeclaration,
-} from '../../definitions/statement/VariableDeclaration.js';
+} from '../../ast/definitions/statement/VariableDeclaration.js';
 import type { QuadsContext } from '../index.js';
 import { FunctionQuad } from './FunctionQuad.js';
 import {
@@ -15,26 +15,26 @@ import {
 } from './GlobalVarQuad.js';
 import { Quad, quadsToAmd, quadsToMips, quadsToString } from './index.js';
 import { formatStringQuad, StringDefQuad } from './StringDefQuad.js';
-import { Globl } from '../../../instructions/definitions/Globl.js';
-import { DataSection } from '../../../instructions/definitions/DataSection.js';
-import { TextSection } from '../../../instructions/definitions/TextSection.js';
+import { Globl } from '../../instructions/definitions/Globl.js';
+import { DataSection } from '../../instructions/definitions/DataSection.js';
+import { TextSection } from '../../instructions/definitions/TextSection.js';
 import {
   getLongestLabel,
   Label,
-} from '../../../instructions/definitions/Label.js';
-import { Jr } from '../../../instructions/definitions/mips/Jr.js';
-import { Syscall } from '../../../instructions/definitions/Syscall.js';
-import { BlankLine } from '../../../instructions/definitions/amd/BlankLink.js';
-import { Jal } from '../../../instructions/definitions/mips/Jal.js';
-import { Instruction } from '../../../instructions/definitions/index.js';
-import { NextComment } from '../../../instructions/definitions/NextComment.js';
-import { Li } from '../../../instructions/definitions/mips/Li.js';
-import { Move } from '../../../instructions/definitions/mips/Move.js';
+} from '../../instructions/definitions/Label.js';
+import { Jr } from '../../instructions/definitions/mips/Jr.js';
+import { Syscall } from '../../instructions/definitions/Syscall.js';
+import { BlankLine } from '../../instructions/definitions/amd/BlankLink.js';
+import { Jal } from '../../instructions/definitions/mips/Jal.js';
+import { Instruction } from '../../instructions/definitions/index.js';
+import { NextComment } from '../../instructions/definitions/NextComment.js';
+import { Li } from '../../instructions/definitions/mips/Li.js';
+import { Move } from '../../instructions/definitions/mips/Move.js';
 import {
   instructionsToLines,
   linesToString,
-} from '../../../instructions/index.js';
-import { optimizeInstructions } from '../../../instructions/optimize/index.js';
+} from '../../instructions/index.js';
+import { optimizeInstructions } from '../../instructions/optimize/index.js';
 
 // FIXME: add tests
 // FIXME: do manual test using the mips test program

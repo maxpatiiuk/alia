@@ -1,5 +1,5 @@
 import type { EvalContext } from '../../../eval.js';
-import type { QuadsContext } from '../../../quads/index.js';
+import type { QuadsContext } from '../../../../quads/index.js';
 import type { TypeCheckContext } from '../../../typing.js';
 import type { PrintContext } from '../../../unparse.js';
 import type { FunctionCall } from '../../expression/FunctionCall.js';

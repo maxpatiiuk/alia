@@ -1,14 +1,14 @@
-import type { RA } from '../../../utils/types.js';
+import type { RA } from '../../utils/types.js';
 import { GoToQuad } from './GoToQuad.js';
 import { Quad, quadsToAmd, quadsToMips, quadsToString } from './index.js';
 import { QuadsContext } from '../index.js';
 import { LoadQuad } from './LoadQuad.js';
 import { Register } from './Register.js';
-import { NextComment } from '../../../instructions/definitions/NextComment.js';
-import { PrevComment } from '../../../instructions/definitions/PrevComment.js';
-import { Jz } from '../../../instructions/definitions/amd/Jz.js';
-import { Beq } from '../../../instructions/definitions/mips/Beq.js';
-import { Label } from '../../../instructions/definitions/Label.js';
+import { NextComment } from '../../instructions/definitions/NextComment.js';
+import { PrevComment } from '../../instructions/definitions/PrevComment.js';
+import { Jz } from '../../instructions/definitions/amd/Jz.js';
+import { Beq } from '../../instructions/definitions/mips/Beq.js';
+import { Label } from '../../instructions/definitions/Label.js';
 
 export class IfQuad extends Quad {
   private readonly quads: RA<Quad | NextComment | PrevComment | Label>;

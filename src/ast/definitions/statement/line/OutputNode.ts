@@ -7,8 +7,8 @@ import { FunctionDeclaration } from '../../FunctionDeclaration.js';
 import type { TokenNode } from '../../TokenNode.js';
 import { token } from '../../TokenNode.js';
 import { LineStatement } from './index.js';
-import { QuadsContext } from '../../../quads/index.js';
-import { ReportQuad } from '../../../quads/definitions/ReportQuad.js';
+import { QuadsContext } from '../../../../quads/index.js';
+import { ReportQuad } from '../../../../quads/definitions/ReportQuad.js';
 
 export class OutputNode extends LineStatement {
   public constructor(

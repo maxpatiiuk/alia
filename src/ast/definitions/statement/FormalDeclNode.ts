@@ -1,6 +1,6 @@
 import { VariableDeclaration } from './VariableDeclaration.js';
-import { FormalQuad } from '../../quads/definitions/FormalQuad.js';
-import { QuadsContext } from '../../quads/index.js';
+import { FormalQuad } from '../../../quads/definitions/FormalQuad.js';
+import { QuadsContext } from '../../../quads/index.js';
 
 export class FormalDeclNode extends VariableDeclaration {
   toQuads(context: QuadsContext) {

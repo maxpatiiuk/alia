@@ -1,6 +1,6 @@
 import type { EvalContext } from '../../eval.js';
 import { ReturnValue } from '../../eval.js';
-import type { QuadsContext } from '../../quads/index.js';
+import type { QuadsContext } from '../../../quads/index.js';
 import type { LanguageType, TypeCheckContext } from '../../typing.js';
 import { assertType, cascadeError, ErrorType } from '../../typing.js';
 import type { PrintContext } from '../../unparse.js';
@@ -10,10 +10,10 @@ import type { IdNode } from '../term/IdNode.js';
 import type { TokenNode } from '../TokenNode.js';
 import { token } from '../TokenNode.js';
 import { Expression } from './index.js';
-import { AssignQuad } from '../../quads/definitions/AssignQuad.js';
-import { LoadQuad } from '../../quads/definitions/LoadQuad.js';
-import { IdQuad, TempVariable } from '../../quads/definitions/IdQuad.js';
-import { Register } from '../../quads/definitions/Register.js';
+import { AssignQuad } from '../../../quads/definitions/AssignQuad.js';
+import { LoadQuad } from '../../../quads/definitions/LoadQuad.js';
+import { IdQuad, TempVariable } from '../../../quads/definitions/IdQuad.js';
+import { Register } from '../../../quads/definitions/Register.js';
 
 export class AssignmentExpression extends Expression {
   public constructor(

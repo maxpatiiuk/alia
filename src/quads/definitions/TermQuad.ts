@@ -1,4 +1,4 @@
-import type { RA } from '../../../utils/types.js';
+import type { RA } from '../../utils/types.js';
 import { Quad } from './index.js';
 
 export class TermQuad extends Quad {

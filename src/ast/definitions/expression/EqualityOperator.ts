@@ -1,5 +1,5 @@
 import type { EvalContext } from '../../eval.js';
-import type { QuadsContext } from '../../quads/index.js';
+import type { QuadsContext } from '../../../quads/index.js';
 import type { LanguageType, TypeCheckContext } from '../../typing.js';
 import { assertType, BoolType, cascadeError, ErrorType } from '../../typing.js';
 import type { PrintContext } from '../../unparse.js';
@@ -8,7 +8,7 @@ import { SynteticToken } from '../SynteticToken.js';
 import type { TokenNode } from '../TokenNode.js';
 import { assertToken } from '../TokenNode.js';
 import { Expression } from './index.js';
-import { OperationQuad } from '../../quads/definitions/OperationQuad.js';
+import { OperationQuad } from '../../../quads/definitions/OperationQuad.js';
 
 export class EqualityOperator extends Expression {
   public readonly operator: '!=' | '==';

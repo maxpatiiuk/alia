@@ -1,9 +1,9 @@
-import type { AmdInstruction } from '../../../instructions/definitions/amd/index.js';
-import type { MipsInstruction } from '../../../instructions/definitions/mips/index.js';
-import type { RA } from '../../../utils/types.js';
-import { Label } from '../../../instructions/definitions/Label.js';
-import { NextComment } from '../../../instructions/definitions/NextComment.js';
-import { PrevComment } from '../../../instructions/definitions/PrevComment.js';
+import type { AmdInstruction } from '../../instructions/definitions/amd/index.js';
+import type { MipsInstruction } from '../../instructions/definitions/mips/index.js';
+import type { RA } from '../../utils/types.js';
+import { Label } from '../../instructions/definitions/Label.js';
+import { NextComment } from '../../instructions/definitions/NextComment.js';
+import { PrevComment } from '../../instructions/definitions/PrevComment.js';
 
 export class Quad {
   /** Convert quad to a printable string */

@@ -4,14 +4,14 @@ import { amdSize, mipsSize, Quad } from './index.js';
 import { formatFunctionName, formatGlobalVariable } from './GlobalVarQuad.js';
 import { Register } from './Register.js';
 import { mainFunction } from './GlobalQuad.js';
-import { PushQ } from '../../../instructions/definitions/amd/PushQ.js';
-import { MovQ } from '../../../instructions/definitions/amd/MovQ.js';
-import { SubQ } from '../../../instructions/definitions/amd/SubQ.js';
-import { NextComment } from '../../../instructions/definitions/NextComment.js';
-import { PrevComment } from '../../../instructions/definitions/PrevComment.js';
-import { Sw } from '../../../instructions/definitions/mips/Sw.js';
-import { Move } from '../../../instructions/definitions/mips/Move.js';
-import { Label } from '../../../instructions/definitions/Label.js';
+import { PushQ } from '../../instructions/definitions/amd/PushQ.js';
+import { MovQ } from '../../instructions/definitions/amd/MovQ.js';
+import { SubQ } from '../../instructions/definitions/amd/SubQ.js';
+import { NextComment } from '../../instructions/definitions/NextComment.js';
+import { PrevComment } from '../../instructions/definitions/PrevComment.js';
+import { Sw } from '../../instructions/definitions/mips/Sw.js';
+import { Move } from '../../instructions/definitions/mips/Move.js';
+import { Label } from '../../instructions/definitions/Label.js';
 
 export class FunctionPrologueQuad extends Quad {
   private readonly entryQuad: Label;

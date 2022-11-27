@@ -1,12 +1,12 @@
 import { reg } from './IdQuad.js';
 import { Quad } from './index.js';
-import { Leave } from '../../../instructions/definitions/amd/Leave.js';
-import { RetQ } from '../../../instructions/definitions/amd/RetQ.js';
-import { BlankLine } from '../../../instructions/definitions/amd/BlankLink.js';
-import { Lw } from '../../../instructions/definitions/mips/Lw.js';
-import { NextComment } from '../../../instructions/definitions/NextComment.js';
-import { Jr } from '../../../instructions/definitions/mips/Jr.js';
-import { Label } from '../../../instructions/definitions/Label.js';
+import { Leave } from '../../instructions/definitions/amd/Leave.js';
+import { RetQ } from '../../instructions/definitions/amd/RetQ.js';
+import { BlankLine } from '../../instructions/definitions/amd/BlankLink.js';
+import { Lw } from '../../instructions/definitions/mips/Lw.js';
+import { NextComment } from '../../instructions/definitions/NextComment.js';
+import { Jr } from '../../instructions/definitions/mips/Jr.js';
+import { Label } from '../../instructions/definitions/Label.js';
 
 export class FunctionEpilogueQuad extends Quad {
   private readonly leave: Label;

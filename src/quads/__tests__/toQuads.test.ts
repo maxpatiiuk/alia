@@ -1,4 +1,4 @@
-import { nameParse, run, typeCheckAst } from '../../../processInput.js';
+import { nameParse, run, typeCheckAst } from '../../processInput.js';
 import { toQuads } from '../index.js';
 
 test('toQuads', async () => {

@@ -1,4 +1,4 @@
-import { NextComment } from '../../../instructions/definitions/NextComment.js';
+import { NextComment } from '../../instructions/definitions/NextComment.js';
 import { AssignQuad } from './AssignQuad.js';
 import type { TempVariable } from './IdQuad.js';
 import { Quad } from './index.js';

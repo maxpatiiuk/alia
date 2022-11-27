@@ -2,7 +2,7 @@ import { AssignQuad } from './AssignQuad.js';
 import type { TempVariable } from './IdQuad.js';
 import { Quad } from './index.js';
 import { Register } from './Register.js';
-import { NextComment } from '../../../instructions/definitions/NextComment.js';
+import { NextComment } from '../../instructions/definitions/NextComment.js';
 
 export class VarDeclQuad extends Quad {
   public readonly assignQuad: AssignQuad;

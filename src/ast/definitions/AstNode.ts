@@ -6,8 +6,8 @@ import type { PrintContext } from '../unparse.js';
 import type { FunctionDeclaration } from './FunctionDeclaration.js';
 import type { VariableDeclaration } from './statement/VariableDeclaration.js';
 import type { TokenNode } from './TokenNode.js';
-import { Quad } from '../quads/definitions/index.js';
-import { QuadsContext } from '../quads/index.js';
+import { Quad } from '../../quads/definitions/index.js';
+import { QuadsContext } from '../../quads/index.js';
 
 export abstract class AstNode {
   // eslint-disable-next-line functional/prefer-readonly-type

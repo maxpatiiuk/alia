@@ -1,8 +1,8 @@
 import fs from 'node:fs';
 
 import type { AstNode } from './ast/definitions/AstNode.js';
-import { GlobalQuad } from './ast/quads/definitions/GlobalQuad.js';
-import { toQuads } from './ast/quads/index.js';
+import { GlobalQuad } from './quads/definitions/GlobalQuad.js';
+import { toQuads } from './quads/index.js';
 import { nameParse, typeCheckAst } from './processInput.js';
 
 export async function processAst({

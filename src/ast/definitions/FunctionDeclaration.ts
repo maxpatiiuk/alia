@@ -15,9 +15,9 @@ import { token } from './TokenNode.js';
 import { FunctionTypeNode } from './types/FunctionTypeNode.js';
 import type { TypeNode } from './types/index.js';
 import { TypeListNode } from './types/TypeListNode.js';
-import { Quad } from '../quads/definitions/index.js';
-import { QuadsContext } from '../quads/index.js';
-import { FunctionQuad } from '../quads/definitions/FunctionQuad.js';
+import { Quad } from '../../quads/definitions/index.js';
+import { QuadsContext } from '../../quads/index.js';
+import { FunctionQuad } from '../../quads/definitions/FunctionQuad.js';
 
 export class FunctionDeclaration extends AstNode {
   public readonly typeNode: FunctionType;

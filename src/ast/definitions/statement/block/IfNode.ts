@@ -10,10 +10,10 @@ import type { TokenNode } from '../../TokenNode.js';
 import { token } from '../../TokenNode.js';
 import type { StatementList } from '../StatementList.js';
 import { BlockStatement } from './index.js';
-import { QuadsContext } from '../../../quads/index.js';
-import { Quad } from '../../../quads/definitions/index.js';
+import { QuadsContext } from '../../../../quads/index.js';
+import { Quad } from '../../../../quads/definitions/index.js';
 import { RA } from '../../../../utils/types.js';
-import { IfQuad } from '../../../quads/definitions/IfQuad.js';
+import { IfQuad } from '../../../../quads/definitions/IfQuad.js';
 
 export class IfNode extends BlockStatement {
   public constructor(

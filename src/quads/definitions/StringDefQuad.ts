@@ -1,7 +1,7 @@
 import { Quad } from './index.js';
-import { Asciz } from '../../../instructions/definitions/amd/Asciz.js';
-import { Asciiz } from '../../../instructions/definitions/mips/Asciiz.js';
-import { Label } from '../../../instructions/definitions/Label.js';
+import { Asciz } from '../../instructions/definitions/amd/Asciz.js';
+import { Asciiz } from '../../instructions/definitions/mips/Asciiz.js';
+import { Label } from '../../instructions/definitions/Label.js';
 
 export class StringDefQuad extends Quad {
   private readonly label: Label;

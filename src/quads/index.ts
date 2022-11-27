@@ -1,5 +1,5 @@
-import type { RA } from '../../utils/types.js';
-import type { AstNode } from '../definitions/AstNode.js';
+import type { RA } from '../utils/types.js';
+import type { AstNode } from '../ast/definitions/AstNode.js';
 import { TempVariable } from './definitions/IdQuad.js';
 import type { Quad } from './definitions/index.js';
 import type { Register } from './definitions/Register.js';
