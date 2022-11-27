@@ -95,6 +95,14 @@ void printSummary() {
   output " tests";
 }
 
+int testNumber;
+void printTestHeader() {
+  testNumber++;
+  output "Section #";
+  output testNumber;
+  output ":\n";
+}
+
 void testLoops() {
   for(int i; i< 10; i++) {
     output i;
@@ -149,10 +157,64 @@ void testOperators() {
   assert(9 / 4, 2);
 }
 
+int var;
+
+int testShadowingHelper() {
+  var = 4;
+  int var;
+  var = 2;
+  return var;
+}
+
+void testShadowing() {
+  int returnValue;
+  returnValue = testShadowingHelper();
+  assert(var, 4);
+  assert(returnValue, 2);
+}
+
+int testLongExpression(bool first) {
+  int a;
+  a = 1;
+  int b;
+  b = 2;
+  int c;
+  c = 3;
+  int d;
+  d = 4;
+  int e;
+  e = 5;
+  int f;
+  f = 6;
+  int g;
+  g = 7;
+
+  if(first) {
+    a = a + b + c + e + f + g;
+    assert(a, 28);
+  }
+  else {
+    a = (a + b) * (d / c) - (testLongExpression(true) / e);
+    assert(a, -2);
+  }
+}
+
+
 int main() {
-  testLoops();
+  printTestHeader();
   testOperators();
+
+  printTestHeader();
+  testLoops();
+
+  printTestHeader();
   testFunctionPointers();
+
+  printTestHeader();
+  testShadowing();
+
+  printTestHeader();
+  testLongExpression(false);
 
   printSummary();
 }
