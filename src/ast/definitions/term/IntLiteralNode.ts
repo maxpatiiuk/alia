@@ -15,8 +15,12 @@ export class IntLiteralNode extends Term {
     return new IntType();
   }
 
+  private getValue(): number {
+    return (this.token.token.data as Tokens['INTLITERAL']).literal;
+  }
+
   public pretty(): string {
-    return (this.token.token.data as Tokens['INTLITERAL']).literal.toString();
+    return this.getValue().toString();
   }
 
   public getToken() {
@@ -30,7 +34,7 @@ export class IntLiteralNode extends Term {
   public toQuads(context: QuadsContext) {
     return [
       new IntLiteralQuad(
-        this.pretty(),
+        this.getValue(),
         context.requestTempRegister(),
         context.requestTemp()
       ),

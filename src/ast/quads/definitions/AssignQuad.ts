@@ -1,7 +1,11 @@
 import type { RA } from '../../../utils/types.js';
 import type { TempVariable } from './IdQuad.js';
-import { addComment, Quad } from './index.js';
+import { Quad } from './index.js';
 import { mem } from './IdQuad.js';
+import { MovQ } from '../../../instructions/amd/MovQ.js';
+import { NextComment } from '../../../instructions/NextComment.js';
+import { PrevComment } from '../../../instructions/PrevComment.js';
+import { Sw } from '../../../instructions/mips/Sw.js';
 
 export class AssignQuad extends Quad {
   private readonly tempValue: string;
@@ -28,16 +32,19 @@ export class AssignQuad extends Quad {
   }
 
   public toMips() {
-    const mips = [
+    return [
+      ...(typeof this.id === 'string'
+        ? [new NextComment(`BEGIN Assigning ${this.id}`)]
+        : []),
       ...this.expression.flatMap((quad) => quad.toMips()),
-      `sw ${this.expression
-        .at(-1)!
-        .toMipsValue()}, ${this.tempVariable.toMipsValue()}`,
-      ...(typeof this.id === 'string' ? [`# END Assigning ${this.id}`] : []),
+      new Sw(
+        this.expression.at(-1)!.toMipsValue(),
+        this.tempVariable.toMipsValue()
+      ),
+      ...(typeof this.id === 'string'
+        ? [new PrevComment(`END Assigning ${this.id}`)]
+        : []),
     ];
-    return typeof this.id === 'string'
-      ? addComment(mips, `BEGIN Assigning ${this.id}`)
-      : mips;
   }
 
   public toMipsValue() {
@@ -45,16 +52,19 @@ export class AssignQuad extends Quad {
   }
 
   public toAmd() {
-    const amd = [
+    return [
+      ...(typeof this.id === 'string'
+        ? [new NextComment(`BEGIN Assigning ${this.id}`)]
+        : []),
       ...this.expression.flatMap((quad) => quad.toAmd()),
-      `movq ${this.expression
-        .at(-1)!
-        .toAmdValue()}, ${this.tempVariable.toAmdValue()}`,
-      ...(typeof this.id === 'string' ? [`# END Assigning ${this.id}`] : []),
+      new MovQ(
+        this.expression.at(-1)!.toAmdValue(),
+        this.tempVariable.toAmdValue()
+      ),
+      ...(typeof this.id === 'string'
+        ? [new PrevComment(`END Assigning ${this.id}`)]
+        : []),
     ];
-    return typeof this.id === 'string'
-      ? addComment(amd, `BEGIN Assigning ${this.id}`)
-      : amd;
   }
 
   public toAmdValue() {

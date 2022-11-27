@@ -1,9 +1,37 @@
 import type { RA } from '../../../utils/types.js';
 import { AssignQuad } from './AssignQuad.js';
-import { addComment, Quad, quadsToAmd, quadsToMips } from './index.js';
+import { Quad, quadsToAmd, quadsToMips } from './index.js';
 import { QuadsContext } from '../index.js';
 import { LoadQuad } from './LoadQuad.js';
 import { Register } from './Register.js';
+import { MovQ } from '../../../instructions/amd/MovQ.js';
+import { SubQ } from '../../../instructions/amd/SubQ.js';
+import { AddQ } from '../../../instructions/amd/AddQ.js';
+import { ImulQ } from '../../../instructions/amd/ImulQ.js';
+import { IdivQ } from '../../../instructions/amd/IdivQ.js';
+import { OrQ } from '../../../instructions/amd/OrQ.js';
+import { AndQ } from '../../../instructions/amd/AndQ.js';
+import { SetL } from '../../../instructions/amd/SetL.js';
+import { SetG } from '../../../instructions/amd/SetG.js';
+import { SetLe } from '../../../instructions/amd/SetLe.js';
+import { SetGe } from '../../../instructions/amd/SetGe.js';
+import { SetE } from '../../../instructions/amd/SetE.js';
+import { SetNe } from '../../../instructions/amd/SetNe.js';
+import { Not } from '../../../instructions/amd/Not.js';
+import { Neg } from '../../../instructions/amd/Neg.js';
+import { NextComment } from '../../../instructions/NextComment.js';
+import { Sub } from '../../../instructions/mips/Sub.js';
+import { Add } from '../../../instructions/mips/Add.js';
+import { Mult } from '../../../instructions/mips/Mult.js';
+import { Mflo } from '../../../instructions/mips/Mflo.js';
+import { Div } from '../../../instructions/mips/Div.js';
+import { Or } from '../../../instructions/mips/Or.js';
+import { And } from '../../../instructions/mips/And.js';
+import { Xori } from '../../../instructions/mips/Xori.js';
+import { Slt } from '../../../instructions/mips/Slt.js';
+import { SltiU } from '../../../instructions/mips/SltiU.js';
+import { Xor } from '../../../instructions/mips/Xor.js';
+import { Andi } from '../../../instructions/mips/Andi.js';
 
 const operationTranslations = {
   '--': 'SUB64',
@@ -49,36 +77,36 @@ export class OpQuad extends Quad {
     const right = this.right.toMipsValue();
     const temp = this.tempRegister.toMipsValue();
     if (this.type === '--' || this.type === '-')
-      return [`sub ${temp}, ${left}, ${right}`];
+      return [new Sub(temp, left, right)];
     else if (this.type === '++' || this.type === '+')
-      return [`add ${temp}, ${left}, ${right}`];
+      return [new Add(temp, left, right)];
     else if (this.type === '*')
       return [
-        `mult ${left}, ${right}`,
+        new Mult(left, right),
         // Note: this does not check for overflow
-        `mflo ${temp}`,
+        new Mflo(temp),
       ];
     else if (this.type === '/')
       return [
-        `div ${left}, ${right}`,
+        new Div(left, right),
         // Note: this discards the remainder
-        `mflo ${temp}`,
+        new Mflo(temp),
       ];
-    else if (this.type === 'or') return [`or ${temp}, ${left}, ${right}`];
-    else if (this.type === 'and') return [`and ${temp}, ${left}, ${right}`];
-    else if (this.type === '<') return [`slt ${temp}, ${left}, ${right}`];
-    else if (this.type === '>') return [`slt ${temp}, ${right}, ${left}`];
+    else if (this.type === 'or') return [new Or(temp, left, right)];
+    else if (this.type === 'and') return [new And(temp, left, right)];
+    else if (this.type === '<') return [new Slt(temp, left, right)];
+    else if (this.type === '>') return [new Slt(temp, right, left)];
     else if (this.type === '<=')
-      return [`slt ${temp}, ${right}, ${left}`, `xori ${temp}, ${temp}, 1`];
+      return [new Slt(temp, right, left), new Xori(temp, temp, 1)];
     else if (this.type === '>=')
-      return [`slt ${temp}, ${left}, ${right}`, `xori ${temp}, ${temp}, 1`];
+      return [new Slt(temp, left, right), new Xori(temp, temp, 1)];
     else if (this.type === '==')
-      return [`xor ${temp}, ${left}, ${right}`, `sltiu ${temp}, ${temp}, 1`];
+      return [new Xor(temp, left, right), new SltiU(temp, temp, 1)];
     else if (this.type === '!=')
-      return [`xor ${temp}, ${left}, ${right}`, `sltu ${temp}, $zero, ${temp}`];
+      return [new Xor(temp, left, right), new Slt(temp, '$zero', temp)];
     else if (this.type === '!')
-      return [`sltiu ${temp}, ${right}, 1`, `andi ${temp}, ${temp}, 0x00ff`];
-    else if (this.type === 'neg') return [`sub ${temp}, $zero, ${right}`];
+      return [new SltiU(temp, right, 1), new Andi(temp, temp, '0x00ff')];
+    else if (this.type === 'neg') return [new Sub(temp, '$zero', right)];
     else throw new Error(`Unknown operation ${this.type}`);
   }
 
@@ -91,45 +119,43 @@ export class OpQuad extends Quad {
     const right = this.right.toAmdValue();
     const temp = this.tempRegister.toAmdValue();
     if (this.type === '--' || this.type === '-')
-      return [`movq ${left}, ${temp}`, `subq ${right}, ${temp}`];
+      return [new MovQ(left, temp), new SubQ(right, temp)];
     else if (this.type === '++' || this.type === '+')
-      return [`movq ${left}, ${temp}`, `addq ${right}, ${temp}`];
+      return [new MovQ(left, temp), new AddQ(right, temp)];
     else if (this.type === '*')
       return [
-        `movq ${left}, ${temp}`,
-        `movq ${right}, %rax`,
-        `imulq %rax`,
+        new MovQ(left, temp),
+        new MovQ(right, '%rax'),
+        new ImulQ('%rax'),
         // Note: this does not check for overflow
-        `movq %rax, ${temp}`,
+        new MovQ('%rax', temp),
       ];
     else if (this.type === '/')
       return [
-        `movq $0, %rdx`,
-        `movq ${left}, %rax`,
-        `idivq ${right}`,
-        `movq %rax, ${temp}`,
+        new MovQ('$0', '%rdx'),
+        new MovQ(left, '%rax'),
+        new IdivQ(right),
         // Note: this discards the remainder
+        new MovQ('%rax', temp),
       ];
     else if (this.type === 'or')
-      return [`movq ${left}, ${temp}`, `orq ${right}, ${temp}`];
+      return [new MovQ(left, temp), new OrQ(right, temp)];
     else if (this.type === 'and')
-      return [`movq ${left}, ${temp}`, `andq ${right}, ${temp}`];
+      return [new MovQ(left, temp), new AndQ(right, temp)];
     else if (this.type === '<')
-      return [`movq ${left}, ${temp}`, `setl ${right}, ${temp}`];
+      return [new MovQ(left, temp), new SetL(right, temp)];
     else if (this.type === '>')
-      return [`movq ${left}, ${temp}`, `setg ${right}, ${temp}`];
+      return [new MovQ(right, temp), new SetG(right, temp)];
     else if (this.type === '<=')
-      return [`movq ${left}, ${temp}`, `setle ${right}, ${temp}`];
+      return [new MovQ(right, temp), new SetLe(right, temp)];
     else if (this.type === '>=')
-      return [`movq ${left}, ${temp}`, `setge ${right}, ${temp}`];
+      return [new MovQ(left, temp), new SetGe(right, temp)];
     else if (this.type === '==')
-      return [`movq ${left}, ${temp}`, `sete ${right}, ${temp}`];
+      return [new MovQ(left, temp), new SetE(right, temp)];
     else if (this.type === '!=')
-      return [`movq ${left}, ${temp}`, `setne ${right}, ${temp}`];
-    else if (this.type === '!')
-      return [`movq ${right}, ${temp}`, `not ${temp}`];
-    else if (this.type === 'neg')
-      return [`movq ${right}, ${temp}`, `neg ${temp}`];
+      return [new MovQ(left, temp), new SetNe(right, temp)];
+    else if (this.type === '!') return [new MovQ(right, temp), new Not(temp)];
+    else if (this.type === 'neg') return [new MovQ(right, temp), new Neg(temp)];
     else throw new Error(`Unknown operation ${this.type}`);
   }
 
@@ -206,16 +232,16 @@ export class OperationQuad extends Quad {
   }
 
   public toMips() {
-    return addComment(
-      quadsToMips([
+    return [
+      new NextComment(`Operation: ${operationTranslations[this.type]}`),
+      ...quadsToMips([
         ...(this.left ?? []),
         ...this.right,
         ...(this.leftLoad?.toMips() ?? []),
         this.rightLoad,
         this.assignUniversal,
       ]),
-      `Operation: ${operationTranslations[this.type]}`
-    );
+    ];
   }
 
   public toMipsValue() {
@@ -223,16 +249,14 @@ export class OperationQuad extends Quad {
   }
 
   public toAmd() {
-    return addComment(
-      quadsToAmd([
-        ...(this.left ?? []),
-        ...this.right,
-        ...(this.leftLoad?.toAmd() ?? []),
-        this.rightLoad,
-        this.assignUniversal,
-      ]),
-      `Operation: ${operationTranslations[this.type]}`
-    );
+    return quadsToAmd([
+      new NextComment(`Operation: ${operationTranslations[this.type]}`),
+      ...(this.left ?? []),
+      ...this.right,
+      ...(this.leftLoad?.toAmd() ?? []),
+      this.rightLoad,
+      this.assignUniversal,
+    ]);
   }
 
   public toAmdValue() {

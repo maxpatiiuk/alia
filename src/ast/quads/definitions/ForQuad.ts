@@ -2,16 +2,11 @@ import type { RA } from '../../../utils/types.js';
 import type { QuadsContext } from '../index.js';
 import { GoToQuad } from './GoToQuad.js';
 import { IfQuad } from './IfQuad.js';
-import {
-  LabelQuad,
-  Quad,
-  quadsToAmd,
-  quadsToMips,
-  quadsToString,
-} from './index.js';
+import { Quad, quadsToAmd, quadsToMips, quadsToString } from './index.js';
+import { Label } from '../../../instructions/Label.js';
 
 export class ForQuad extends Quad {
-  private readonly quads: RA<Quad>;
+  private readonly instructions: RA<Quad | Label>;
 
   public constructor(
     private readonly declaration: RA<Quad>,
@@ -21,9 +16,9 @@ export class ForQuad extends Quad {
   ) {
     super();
     const startLabel = context.requestLabel();
-    this.quads = [
+    this.instructions = [
       ...this.declaration,
-      new LabelQuad(startLabel),
+      new Label(startLabel),
       new IfQuad(
         this.condition,
         [...this.statements, new GoToQuad(startLabel)],
@@ -34,14 +29,14 @@ export class ForQuad extends Quad {
   }
 
   public toString() {
-    return quadsToString(this.quads);
+    return quadsToString(this.instructions);
   }
 
-  public toMips(): RA<LabelQuad | string> {
-    return quadsToMips(this.quads);
+  public toMips() {
+    return quadsToMips(this.instructions);
   }
 
-  public toAmd(): RA<LabelQuad | string> {
-    return quadsToAmd(this.quads);
+  public toAmd() {
+    return quadsToAmd(this.instructions);
   }
 }

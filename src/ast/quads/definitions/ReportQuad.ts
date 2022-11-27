@@ -1,7 +1,15 @@
 import type { RA } from '../../../utils/types.js';
-import { addComment, Quad } from './index.js';
+import { Quad } from './index.js';
 import { StringQuad } from './StringQuad.js';
 import { IdQuad } from './IdQuad.js';
+import { NextComment } from '../../../instructions/NextComment.js';
+import { CallQ } from '../../../instructions/amd/CallQ.js';
+import { MovQ } from '../../../instructions/amd/MovQ.js';
+import { La } from '../../../instructions/mips/La.js';
+import { Addi } from '../../../instructions/mips/Addi.js';
+import { Syscall } from '../../../instructions/Syscall.js';
+import { PrevComment } from '../../../instructions/PrevComment.js';
+import { Lw } from '../../../instructions/mips/Lw.js';
 
 export class ReportQuad extends Quad {
   public constructor(private readonly quads: RA<Quad>) {
@@ -18,15 +26,14 @@ export class ReportQuad extends Quad {
   public toMips() {
     const isString = this.quads.at(-1) instanceof StringQuad;
     const value = this.quads.at(-1)!.toMipsValue();
-    return addComment(
-      [
-        ...this.quads.flatMap((quad) => quad.toMips()),
-        isString ? `la $a0, ${value}` : `lw $a0, ${value}`,
-        `addi $v0, $zero, ${isString ? 4 : 1}`,
-        'syscall  # END Output',
-      ],
-      'BEGIN Output'
-    );
+    return [
+      new NextComment('BEGIN Output'),
+      ...this.quads.flatMap((quad) => quad.toMips()),
+      new (isString ? La : Lw)('$a0', value),
+      new Addi('$v0', '$zero', isString ? 4 : 1),
+      new Syscall(),
+      new PrevComment('BEGIN Output'),
+    ];
   }
 
   public toAmd() {
@@ -34,12 +41,10 @@ export class ReportQuad extends Quad {
     const isString = quad instanceof StringQuad;
     const isBool = quad instanceof IdQuad && quad.type === 'bool';
     const value = quad.toAmdValue();
-    return addComment(
-      [
-        `movq ${value}, %rdi`,
-        `callq ${isString ? 'printString' : isBool ? 'printBool' : 'printInt'}`,
-      ],
-      'Output'
-    );
+    return [
+      new NextComment('Output'),
+      new MovQ(value, '%rdi'),
+      new CallQ(isString ? 'printString' : isBool ? 'printBool' : 'printInt'),
+    ];
   }
 }

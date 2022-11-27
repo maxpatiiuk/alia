@@ -1,8 +1,9 @@
+import { NextComment } from '../../../instructions/NextComment.js';
 import { AssignQuad } from './AssignQuad.js';
 import type { TempVariable } from './IdQuad.js';
-import { addComment, Quad } from './index.js';
+import { Quad } from './index.js';
 import { LoadQuad } from './LoadQuad.js';
-import { Register } from './Register.js';
+import type { Register } from './Register.js';
 
 export class SetArgQuad extends Quad {
   private readonly loadQuad: LoadQuad | undefined;
@@ -30,19 +31,18 @@ export class SetArgQuad extends Quad {
   }
 
   public toMips() {
-    return addComment(
-      [
-        ...(this.loadQuad?.toMips() ?? []),
-        ...(this.assignQuad?.toMips() ?? []),
-      ],
-      `Setting argument ${this.index}`
-    );
+    return [
+      new NextComment(`Setting argument ${this.index}`),
+      ...(this.loadQuad?.toMips() ?? []),
+      ...(this.assignQuad?.toMips() ?? []),
+    ];
   }
 
   public toAmd() {
-    return addComment(
-      [...(this.loadQuad?.toAmd() ?? []), ...(this.assignQuad?.toAmd() ?? [])],
-      `Setting argument ${this.index}`
-    );
+    return [
+      new NextComment(`Setting argument ${this.index}`),
+      ...(this.loadQuad?.toAmd() ?? []),
+      ...(this.assignQuad?.toAmd() ?? []),
+    ];
   }
 }

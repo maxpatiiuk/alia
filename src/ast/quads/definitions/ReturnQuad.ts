@@ -1,6 +1,10 @@
+import { Jmp } from '../../../instructions/amd/Jmp.js';
+import { J } from '../../../instructions/mips/J.js';
+import { NextComment } from '../../../instructions/NextComment.js';
+import { PrevComment } from '../../../instructions/PrevComment.js';
 import type { RA } from '../../../utils/types.js';
 import { filterArray } from '../../../utils/types.js';
-import { addComment, Quad } from './index.js';
+import { Quad } from './index.js';
 import { LoadQuad } from './LoadQuad.js';
 import { Register } from './Register.js';
 
@@ -33,24 +37,21 @@ export class ReturnQuad extends Quad {
   }
 
   public toMips() {
-    return addComment(
-      [
-        ...(this.quads ?? []).flatMap((quad) => quad.toMips()),
-        ...this.loadQuad.toMips(),
-        `j ${this.returnLabel}`,
-      ],
-      `Return`
-    );
+    return [
+      new NextComment('BEGIN Return'),
+      ...(this.quads ?? []).flatMap((quad) => quad.toMips()),
+      ...this.loadQuad.toMips(),
+      new J(this.returnLabel),
+      new PrevComment('END Return'),
+    ];
   }
 
   public toAmd() {
-    return addComment(
-      [
-        ...(this.quads ?? []).flatMap((quad) => quad.toAmd()),
-        ...this.loadQuad.toAmd(),
-        `jmp ${this.returnLabel}`,
-      ],
-      `Return`
-    );
+    return [
+      new NextComment('Return'),
+      ...(this.quads ?? []).flatMap((quad) => quad.toAmd()),
+      ...this.loadQuad.toAmd(),
+      new Jmp(this.returnLabel),
+    ];
   }
 }

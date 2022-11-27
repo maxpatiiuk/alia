@@ -1,6 +1,9 @@
 import type { TempVariable } from './IdQuad.js';
 import { Quad } from './index.js';
 import { Register } from './Register.js';
+import { MovQ } from '../../../instructions/amd/MovQ.js';
+import { La } from '../../../instructions/mips/La.js';
+import { Lw } from '../../../instructions/mips/Lw.js';
 
 export class LoadQuad extends Quad {
   public constructor(
@@ -18,9 +21,10 @@ export class LoadQuad extends Quad {
   public toMips() {
     return [
       ...this.tempRegister.toMips(),
-      `${
-        this.isFunction ? 'la' : 'lw'
-      } ${this.tempRegister.toMipsValue()}, ${this.tempVariable.toMipsValue()}`,
+      new (this.isFunction ? La : Lw)(
+        this.tempRegister.toMipsValue(),
+        this.tempVariable.toMipsValue()
+      ),
     ];
   }
 
@@ -31,7 +35,7 @@ export class LoadQuad extends Quad {
   public toAmd() {
     return [
       ...this.tempRegister.toAmd(),
-      `movq ${this.tempVariable.toAmdValue()}, ${this.tempRegister.toAmdValue()}`,
+      new MovQ(this.tempVariable.toAmdValue(), this.tempRegister.toAmdValue()),
     ];
   }
 

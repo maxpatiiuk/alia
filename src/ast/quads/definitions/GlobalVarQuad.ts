@@ -1,9 +1,12 @@
-import { LabelQuad, Quad } from './index.js';
+import { Quad } from './index.js';
+import { QuadGlobal } from '../../../instructions/amd/QuadGlobal.js';
+import { WordGlobal } from '../../../instructions/mips/WordGlobal.js';
+import { Label } from '../../../instructions/Label.js';
 
 export class GlobalVarQuad extends Quad {
   private readonly name: string;
 
-  private readonly labelQuad: LabelQuad | undefined;
+  private readonly labelQuad: Label | undefined;
 
   public constructor(
     private readonly id: string,
@@ -13,7 +16,7 @@ export class GlobalVarQuad extends Quad {
 
     this.name = formatGlobalVariable(this.id);
     this.labelQuad =
-      typeof this.value === 'number' ? new LabelQuad(this.name) : undefined;
+      typeof this.value === 'number' ? new Label(this.name) : undefined;
   }
 
   public toString() {
@@ -21,15 +24,15 @@ export class GlobalVarQuad extends Quad {
   }
 
   public toMips() {
-    return this.labelQuad === undefined
+    return this.labelQuad === undefined || this.value === undefined
       ? []
-      : [this.labelQuad, `.word ${this.value}`];
+      : [this.labelQuad, new WordGlobal(this.value)];
   }
 
   public toAmd() {
-    return this.labelQuad === undefined
+    return this.labelQuad === undefined || this.value === undefined
       ? []
-      : [this.labelQuad, `.quad ${this.value}`];
+      : [this.labelQuad, new QuadGlobal(this.value)];
   }
 }
 

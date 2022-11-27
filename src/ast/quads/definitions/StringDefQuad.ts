@@ -1,7 +1,10 @@
-import { LabelQuad, Quad } from './index.js';
+import { Quad } from './index.js';
+import { Asciz } from '../../../instructions/amd/Asciz.js';
+import { Asciiz } from '../../../instructions/mips/Asciiz.js';
+import { Label } from '../../../instructions/Label.js';
 
 export class StringDefQuad extends Quad {
-  private readonly label: LabelQuad;
+  private readonly label: Label;
 
   public constructor(
     private readonly name: string,
@@ -9,7 +12,7 @@ export class StringDefQuad extends Quad {
   ) {
     super();
 
-    this.label = new LabelQuad(this.name);
+    this.label = new Label(this.name);
   }
 
   public toString() {
@@ -17,11 +20,11 @@ export class StringDefQuad extends Quad {
   }
 
   public toMips() {
-    return [this.label, `.asciiz ${this.value}`];
+    return [this.label, new Asciiz(this.value)];
   }
 
   public toAmd() {
-    return [this.label, `.asciz ${this.value}`];
+    return [this.label, new Asciz(this.value)];
   }
 }
 

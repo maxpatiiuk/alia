@@ -1,7 +1,8 @@
 import { AssignQuad } from './AssignQuad.js';
 import type { TempVariable } from './IdQuad.js';
-import { addComment, Quad } from './index.js';
+import { Quad } from './index.js';
 import { Register } from './Register.js';
+import { NextComment } from '../../../instructions/NextComment.js';
 
 export class VarDeclQuad extends Quad {
   public readonly assignQuad: AssignQuad;
@@ -21,10 +22,16 @@ export class VarDeclQuad extends Quad {
   }
 
   public toMips() {
-    return addComment(this.assignQuad.toMips(), `Initializing ${this.id}`);
+    return [
+      new NextComment(`Initializing ${this.id}`),
+      ...this.assignQuad.toMips(),
+    ];
   }
 
   public toAmd() {
-    return addComment(this.assignQuad.toAmd(), `Initializing ${this.id}`);
+    return [
+      new NextComment(`Initializing ${this.id}`),
+      this.assignQuad.toAmd(),
+    ];
   }
 }

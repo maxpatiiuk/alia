@@ -1,20 +1,17 @@
 import type { RA } from '../../../utils/types.js';
-import { UniversalQuad } from './UniversalQuad.js';
 import { GoToQuad } from './GoToQuad.js';
-import {
-  addComment,
-  LabelQuad,
-  Quad,
-  quadsToAmd,
-  quadsToMips,
-  quadsToString,
-} from './index.js';
+import { Quad, quadsToAmd, quadsToMips, quadsToString } from './index.js';
 import { QuadsContext } from '../index.js';
 import { LoadQuad } from './LoadQuad.js';
 import { Register } from './Register.js';
+import { NextComment } from '../../../instructions/NextComment.js';
+import { PrevComment } from '../../../instructions/PrevComment.js';
+import { Jz } from '../../../instructions/amd/Jz.js';
+import { Beq } from '../../../instructions/mips/Beq.js';
+import { Label } from '../../../instructions/Label.js';
 
 export class IfQuad extends Quad {
-  private readonly quads: RA<Quad>;
+  private readonly quads: RA<Quad | NextComment | PrevComment | Label>;
   private readonly label: string;
 
   public constructor(
@@ -37,23 +34,19 @@ export class IfQuad extends Quad {
         context.requestTempRegister(),
         falseCase?.label ?? this.label
       ),
-      new UniversalQuad({
-        mips: '# True Branch',
-        amd: '# True Branch',
-      }),
+      new NextComment('BEGIN True Branch'),
       ...this.trueQuads,
+      new PrevComment('END True Branch'),
       ...(typeof falseCase === 'object'
         ? [
             new GoToQuad(this.label),
-            new UniversalQuad({
-              mips: '# False Branch',
-              amd: '# False Branch',
-            }),
-            new LabelQuad(falseCase.label),
+            new NextComment('BEGIN False Branch'),
+            new Label(falseCase.label),
             ...falseCase.quads,
+            new PrevComment('END False Branch'),
           ]
         : []),
-      new LabelQuad(this.label),
+      new Label(this.label),
     ];
   }
 
@@ -62,11 +55,19 @@ export class IfQuad extends Quad {
   }
 
   public toMips() {
-    return addComment(quadsToMips(this.quads), 'BEGIN if');
+    return [
+      new NextComment('BEGIN if'),
+      ...quadsToMips(this.quads),
+      new PrevComment('END if'),
+    ];
   }
 
   public toAmd() {
-    return addComment(quadsToAmd(this.quads), 'BEGIN if');
+    return [
+      new NextComment('BEGIN if'),
+      ...quadsToAmd(this.quads),
+      new PrevComment('END if'),
+    ];
   }
 }
 
@@ -90,14 +91,14 @@ class IfzQuad extends Quad {
   public toMips() {
     return [
       ...this.loadQuad.toMips(),
-      `beq $zero, ${this.loadQuad.toMipsValue()}, ${this.label}`,
+      new Beq('$zero', this.loadQuad.toMipsValue(), this.label),
     ];
   }
 
   public toAmd() {
     return [
       ...this.loadQuad.toAmd(),
-      `jz ${this.loadQuad.toAmdValue()}, ${this.label}`,
+      new Jz(this.loadQuad.toAmdValue(), this.label),
     ];
   }
 }

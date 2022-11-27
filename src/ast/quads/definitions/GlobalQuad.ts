@@ -13,16 +13,21 @@ import {
   formatGlobalVariable,
   GlobalVarQuad as GlobalVariableQuad,
 } from './GlobalVarQuad.js';
-import {
-  LabelQuad,
-  Quad,
-  quadsToAmd,
-  quadsToMips,
-  quadsToString,
-} from './index.js';
+import { Quad, quadsToAmd, quadsToMips, quadsToString } from './index.js';
 import { formatStringQuad, StringDefQuad } from './StringDefQuad.js';
-import { UniversalQuad } from './UniversalQuad.js';
 import { LineQuad } from './LineQuad.js';
+import { Globl } from '../../../instructions/Globl.js';
+import { DataSection } from '../../../instructions/DataSection.js';
+import { TextSection } from '../../../instructions/TextSection.js';
+import { Label } from '../../../instructions/Label.js';
+import { Jr } from '../../../instructions/mips/Jr.js';
+import { Syscall } from '../../../instructions/Syscall.js';
+import { BlankLine } from '../../../instructions/amd/BlankLink.js';
+import { Jal } from '../../../instructions/mips/Jal.js';
+import { Instruction } from '../../../instructions/index.js';
+import { NextComment } from '../../../instructions/NextComment.js';
+import { Li } from '../../../instructions/mips/Li.js';
+import { Move } from '../../../instructions/mips/Move.js';
 
 // FIXME: add tests
 // FIXME: do manual test using the mips test program
@@ -33,7 +38,7 @@ export class GlobalQuad extends Quad {
 
   private readonly functions: RA<Quad>;
 
-  private readonly mipsBootloader: RA<Quad | string>;
+  private readonly mipsBootloader: RA<Instruction>;
 
   public constructor(
     private readonly children: GlobalsNode['children'],
@@ -90,16 +95,16 @@ export class GlobalQuad extends Quad {
     this.globalQuads = [...globalQuads, ...stringQuads];
 
     this.mipsBootloader = [
-      new LabelQuad(startFunction),
-      new UniversalQuad(`jal ${formatGlobalVariable(mainFunction)}`),
-      'li $v0, 10  # Exit syscall',
-      'syscall',
-      '',
-      new LabelQuad(getPcHelper),
-      new UniversalQuad(
-        'move $v0, $ra  # A helper function for getting current PC'
-      ),
-      'jr $ra',
+      new Label(startFunction),
+      new Jal(formatGlobalVariable(mainFunction)),
+      new NextComment('Exit syscall'),
+      new Li('$v0', 10),
+      new Syscall(),
+      new BlankLine(),
+      new Label(getPcHelper),
+      new NextComment('A helper function for getting current PC'),
+      new Move('$v0', '$ra'),
+      new Jr('$ra'),
     ];
   }
 
@@ -124,10 +129,10 @@ export class GlobalQuad extends Quad {
         'Conversion to MIPS requires there to be a main() function. Please define it'
       );
     return [
-      `.globl ${startFunction}`,
-      '.data',
+      new Globl([startFunction]),
+      new DataSection(),
       ...inlineLabels(quadsToMips(this.globalQuads)),
-      '.text',
+      new TextSection(),
       ...inlineLabels(
         quadsToMips([...this.mipsBootloader, '', ...this.functions])
       ),
@@ -144,10 +149,10 @@ export class GlobalQuad extends Quad {
         'Conversion to x64 requires there to be a main() function. Please define it'
       );
     return [
-      `.globl ${mainFunction}`,
-      '.data',
+      new Globl([mainFunction]),
+      new DataSection(),
       ...inlineLabels(quadsToAmd(this.globalQuads)),
-      '.text',
+      new TextSection(),
       ...inlineLabels(quadsToAmd(this.functions)),
     ];
   }
@@ -157,6 +162,7 @@ const startFunction = '_start';
 export const mainFunction = 'main';
 export const getPcHelper = '_get_pc';
 
+// FIXME: refactor this
 function inlineLabels(lines: RA<LabelQuad | string>): RA<string> {
   let currentLabel: LabelQuad | undefined = undefined;
   const newLines = filterArray(

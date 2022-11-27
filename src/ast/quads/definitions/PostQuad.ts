@@ -29,7 +29,7 @@ export class PostQuad extends Quad {
     ]);
 
     const intRegister = context.requestTempRegister();
-    this.intQuad = new IntLiteralQuad('1', intRegister, context.requestTemp());
+    this.intQuad = new IntLiteralQuad(1, intRegister, context.requestTemp());
     this.loadQuad = new LoadQuad(tempRegister, tempVariable);
     this.universalQuad = new AssignQuad(undefined, tempVariable, [
       new OpQuad(this.loadQuad, type, intRegister, tempRegister),

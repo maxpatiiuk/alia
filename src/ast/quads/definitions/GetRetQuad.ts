@@ -1,6 +1,6 @@
-import { Quad } from './index.js';
-import { TempVariable } from './IdQuad.js';
 import { AssignQuad } from './AssignQuad.js';
+import type { TempVariable } from './IdQuad.js';
+import { Quad } from './index.js';
 import { Register } from './Register.js';
 
 export class GetRetQuad extends Quad {
