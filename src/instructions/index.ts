@@ -4,11 +4,10 @@ import { BlankLine } from './definitions/amd/BlankLink.js';
 import { DataSection } from './definitions/DataSection.js';
 import { Globl } from './definitions/Globl.js';
 import type { Instruction } from './definitions/index.js';
-import { getLongestLabel, Label } from './definitions/Label.js';
+import { Label } from './definitions/Label.js';
 import { NextComment } from './definitions/NextComment.js';
 import { PrevComment } from './definitions/PrevComment.js';
 import { TextSection } from './definitions/TextSection.js';
-import { optimizeInstructions } from './optimize/index.js';
 
 export function instructionsToLines(instructions: RA<Instruction>): RA<Line> {
   let comments: WritableArray<NextComment | PrevComment> = [];
@@ -41,6 +40,14 @@ export function instructionsToLines(instructions: RA<Instruction>): RA<Line> {
       if (instruction instanceof NextComment) {
         comments.push(instruction);
         return undefined;
+      } else if (instruction instanceof Label) {
+        if (lineComments.length > 0)
+          throw new Error(
+            `Found comments for a label: ${comments
+              .map(({ comment }) => comment)
+              .join(', ')}`
+          );
+        return { comments: [], instruction };
       } else {
         const currentComments = [...lineComments, ...comments];
         comments = [];
@@ -58,7 +65,7 @@ export function instructionsToLines(instructions: RA<Instruction>): RA<Line> {
 
   const notIndented = [BlankLine, Globl, DataSection, TextSection];
   let label: Label | undefined = undefined;
-  const lines = filterArray(
+  return filterArray(
     instructionsWithComments.map(({ comments, instruction }) => {
       if (instruction instanceof Label) {
         if (comments.length > 0)
@@ -77,12 +84,14 @@ export function instructionsToLines(instructions: RA<Instruction>): RA<Line> {
         const isIndented = !notIndented.some(
           (type) => instruction instanceof type
         );
-        if (isIndented && label !== undefined)
+        if (!isIndented && label !== undefined)
           throw new Error(
             `Found a label for not indented line: ${label.label} (${instruction.constructor.name})`
           );
+        const resolvedLabel = isIndented ? label?.label ?? '' : undefined;
+        label = undefined;
         return new Line(
-          isIndented ? label?.label ?? '' : undefined,
+          resolvedLabel,
           instruction,
           comments.map(({ comment }) => comment)
         );
@@ -97,8 +106,10 @@ function mergeLabels(instructions: RA<Instruction>): RA<Instruction> {
   const filteredLabels = filterArray(
     instructions.map((instruction) => {
       if (instruction instanceof Label) {
-        if (currentLabel === undefined) currentLabel = instruction;
-        else toReplace[instruction.label] = currentLabel.label;
+        if (currentLabel === undefined) {
+          currentLabel = instruction;
+          return instruction;
+        } else toReplace[instruction.label] = currentLabel.label;
         return undefined;
       } else if (
         !(instruction instanceof NextComment) &&
@@ -147,7 +158,7 @@ export class Line {
         : (this.label === '' ? '' : `${this.label}:`).padEnd(longestLabel);
     const instruction = this.instruction.toString();
     const comments = this.comments.map((comment) => `# ${comment}`).join('  ');
-    return `${label}${instruction}${instruction}${
+    return `${label}${instruction}${
       comments.length === 0 ? '' : `  ${comments}`
     }`;
   }

@@ -7,7 +7,7 @@ export class Label extends Instruction {
   }
 }
 
-const labelPadding = 10;
+const labelPadding = 3;
 export const getLongestLabel = <T>(lines: RA<Label | T>): number =>
   Math.max(
     0,
