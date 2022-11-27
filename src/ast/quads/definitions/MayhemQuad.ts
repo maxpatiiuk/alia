@@ -20,7 +20,7 @@ export class MayhemQuad extends Quad {
         'addi $v0, $zero, 41',
         'move $a0, $zero',
         'syscall',
-        `sw $a0, ${this.tempVariable.toMipsValue()} # END Mayhem`,
+        `sw $a0, ${this.tempVariable.toMipsValue()}  # END Mayhem`,
       ],
       'BEGIN Mayhem'
     );
@@ -30,5 +30,17 @@ export class MayhemQuad extends Quad {
     return this.tempVariable.toMipsValue();
   }
 
-  // FIXME: implement
+  public toAmd() {
+    return addComment(
+      [
+        `callq mayhem`,
+        `movq %rax, ${this.tempVariable.toAmdValue()}  # END Mayhem`,
+      ],
+      'BEGIN Mayhem'
+    );
+  }
+
+  public toAmdValue() {
+    return this.tempVariable.toAmdValue();
+  }
 }
