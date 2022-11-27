@@ -49,7 +49,7 @@ export function instructionsToLines(instructions: RA<Instruction>): RA<Line> {
           );
         return { comments: [], instruction };
       } else {
-        const currentComments = [...lineComments, ...comments];
+        const currentComments = [...comments, ...lineComments];
         comments = [];
         return { comments: currentComments, instruction };
       }

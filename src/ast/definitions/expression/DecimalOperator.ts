@@ -9,6 +9,7 @@ import { assertToken } from '../TokenNode.js';
 import { Expression } from './index.js';
 import { OperationQuad } from '../../../quads/definitions/OperationQuad.js';
 import { IntLiteralNode } from '../term/IntLiteralNode.js';
+import { PostQuad } from '../../../quads/definitions/PostQuad.js';
 
 export class DecimalOperator extends Expression {
   public readonly operator: '-' | '*' | '/' | '+';
@@ -63,27 +64,49 @@ export class DecimalOperator extends Expression {
 
   public toQuads(context: QuadsContext) {
     const leftQuads = this.left.toQuads(context);
-    const intLiteral =
-      this.right instanceof IntLiteralNode ? this.right : undefined;
-    const isUseless =
-      typeof intLiteral === 'object' &&
+    const rightQuads = this.right.toQuads(context);
+    const rightInt = this.right;
+    const leftInt = this.right;
+    if (
+      leftInt instanceof IntLiteralNode &&
       uselessActions.some(
         ([operator, value]) =>
-          operator === this.operator && value.toString() === intLiteral.pretty()
-      );
-    return isUseless
-      ? leftQuads
-      : [
-          new OperationQuad(
-            leftQuads,
-            this.operator,
-            this.right.toQuads(context),
-            context
-          ),
-        ];
+          operator === this.operator && value.toString() === leftInt.pretty()
+      )
+    )
+      return rightQuads;
+    else if (rightInt instanceof IntLiteralNode) {
+      if (
+        uselessActions.some(
+          ([operator, value]) =>
+            operator === this.operator && value.toString() === rightInt.pretty()
+        )
+      )
+        return leftQuads;
+      else if (rightInt.pretty() === '1') {
+        const mappedOperator =
+          this.operator === '+'
+            ? '++'
+            : this.operator === '-'
+            ? '--'
+            : undefined;
+        if (typeof mappedOperator === 'string') {
+          const tempVariable = context.requestTemp();
+          // FIXME: test this
+          return new PostQuad(
+            tempVariable.toValue(),
+            tempVariable,
+            context,
+            mappedOperator
+          );
+        }
+      }
+    }
+    return [new OperationQuad(leftQuads, this.operator, rightQuads, context)];
   }
 }
 
+// FIXME: test that this is removed
 const uselessActions = [
   ['-', 0],
   ['*', 1],
