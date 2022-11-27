@@ -6,7 +6,8 @@ import { mem } from './IdQuad.js';
 export class ReceiveQuad extends Quad {
   public constructor(
     private readonly id: string,
-    private readonly tempVariable: TempVariable
+    private readonly tempVariable: TempVariable,
+    private readonly type: string
   ) {
     super();
   }
@@ -26,5 +27,13 @@ export class ReceiveQuad extends Quad {
     );
   }
 
-  // FIXME: implement
+  public toAmd() {
+    return addComment(
+      [
+        `callq ${this.type === 'bool' ? 'getBool' : 'getInt'}`,
+        `movq %rax, ${this.tempVariable.toAmdValue()}`,
+      ],
+      'Input'
+    );
+  }
 }

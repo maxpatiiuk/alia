@@ -1,4 +1,4 @@
-// Standard library for usage in the process of complilation to x64
+// Standard library for usage in the process of compilation to x64
 
 #include <stdio.h>
 #include <stdlib.h>
