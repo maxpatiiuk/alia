@@ -2,6 +2,7 @@ import type { RA } from '../../../utils/types.js';
 import { addComment, Quad } from './index.js';
 import { StringQuad } from './StringQuad.js';
 import { BoolLiteralQuad } from './IntLiteralQuad.js';
+import { IdQuad } from './IdQuad.js';
 
 export class ReportQuad extends Quad {
   public constructor(private readonly quads: RA<Quad>) {
@@ -30,9 +31,10 @@ export class ReportQuad extends Quad {
   }
 
   public toAmd() {
-    const isString = this.quads.at(-1) instanceof StringQuad;
-    const isBool = this.quads.at(-1) instanceof BoolLiteralQuad;
-    const value = this.quads.at(-1)!.toAmdValue();
+    const quad = this.quads.at(-1)!;
+    const isString = quad instanceof StringQuad;
+    const isBool = quad instanceof IdQuad && quad.type === 'bool';
+    const value = quad.toAmdValue();
     return addComment(
       [
         `movq ${value}, %rdi`,

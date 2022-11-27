@@ -101,7 +101,8 @@ export class IdNode extends Term {
       new IdQuad(
         this.getName(),
         this.getTempVariable(),
-        this.getDeclaration()! instanceof FunctionDeclaration
+        this.getDeclaration()! instanceof FunctionDeclaration,
+        this.getDeclaration()!.type.children[0].toString()
       ),
     ];
   }

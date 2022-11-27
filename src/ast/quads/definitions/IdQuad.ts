@@ -10,7 +10,8 @@ export class IdQuad extends Quad {
   public constructor(
     private readonly name: string,
     private readonly tempVariable: TempVariable,
-    public readonly isFunction: boolean
+    public readonly isFunction: boolean,
+    public readonly type: string
   ) {
     super();
     this.quad = new TermQuad(mem(this.name));
