@@ -1,7 +1,6 @@
 import type { RA } from '../../../utils/types.js';
 import {
   addComment,
-  amdSize,
   mipsSize,
   Quad,
   quadsToAmd,
@@ -73,10 +72,8 @@ export class CallQuad extends Quad {
   }
 
   public toAmd() {
-    const stackSize = this.tempsCount * amdSize;
     return quadsToAmd([
       ...this.quads,
-      `addq $${stackSize}, %rsp  # BEGIN Calling ${this.name}`,
       ...(this.dynamicTempVariable === undefined
         ? [`callq ${formatGlobalVariable(this.name)}`]
         : addComment(
@@ -86,7 +83,6 @@ export class CallQuad extends Quad {
             ],
             'Calling function by pointer'
           )),
-      `subq $${stackSize}, %rsp  # END Calling ${this.name}`,
     ]);
   }
 }

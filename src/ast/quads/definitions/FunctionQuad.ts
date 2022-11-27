@@ -140,17 +140,5 @@ export function parseTempVar(index: string): number | undefined {
 }
 
 const tempRegisterCount = 10;
-const amdTempRegisters = [
-  '%rbx',
-  '%rcx',
-  '%rsi',
-  '%rdi',
-  '%r8',
-  '%r9',
-  '%r10',
-  '%r11',
-  '%r12',
-  '%r13',
-  '%r14',
-  '%r15',
-];
+// Using only callee-saved registers to simplify coding
+const amdTempRegisters = ['%rbx', '%r12', '%r13', '%r14', '%r15'];

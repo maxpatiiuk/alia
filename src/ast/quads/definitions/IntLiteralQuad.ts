@@ -48,3 +48,5 @@ export class IntLiteralQuad extends Quad {
     return this.tempVariable.toAmdValue();
   }
 }
+
+export class BoolLiteralQuad extends IntLiteralQuad {}

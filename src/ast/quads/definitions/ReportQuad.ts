@@ -1,6 +1,7 @@
 import type { RA } from '../../../utils/types.js';
 import { addComment, Quad } from './index.js';
 import { StringQuad } from './StringQuad.js';
+import { BoolLiteralQuad } from './IntLiteralQuad.js';
 
 export class ReportQuad extends Quad {
   public constructor(private readonly quads: RA<Quad>) {
@@ -25,6 +26,19 @@ export class ReportQuad extends Quad {
         'syscall  # END Output',
       ],
       'BEGIN Output'
+    );
+  }
+
+  public toAmd() {
+    const isString = this.quads.at(-1) instanceof StringQuad;
+    const isBool = this.quads.at(-1) instanceof BoolLiteralQuad;
+    const value = this.quads.at(-1)!.toAmdValue();
+    return addComment(
+      [
+        `movq ${value}, %rdi`,
+        `callq ${isString ? 'printString' : isBool ? 'printBool' : 'printInt'}`,
+      ],
+      'Output'
     );
   }
 

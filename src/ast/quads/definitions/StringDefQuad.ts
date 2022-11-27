@@ -21,7 +21,7 @@ export class StringDefQuad extends Quad {
   }
 
   public toAmd() {
-    return [this.label, `.asciiz ${this.value}`];
+    return [this.label, `.asciz ${this.value}`];
   }
 }
 
