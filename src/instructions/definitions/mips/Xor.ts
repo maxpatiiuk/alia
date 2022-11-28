@@ -10,6 +10,6 @@ export class Xor extends MipsInstruction {
   }
 
   public toString(): string {
-    return `sor ${this.destination}, ${this.left}, ${this.right}`;
+    return `xor ${this.destination}, ${this.left}, ${this.right}`;
   }
 }
