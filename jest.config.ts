@@ -13,7 +13,7 @@
  * into JavaScript (without type checking).
  */
 
-import type { InitialOptionsTsJest } from 'ts-jest'
+import type { InitialOptionsTsJest } from 'ts-jest';
 
 /* eslint-disable multiline-comment-style */
 /* eslint-disable capitalized-comments */
@@ -196,10 +196,10 @@ const config: InitialOptionsTsJest = {
   // testLocationInResults: false,
 
   // The glob patterns Jest uses to detect test files
-  // testMatch: [
-  //   "**/__tests__/**/*.[jt]s?(x)",
-  //   "**/?(*.)+(spec|test).[tj]s?(x)"
-  // ],
+  testMatch: [
+    '**/__tests__/**/*.test.[jt]s?(x)',
+    '**/?(*.)+(spec|test).[tj]s?(x)',
+  ],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
   // testPathIgnorePatterns: [
