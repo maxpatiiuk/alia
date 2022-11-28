@@ -15,13 +15,19 @@ import { Move } from '../../instructions/definitions/mips/Move.js';
 import { Lw } from '../../instructions/definitions/mips/Lw.js';
 import { Jr } from '../../instructions/definitions/mips/Jr.js';
 import { PrevComment } from '../../instructions/definitions/PrevComment.js';
+import { amdTempRegisters } from './FunctionQuad.js';
+import { PushQ } from '../../instructions/definitions/amd/PushQ.js';
+import { PopQ } from '../../instructions/definitions/amd/PopQ.js';
 import { AddQ } from '../../instructions/definitions/amd/AddQ.js';
 import { SubQ } from '../../instructions/definitions/amd/SubQ.js';
 
 export class CallQuad extends Quad {
-  private readonly quads: RA<Quad>;
+  private readonly quads: RA<readonly [RA<Quad>, Quad]>;
   private readonly tempsCount: number;
+  private readonly needsAlignment: boolean;
   private readonly formattedName: string;
+  private readonly preStackOffset: number;
+  private readonly postStackOffset: number;
 
   public constructor(
     context: QuadsContext,
@@ -36,12 +42,14 @@ export class CallQuad extends Quad {
       : formatGlobalVariable(this.name);
 
     let tempRegister: undefined | Register = undefined;
+
     function getTempRegister() {
       tempRegister ??= context.requestTempRegister();
       return tempRegister;
     }
-    this.quads = actuals.flatMap((actual, index) => [
-      ...(actual ?? []),
+
+    this.quads = actuals.map((actual, index) => [
+      actual ?? [],
       new SetArgumentQuad(
         index + 1,
         actual?.at(-1)!.toValue(),
@@ -56,11 +64,16 @@ export class CallQuad extends Quad {
       ),
     ]);
     this.tempsCount = context.getTempCount();
+    const stackSize = this.tempsCount;
+    const stackPushCount = actuals.length + amdTempRegisters.length;
+    this.needsAlignment = stackSize % 2 !== stackPushCount % 2;
+    this.preStackOffset = stackSize + (this.needsAlignment ? 1 : 0);
+    this.postStackOffset = this.preStackOffset + actuals.length;
   }
 
   public toString() {
     return [
-      ...this.quads.flatMap((quad) => quad.toString()),
+      ...this.quads.flat().flatMap((quad) => quad.toString()),
       `call ${this.name}`,
     ];
   }
@@ -68,7 +81,10 @@ export class CallQuad extends Quad {
   public toMips() {
     const stackSize = this.tempsCount * mipsSize;
     return quadsToMips([
-      ...this.quads,
+      ...this.quads.flatMap(([quads, setArgumentQuad]) => [
+        ...quads,
+        setArgumentQuad,
+      ]),
       new NextComment(`BEGIN Calling ${this.name}`),
       new Addi('$sp', '$sp', -stackSize),
       ...(this.dynamicTempVariable === undefined
@@ -88,20 +104,23 @@ export class CallQuad extends Quad {
   }
 
   public toAmd() {
-    const stackSize = this.tempsCount * amdSize;
     return quadsToAmd([
       new NextComment(`BEGIN Calling ${this.name}`),
-      ...this.quads,
-      new SubQ(`$${stackSize}`, '%rsp'),
+      ...this.quads.flatMap(([quads]) => quads),
+      new SubQ(`$${this.preStackOffset * amdSize}`, '%rsp'),
+      ...amdTempRegisters.map((register) => new PushQ(register)),
+      ...this.quads.map(([_, setArgumentQuad]) => setArgumentQuad),
       ...(this.dynamicTempVariable === undefined
         ? [new CallQ(this.formattedName)]
         : [
-            // FIXME: add provisions for saving temps to stack
             new NextComment('Calling function by pointer'),
             new MovQ(this.dynamicTempVariable.toAmdValue(), '%rax'),
-            new CallQ('%rax'),
+            new CallQ('*%rax'),
           ]),
-      new AddQ(`$${stackSize}`, '%rsp'),
+      ...Array.from(amdTempRegisters)
+        .reverse()
+        .map((register) => new PopQ(register)),
+      new AddQ(`$${this.postStackOffset * amdSize}`, '%rsp'),
       new PrevComment(`END Calling ${this.name}`),
     ]);
   }

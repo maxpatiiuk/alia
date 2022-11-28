@@ -8,7 +8,8 @@ import type { Register } from './Register.js';
 import { NextComment } from '../../instructions/definitions/NextComment.js';
 
 export class GetArgQuad extends Quad {
-  private readonly loadQuad: LoadQuad;
+  private readonly mipsLoadQuad: LoadQuad;
+  private readonly amdLoadQuad: LoadQuad;
 
   private readonly assignQuad: AssignQuad;
 
@@ -21,7 +22,9 @@ export class GetArgQuad extends Quad {
     super();
     const resolvedIndex = -(length - this.index) + 1;
     const tempVariable = new TempVariable(resolvedIndex);
-    this.loadQuad = new LoadQuad(tempRegister, tempVariable);
+    this.mipsLoadQuad = new LoadQuad(tempRegister, tempVariable);
+    const amdTempVariable = new TempVariable(resolvedIndex - 2);
+    this.amdLoadQuad = new LoadQuad(tempRegister, amdTempVariable);
     this.assignQuad = new AssignQuad(undefined, this.formal.tempVariable, [
       tempRegister,
     ]);
@@ -34,7 +37,7 @@ export class GetArgQuad extends Quad {
   public toMips() {
     return [
       new NextComment(`Getting argument "${this.formal.id}"`),
-      ...this.loadQuad.toMips(),
+      ...this.mipsLoadQuad.toMips(),
       ...this.assignQuad.toMips(),
     ];
   }
@@ -42,7 +45,7 @@ export class GetArgQuad extends Quad {
   public toAmd() {
     return [
       new NextComment(`Getting argument "${this.formal.id}"`),
-      ...this.loadQuad.toAmd(),
+      ...this.amdLoadQuad.toAmd(),
       ...this.assignQuad.toAmd(),
     ];
   }

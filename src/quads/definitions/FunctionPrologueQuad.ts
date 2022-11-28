@@ -19,6 +19,7 @@ export class FunctionPrologueQuad extends Quad {
   private readonly entryAmd: Label;
 
   private readonly setRa: Quad;
+  // public tempsCount: number = 2;
 
   public constructor(private readonly id: string, context: QuadsContext) {
     super();
@@ -58,7 +59,8 @@ export class FunctionPrologueQuad extends Quad {
       this.entryAmd,
       new PushQ('%rbp'),
       new MovQ('%rsp', '%rbp'),
-      new SubQ(`$${amdSize * 2}`, '%rsp'),
+      // new SubQ(`$${amdSize * 2}`, '%rsp'),
+      // new SubQ(`$${amdSize * this.tempsCount}`, '%rsp'),
       new PrevComment('BEGIN Function body'),
     ];
   }

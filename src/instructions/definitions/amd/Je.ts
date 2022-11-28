@@ -1,6 +1,6 @@
 import { AmdInstruction } from './index.js';
 
-export class Jz extends AmdInstruction {
+export class Je extends AmdInstruction {
   public constructor(
     // eslint-disable-next-line functional/prefer-readonly-type
     public label: string
@@ -9,6 +9,6 @@ export class Jz extends AmdInstruction {
   }
 
   public toString(): string {
-    return `jz ${this.label}`;
+    return `je ${this.label}`;
   }
 }

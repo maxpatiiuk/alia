@@ -132,10 +132,7 @@ function replaceLabels(
   toReplace: IR<string>
 ): RA<Instruction> {
   instructions.forEach((instruction) => {
-    if (
-      typeof instruction.label === 'string' &&
-      instruction.label in instructions
-    )
+    if (typeof instruction.label === 'string' && instruction.label in toReplace)
       instruction.label = toReplace[instruction.label];
   });
   return instructions;

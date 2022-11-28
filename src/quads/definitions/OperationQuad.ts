@@ -128,9 +128,8 @@ export class OpQuad extends Quad {
       return [new MovQ(left, temp), new AddQ(right, temp)];
     else if (this.type === '*')
       return [
-        new MovQ(left, temp),
         new MovQ(right, '%rax'),
-        new ImulQ('%rax'),
+        new ImulQ(left),
         // Note: this does not check for overflow
         new MovQ('%rax', temp),
       ];
@@ -147,17 +146,17 @@ export class OpQuad extends Quad {
     else if (this.type === 'and')
       return [new MovQ(left, temp), new AndQ(right, temp)];
     else if (this.type === '<')
-      return [new CmpQ(left, right), new SetL(lowTemp)];
+      return [new CmpQ(right, left), new SetL(lowTemp), new AndQ('$1', temp)];
     else if (this.type === '>')
-      return [new CmpQ(left, right), new SetG(lowTemp)];
+      return [new CmpQ(right, left), new SetG(lowTemp), new AndQ('$1', temp)];
     else if (this.type === '<=')
-      return [new CmpQ(left, right), new SetLe(lowTemp)];
+      return [new CmpQ(right, left), new SetLe(lowTemp), new AndQ('$1', temp)];
     else if (this.type === '>=')
-      return [new CmpQ(left, right), new SetGe(lowTemp)];
+      return [new CmpQ(right, left), new SetGe(lowTemp), new AndQ('$1', temp)];
     else if (this.type === '==')
-      return [new CmpQ(left, right), new SetE(lowTemp)];
+      return [new CmpQ(right, left), new SetE(lowTemp), new AndQ('$1', temp)];
     else if (this.type === '!=')
-      return [new CmpQ(left, right), new SetNe(lowTemp)];
+      return [new CmpQ(right, left), new SetNe(lowTemp), new AndQ('$1', temp)];
     else if (this.type === '!') return [new MovQ(right, temp), new Not(temp)];
     else if (this.type === 'neg') return [new MovQ(right, temp), new Neg(temp)];
     else throw new Error(`Unknown operation ${this.type}`);

@@ -14,9 +14,9 @@ import { Register } from './Register.js';
 import { BlankLine } from '../../instructions/definitions/amd/BlankLink.js';
 
 export class FunctionQuad extends Quad {
-  private readonly enter: Quad;
+  private readonly enter: FunctionPrologueQuad;
 
-  private readonly leave: Quad;
+  private readonly leave: FunctionEpilogueQuad;
 
   private readonly getArgs: RA<Quad>;
 
@@ -83,6 +83,9 @@ export class FunctionQuad extends Quad {
     );
 
     this.statements = statements.toQuads(newContext);
+    // this.enter.tempsCount =
+    //   this.tempsCount +
+    //   (this.tempsCount % 2 === amdTempRegisters.length % 2 ? 0 : 1);
   }
 
   public toString() {

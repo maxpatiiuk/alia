@@ -43,6 +43,10 @@ export class ForQuad extends Quad {
   }
 
   public toAmd() {
-    return quadsToAmd(this.instructions);
+    return [
+      new NextComment('BEGIN for loop'),
+      ...quadsToAmd(this.instructions),
+      new PrevComment('END for loop'),
+    ];
   }
 }

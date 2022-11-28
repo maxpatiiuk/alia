@@ -1,3 +1,4 @@
+import { PushQ } from '../../instructions/definitions/amd/PushQ.js';
 import { NextComment } from '../../instructions/definitions/NextComment.js';
 import { AssignQuad } from './AssignQuad.js';
 import type { TempVariable } from './IdQuad.js';
@@ -9,6 +10,8 @@ export class SetArgQuad extends Quad {
   private readonly loadQuad: LoadQuad | undefined;
 
   private readonly assignQuad: AssignQuad | undefined;
+
+  private readonly amdPushQ: PushQ | undefined;
 
   public constructor(
     private readonly index: number,
@@ -24,6 +27,8 @@ export class SetArgQuad extends Quad {
       variable === undefined
         ? undefined
         : new AssignQuad(undefined, tempVariable, [tempRegister]);
+    this.amdPushQ =
+      variable === undefined ? undefined : new PushQ(tempRegister.toAmdValue());
   }
 
   public toString() {
@@ -42,7 +47,7 @@ export class SetArgQuad extends Quad {
     return [
       new NextComment(`Setting argument ${this.index}`),
       ...(this.loadQuad?.toAmd() ?? []),
-      ...(this.assignQuad?.toAmd() ?? []),
+      ...(typeof this.amdPushQ === 'object' ? [this.amdPushQ] : []),
     ];
   }
 }

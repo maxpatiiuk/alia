@@ -6,11 +6,11 @@ import { LoadQuad } from './LoadQuad.js';
 import { Register } from './Register.js';
 import { NextComment } from '../../instructions/definitions/NextComment.js';
 import { PrevComment } from '../../instructions/definitions/PrevComment.js';
-import { Jz } from '../../instructions/definitions/amd/Jz.js';
+import { Je } from '../../instructions/definitions/amd/Je.js';
 import { Beq } from '../../instructions/definitions/mips/Beq.js';
 import { Label } from '../../instructions/definitions/Label.js';
-import { OpQuad } from './OperationQuad.js';
-import { MovQ } from '../../instructions/definitions/amd/MovQ.js';
+import { CmpQ } from '../../instructions/definitions/amd/CmpQ.js';
+import { CmpL } from '../../instructions/definitions/amd/CmpL.js';
 
 export class IfQuad extends Quad {
   private readonly quads: RA<Quad | NextComment | PrevComment | Label>;
@@ -104,14 +104,8 @@ class IfzQuad extends Quad {
     return quadsToAmd([
       ...this.condition,
       this.loadQuad,
-      new MovQ('$0', '%rax'),
-      new OpQuad(
-        this.loadQuad,
-        '==',
-        new Register('%rax'),
-        new Register('%rax')
-      ),
-      new Jz(this.label),
+      new CmpQ('$0', this.loadQuad.toAmdValue()),
+      new Je(this.label),
     ]);
   }
 }
