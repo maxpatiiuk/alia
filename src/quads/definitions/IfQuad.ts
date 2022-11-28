@@ -10,7 +10,6 @@ import { Je } from '../../instructions/definitions/amd/Je.js';
 import { Beq } from '../../instructions/definitions/mips/Beq.js';
 import { Label } from '../../instructions/definitions/Label.js';
 import { CmpQ } from '../../instructions/definitions/amd/CmpQ.js';
-import { CmpL } from '../../instructions/definitions/amd/CmpL.js';
 
 export class IfQuad extends Quad {
   private readonly quads: RA<Quad | NextComment | PrevComment | Label>;

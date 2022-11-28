@@ -1,25 +1,25 @@
-import type { QuadsContext } from '../index.js';
-import { AssignQuad } from './AssignQuad.js';
-import { amdSize, mipsSize, Quad } from './index.js';
-import { formatFunctionName, formatGlobalVariable } from './GlobalVarQuad.js';
-import { Register } from './Register.js';
-import { mainFunction } from './GlobalQuad.js';
-import { PushQ } from '../../instructions/definitions/amd/PushQ.js';
 import { MovQ } from '../../instructions/definitions/amd/MovQ.js';
-import { SubQ } from '../../instructions/definitions/amd/SubQ.js';
+import { PushQ } from '../../instructions/definitions/amd/PushQ.js';
+import { Label } from '../../instructions/definitions/Label.js';
+import { Move } from '../../instructions/definitions/mips/Move.js';
+import { Sw } from '../../instructions/definitions/mips/Sw.js';
 import { NextComment } from '../../instructions/definitions/NextComment.js';
 import { PrevComment } from '../../instructions/definitions/PrevComment.js';
-import { Sw } from '../../instructions/definitions/mips/Sw.js';
-import { Move } from '../../instructions/definitions/mips/Move.js';
-import { Label } from '../../instructions/definitions/Label.js';
+import type { QuadsContext } from '../index.js';
+import { AssignQuad } from './AssignQuad.js';
+import { mainFunction } from './GlobalQuad.js';
+import { formatFunctionName, formatGlobalVariable } from './GlobalVarQuad.js';
+import { mipsSize, Quad } from './index.js';
+import { Register } from './Register.js';
 
 export class FunctionPrologueQuad extends Quad {
   private readonly entryQuad: Label;
+
   private readonly entryMips: Label;
+
   private readonly entryAmd: Label;
 
   private readonly setRa: Quad;
-  // public tempsCount: number = 2;
 
   public constructor(private readonly id: string, context: QuadsContext) {
     super();
@@ -59,8 +59,6 @@ export class FunctionPrologueQuad extends Quad {
       this.entryAmd,
       new PushQ('%rbp'),
       new MovQ('%rsp', '%rbp'),
-      // new SubQ(`$${amdSize * 2}`, '%rsp'),
-      // new SubQ(`$${amdSize * this.tempsCount}`, '%rsp'),
       new PrevComment('BEGIN Function body'),
     ];
   }

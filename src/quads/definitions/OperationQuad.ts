@@ -1,4 +1,4 @@
-import type { RA } from '../../utils/types.js';
+import type { IR, RA } from '../../utils/types.js';
 import { AssignQuad } from './AssignQuad.js';
 import { Quad, quadsToAmd, quadsToMips } from './index.js';
 import { QuadsContext } from '../index.js';
@@ -267,7 +267,7 @@ export class OperationQuad extends Quad {
   }
 }
 
-const lowRegisterMapping = {
+const lowRegisterMapping: IR<string> = {
   '%rax': '%al',
   '%rbx': '%bl',
   '%r12': '%r12b',

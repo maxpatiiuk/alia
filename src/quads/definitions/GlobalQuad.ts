@@ -36,8 +36,6 @@ import {
 } from '../../instructions/index.js';
 import { optimizeInstructions } from '../../instructions/optimize/index.js';
 
-// FIXME: add tests
-// FIXME: do manual test using the mips test program
 // FIXME: fix failing tests
 export class GlobalQuad extends Quad {
   private readonly globalQuads: RA<Quad>;

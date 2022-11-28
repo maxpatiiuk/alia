@@ -3,7 +3,7 @@ import { toQuads } from '../index.js';
 import { testProgram } from './testProgram.js';
 import { GlobalQuad } from '../definitions/GlobalQuad.js';
 
-test('toMips', async () => {
+test('toAmd', async () => {
   const ast = await run({
     rawText: testProgram,
   });
@@ -16,5 +16,5 @@ test('toMips', async () => {
   if (!(globalQuad instanceof GlobalQuad))
     throw new Error('Top level quad must be an instance of GlobalQuad');
 
-  expect(globalQuad.convertToMips()).toMatchSnapshot();
+  expect(globalQuad.convertToAmd()).toMatchSnapshot();
 });

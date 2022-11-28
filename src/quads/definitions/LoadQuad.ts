@@ -35,7 +35,10 @@ export class LoadQuad extends Quad {
   public toAmd() {
     return [
       ...this.tempRegister.toAmd(),
-      new MovQ(this.tempVariable.toAmdValue(), this.tempRegister.toAmdValue()),
+      new MovQ(
+        `${this.isFunction ? '$' : ''}${this.tempVariable.toAmdValue()}`,
+        this.tempRegister.toAmdValue()
+      ),
     ];
   }
 
