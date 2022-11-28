@@ -18,7 +18,7 @@ export class FunctionEpilogueQuad extends Quad {
   }
 
   public toString() {
-    return [...this.leave.toString(), `leave ${this.id}`];
+    return [this.leave, `leave ${this.id}`];
   }
 
   public toMips() {

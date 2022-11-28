@@ -73,7 +73,9 @@ export class CallQuad extends Quad {
 
   public toString() {
     return [
-      ...this.quads.flat().flatMap((quad) => quad.toString()),
+      ...this.quads
+        .flatMap(([quads, setArgumentQuad]) => [...quads, setArgumentQuad])
+        .flatMap((quad) => quad.toString()),
       `call ${this.name}`,
     ];
   }

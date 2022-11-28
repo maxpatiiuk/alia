@@ -36,7 +36,6 @@ import {
 } from '../../instructions/index.js';
 import { optimizeInstructions } from '../../instructions/optimize/index.js';
 
-// FIXME: fix failing tests
 export class GlobalQuad extends Quad {
   private readonly globalQuads: RA<Quad>;
 
@@ -117,14 +116,14 @@ export class GlobalQuad extends Quad {
   }
 
   public toString() {
-    return inlineLabels(
-      quadsToString([
+    return [
+      ...quadsToString([
         '[BEGIN GLOBALS]',
         ...this.globalQuads,
         '[END GLOBALS]',
-        ...this.functions,
-      ])
-    );
+      ]),
+      ...quadsToString(this.functions),
+    ];
   }
 
   public convertToMips(): string {
@@ -206,11 +205,11 @@ const startFunction = '_start';
 export const mainFunction = 'main';
 export const getPcHelper = '_get_pc';
 
-function inlineLabels(lines: RA<Label | string>): RA<string> {
+export function inlineLabels(lines: RA<Label | string>): RA<string> {
   const longestLabel = getLongestLabel(lines);
   return lines.map((line) =>
     line instanceof Label
       ? `${`${line.label}:`.padEnd(longestLabel, ' ')}nop`
-      : `${''.padEnd(longestLabel + 1, ' ')}${line}`
+      : `${''.padEnd(longestLabel, ' ')}${line}`
   );
 }

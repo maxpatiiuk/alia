@@ -9,9 +9,10 @@ import { FunctionPrologueQuad } from './FunctionPrologueQuad.js';
 import { GetArgQuad as GetArgumentQuad } from './GetArgQuad.js';
 import { formatGlobalVariable } from './GlobalVarQuad.js';
 import { TempVariable } from './IdQuad.js';
-import { Quad } from './index.js';
+import { Quad, quadsToString } from './index.js';
 import { Register } from './Register.js';
 import { BlankLine } from '../../instructions/definitions/amd/BlankLink.js';
+import { inlineLabels } from './GlobalQuad.js';
 
 export class FunctionQuad extends Quad {
   private readonly enter: FunctionPrologueQuad;
@@ -83,9 +84,6 @@ export class FunctionQuad extends Quad {
     );
 
     this.statements = statements.toQuads(newContext);
-    // this.enter.tempsCount =
-    //   this.tempsCount +
-    //   (this.tempsCount % 2 === amdTempRegisters.length % 2 ? 0 : 1);
   }
 
   public toString() {
@@ -97,11 +95,15 @@ export class FunctionQuad extends Quad {
         formatTemporary(index)
       ),
       `[END ${this.id} LOCALS]`,
-      ...this.enter.toString(),
-      ...[...this.getArgs, ...this.statements].flatMap((quad) =>
-        quad.toString()
+      ...inlineLabels(
+        quadsToString([
+          ...this.enter.toString(),
+          ...[...this.getArgs, ...this.statements].flatMap((quad) =>
+            quad.toString()
+          ),
+          ...this.leave.toString(),
+        ])
       ),
-      ...this.leave.toString(),
     ];
   }
 

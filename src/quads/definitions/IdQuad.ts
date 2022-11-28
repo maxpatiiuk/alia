@@ -48,7 +48,7 @@ export class TempVariable extends Register {
   }
 
   public toValue() {
-    return mem(this.variable.toString());
+    return mem(this.variable);
   }
 }
 
@@ -72,4 +72,8 @@ const ref = (tempVariable: string | number): string =>
 
 /** Wrap an identifier in square brackets (indicates memory access) */
 export const mem = (id: number | string): string =>
-  `[${typeof id === 'number' ? formatTemp(id) : id}]`;
+  typeof id === 'string' &&
+  ((id.startsWith('[') && id.endsWith(']')) ||
+    !Number.isNaN(Number.parseInt(id)))
+    ? id
+    : `[${typeof id === 'number' ? formatTemp(id) : id}]`;
