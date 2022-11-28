@@ -173,7 +173,7 @@ void testShadowing() {
   assert(returnValue, 2);
 }
 
-int testLongExpression(bool first) {
+int testLongExpression(bool isFirstCall) {
   int a;
   a = 1;
   int b;
@@ -189,14 +189,36 @@ int testLongExpression(bool first) {
   int g;
   g = 7;
 
-  if(first) {
-    a = a + b + c + e + f + g;
-    assert(a, 28);
-  }
-  else {
-    a = (a + b) * (d / c) - (testLongExpression(true) / e);
+  if(isFirstCall) {
+    a = (a + b) * (d / c) - (testLongExpression(false) / e);
     assert(a, -2);
   }
+  else {
+    a = a + b + c + d + e + f + g;
+    assert(a, 28);
+    return a;
+  }
+}
+
+void tonOfArguments(int a, int b, int c, int d, int e, int f, int g) {
+  output a;
+  output "\n";
+  output b;
+  output "\n";
+  output c;
+  output "\n";
+  output d;
+  output "\n";
+  output e;
+  output "\n";
+  output f;
+  output "\n";
+  output g;
+  output "\n";
+}
+
+void testTonOfArguments() {
+  tonOfArguments(11,22,33,44,55,66,77);
 }
 
 
@@ -208,13 +230,16 @@ int main() {
   testLoops();
 
   printTestHeader();
-  testFunctionPointers();
+  testTonOfArguments();
 
   printTestHeader();
   testShadowing();
 
   printTestHeader();
-  testLongExpression(false);
+  testLongExpression(true);
+
+  printTestHeader();
+  testFunctionPointers();
 
   printSummary();
 }
