@@ -49,13 +49,13 @@ run in an [interpreter](#running-interpreter).
   * [Running Interpreter](#running-interpreter)
   * [Testing](#testing)
   * [Architecture](#architecture)
-    + [Lexical Analysis (Tokenizing)](#lexical-analysis--tokenizing-)
-    + [Syntactic analysis (Parsing)](#syntactic-analysis--parsing-)
+    + [Lexical Analysis (Tokenizing)](#lexical-analysis-tokenizing)
+    + [Syntactic analysis (Parsing)](#syntactic-analysis-parsing)
       - [Syntax directed translation](#syntax-directed-translation)
         * [Parse tree generation](#parse-tree-generation)
-          + [(optional) Prettify the code](#-optional--prettify-the-code)
-        * [Abstract syntax tree (AST) generation](#abstract-syntax-tree--ast--generation)
-          + [(optional) Prettify the code](#-optional--prettify-the-code-1)
+          + [(optional) Prettify the code](#optional-prettify-the-code)
+        * [Abstract syntax tree (AST) generation](#abstract-syntax-tree-ast-generation)
+          + [(optional) Prettify the code](#optional-prettify-the-code-1)
     + [Semantic analysis](#semantic-analysis)
       - [Name analysis](#name-analysis)
       - [Type analysis](#type-analysis)
@@ -68,10 +68,10 @@ run in an [interpreter](#running-interpreter).
         * [MIPS](#mips)
         * [x64](#x64)
       - [Interpreter](#interpreter)
-  * [`dgc` Documentation](#-dgc--documentation)
+  * [`dgc` Documentation](#dgc-documentation)
   * [Development Documentation](#development-documentation)
-  * [Appendix 1: Extending the language](#appendix-1--extending-the-language)
-  * [Appendix 2: Generating a graph of the grammar](#appendix-2--generating-a-graph-of-the-grammar)
+  * [Appendix 1: Extending the language](#appendix-1-extending-the-language)
+  * [Appendix 2: Generating a graph of the grammar](#appendix-2-generating-a-graph-of-the-grammar)
 
 ## Prerequisites
 
@@ -164,6 +164,7 @@ Several restrictions are lifted when running Drewgon in an interpreter:
 - `output` statements always include a trailing newline
  
 Example Interpreter session:
+
 ![Example Interpreter session](./docs/img/interpreter-session.png)
 
 ## Testing
@@ -181,6 +182,7 @@ in [./src/interpreter/__
 tests__/runtime.test.ts](./src/interpreter/__tests__/runtime.test.ts)
 
 Example test run:
+
 ![Example test run](./docs/img/test-results.png)
 
 ## Architecture
@@ -218,6 +220,7 @@ You can run the compiler in tokenizing-only mode like this:
 This would output the token stream into `./tokens.out` text file.
 
 Example token stream:
+
 ![Example token stream](./docs/img/tokens-stream.png)
 
 ### Syntactic analysis (Parsing)
@@ -359,6 +362,7 @@ Each AST node has a `nameAnalysis` method that is called during name analysis.
 It collects information about used variables, their scope and reports errors.
 
 Example name analysis output:
+
 ![Example name analysis output](./docs/img/name-analysis.png)
 
 #### Type analysis
@@ -379,6 +383,7 @@ It collects information about the type of each variable, function and reports
 any incorrect type conversions.
 
 Example type analysis output:
+
 ![Example type analysis output](./docs/img/type-analysis.png)
 
 You can also output the prettified source code with name analysis and type
