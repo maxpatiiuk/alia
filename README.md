@@ -1,14 +1,12 @@
 # dgc
 
-// TODO: add screenshots and gifs
-
 The ultimate Drewgon compiler and interpreter.
 
 Written in TypeScript.
 
 Drewgon follows c-like syntax. Example code:
 
-```sh
+```javascript
 int x;
 
 int double(int x) {
@@ -39,7 +37,41 @@ language it is written in.
 Drewgon can be compiled down to [x64 or MIPS](#running-compiler). It can also be
 run in an [interpreter](#running-interpreter).
 
-// TODO: add a contents section
+## Contents
+
+- [dgc](#dgc)
+  * [Contents](#contents)
+  * [Prerequisites](#prerequisites)
+  * [Installation](#installation)
+  * [Running Compiler](#running-compiler)
+    + [Compiling to x64](#compiling-to-x64)
+    + [Compiling to MIPS](#compiling-to-mips)
+  * [Running Interpreter](#running-interpreter)
+  * [Testing](#testing)
+  * [Architecture](#architecture)
+    + [Lexical Analysis (Tokenizing)](#lexical-analysis--tokenizing-)
+    + [Syntactic analysis (Parsing)](#syntactic-analysis--parsing-)
+      - [Syntax directed translation](#syntax-directed-translation)
+        * [Parse tree generation](#parse-tree-generation)
+          + [(optional) Prettify the code](#-optional--prettify-the-code)
+        * [Abstract syntax tree (AST) generation](#abstract-syntax-tree--ast--generation)
+          + [(optional) Prettify the code](#-optional--prettify-the-code-1)
+    + [Semantic analysis](#semantic-analysis)
+      - [Name analysis](#name-analysis)
+      - [Type analysis](#type-analysis)
+    + [Intermediate code generation](#intermediate-code-generation)
+      - [Intermediate code optimization](#intermediate-code-optimization)
+    + [Final code generation](#final-code-generation)
+      - [Final code optimization](#final-code-optimization)
+    + [Execution](#execution)
+      - [Runtime environment](#runtime-environment)
+        * [MIPS](#mips)
+        * [x64](#x64)
+      - [Interpreter](#interpreter)
+  * [`dgc` Documentation](#-dgc--documentation)
+  * [Development Documentation](#development-documentation)
+  * [Appendix 1: Extending the language](#appendix-1--extending-the-language)
+  * [Appendix 2: Generating a graph of the grammar](#appendix-2--generating-a-graph-of-the-grammar)
 
 ## Prerequisites
 
@@ -539,8 +571,8 @@ Convert the SLR automata into a Graphviz graph definition, which in turn can
 be converted into an SVG or a PNG.
 
 > NOTE: due to grammar being quite large, the resulting graph is enormous.
->
-> To make it more practical, I commented out large portions of the grammar
+> 
+> To make it more practical, I commented out large portions of the grammar 
 > before running the graph generation in order to reduce the size of the
 > graph.
 
