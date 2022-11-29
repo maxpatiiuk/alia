@@ -96,8 +96,7 @@ global_twice:                 sw $fp, -4($sp)  # Save frame pointer
                               addi $ra, $ra, 16  # Offset the return position
                               lw $v0, -12($fp)
                               jr $v0
-                              addi $sp, $sp, 20
-                              move $fp, $sp  # END Calling f
+                              addi $sp, $sp, 20  # END Calling f
                               lw $t2, -16($fp)  # Setting argument 1
                               sw $t2, -24($fp)
                               addi $sp, $sp, -24  # BEGIN Calling f
@@ -106,8 +105,7 @@ global_twice:                 sw $fp, -4($sp)  # Save frame pointer
                               addi $ra, $ra, 16  # Offset the return position
                               lw $v0, -12($fp)
                               jr $v0
-                              addi $sp, $sp, 24
-                              move $fp, $sp  # END Calling f
+                              addi $sp, $sp, 24  # END Calling f
                               lw $v0, -12($fp)  # BEGIN Return
 lbl_3:                        lw $ra, -8($fp)  # END Function body  # Restore return address
                               lw $fp, -4($fp)  # Restore frame pointer
@@ -149,8 +147,7 @@ lbl_5:                        la $t8, global_right  # BEGIN False Branch
                               sw $t9, -12($fp)  # BEGIN Assigning localPointer  # END if  # END False Branch  # END Assigning localPointer
 lbl_6:                        addi $sp, $sp, -32  # BEGIN Calling break
                               jal global_break
-                              addi $sp, $sp, 32
-                              move $fp, $sp  # END Calling break
+                              addi $sp, $sp, 32  # END Calling break
                               la $a0, str_3  # BEGIN Output  # String Literal: \\"Calling a function using pointer:\\\\n\\"
                               addi $v0, $zero, 4
                               syscall  # END Output
@@ -162,8 +159,7 @@ lbl_6:                        addi $sp, $sp, -32  # BEGIN Calling break
                               addi $ra, $ra, 16  # Offset the return position
                               lw $v0, -12($fp)
                               jr $v0
-                              addi $sp, $sp, 36
-                              move $fp, $sp  # END Calling localPointer
+                              addi $sp, $sp, 36  # END Calling localPointer
                               sw $zero, -40($fp)  # Initializing result
                               la $a0, str_4  # BEGIN Output  # String Literal: \\"Function as an actual:\\\\n\\"
                               addi $v0, $zero, 4
@@ -174,8 +170,7 @@ lbl_6:                        addi $sp, $sp, -32  # BEGIN Calling break
                               sw $t3, -48($fp)
                               addi $sp, $sp, -48  # BEGIN Calling twice
                               jal global_twice
-                              addi $sp, $sp, 48
-                              move $fp, $sp  # END Calling twice
+                              addi $sp, $sp, 48  # END Calling twice
                               sw $v0, -52($fp)
                               lw $t2, -52($fp)
                               sw $t2, -40($fp)  # BEGIN Assigning result  # END Assigning result
@@ -190,8 +185,7 @@ lbl_6:                        addi $sp, $sp, -32  # BEGIN Calling break
                               addi $ra, $ra, 16  # Offset the return position
                               lw $v0, -40($fp)
                               jr $v0
-                              addi $sp, $sp, 56
-                              move $fp, $sp  # END Calling result
+                              addi $sp, $sp, 56  # END Calling result
 lbl_4:                        lw $ra, -8($fp)  # END Function body  # Restore return address
                               lw $fp, -4($fp)  # Restore frame pointer
                               jr $ra  # Return to caller
@@ -428,8 +422,7 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t6, -24($fp)
                               addi $sp, $sp, -24  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 24
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 24  # END Calling assertBool
                               li $t7, 1  # Operation: OR64  # Int Literal: 1
                               sw $t7, -28($fp)
                               li $t8, 1  # Int Literal: 1
@@ -442,8 +435,7 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t2, -40($fp)
                               addi $sp, $sp, -40  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 40
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 40  # END Calling assertBool
                               li $t3, 1  # Operation: AND64  # Int Literal: 1
                               sw $t3, -44($fp)
                               li $t4, 0  # Int Literal: 0
@@ -456,15 +448,13 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t8, -56($fp)
                               addi $sp, $sp, -56  # BEGIN Calling not
                               jal global_not
-                              addi $sp, $sp, 56
-                              move $fp, $sp  # END Calling not
+                              addi $sp, $sp, 56  # END Calling not
                               sw $v0, -60($fp)
                               lw $t9, -60($fp)  # Setting argument 1
                               sw $t9, -64($fp)
                               addi $sp, $sp, -64  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 64
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 64  # END Calling assertBool
                               li $t0, 1  # Operation: OR64  # Int Literal: 1
                               sw $t0, -68($fp)
                               li $t1, 0  # Int Literal: 0
@@ -477,8 +467,7 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t5, -80($fp)
                               addi $sp, $sp, -80  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 80
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 80  # END Calling assertBool
                               li $t6, 0  # Operation: AND64  # Int Literal: 0
                               sw $t6, -84($fp)
                               li $t7, 1  # Int Literal: 1
@@ -491,15 +480,13 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t1, -96($fp)
                               addi $sp, $sp, -96  # BEGIN Calling not
                               jal global_not
-                              addi $sp, $sp, 96
-                              move $fp, $sp  # END Calling not
+                              addi $sp, $sp, 96  # END Calling not
                               sw $v0, -100($fp)
                               lw $t2, -100($fp)  # Setting argument 1
                               sw $t2, -104($fp)
                               addi $sp, $sp, -104  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 104
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 104  # END Calling assertBool
                               li $t3, 0  # Operation: OR64  # Int Literal: 0
                               sw $t3, -108($fp)
                               li $t4, 1  # Int Literal: 1
@@ -512,8 +499,7 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t8, -120($fp)
                               addi $sp, $sp, -120  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 120
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 120  # END Calling assertBool
                               li $t9, 0  # Operation: AND64  # Int Literal: 0
                               sw $t9, -124($fp)
                               li $t0, 0  # Int Literal: 0
@@ -526,15 +512,13 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t4, -136($fp)
                               addi $sp, $sp, -136  # BEGIN Calling not
                               jal global_not
-                              addi $sp, $sp, 136
-                              move $fp, $sp  # END Calling not
+                              addi $sp, $sp, 136  # END Calling not
                               sw $v0, -140($fp)
                               lw $t5, -140($fp)  # Setting argument 1
                               sw $t5, -144($fp)
                               addi $sp, $sp, -144  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 144
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 144  # END Calling assertBool
                               li $t6, 0  # Operation: OR64  # Int Literal: 0
                               sw $t6, -148($fp)
                               li $t7, 0  # Int Literal: 0
@@ -547,15 +531,13 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t1, -160($fp)
                               addi $sp, $sp, -160  # BEGIN Calling not
                               jal global_not
-                              addi $sp, $sp, 160
-                              move $fp, $sp  # END Calling not
+                              addi $sp, $sp, 160  # END Calling not
                               sw $v0, -164($fp)
                               lw $t2, -164($fp)  # Setting argument 1
                               sw $t2, -168($fp)
                               addi $sp, $sp, -168  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 168
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 168  # END Calling assertBool
                               li $t3, 3  # Operation: GT64  # Int Literal: 3
                               sw $t3, -172($fp)
                               li $t4, 2  # Int Literal: 2
@@ -568,8 +550,7 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t8, -184($fp)
                               addi $sp, $sp, -184  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 184
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 184  # END Calling assertBool
                               li $t9, 2  # Operation: GT64  # Int Literal: 2
                               sw $t9, -188($fp)
                               li $t0, 2  # Int Literal: 2
@@ -582,15 +563,13 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t4, -200($fp)
                               addi $sp, $sp, -200  # BEGIN Calling not
                               jal global_not
-                              addi $sp, $sp, 200
-                              move $fp, $sp  # END Calling not
+                              addi $sp, $sp, 200  # END Calling not
                               sw $v0, -204($fp)
                               lw $t5, -204($fp)  # Setting argument 1
                               sw $t5, -208($fp)
                               addi $sp, $sp, -208  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 208
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 208  # END Calling assertBool
                               li $t6, 2  # Operation: GT64  # Int Literal: 2
                               sw $t6, -212($fp)
                               li $t7, 3  # Int Literal: 3
@@ -603,15 +582,13 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t1, -224($fp)
                               addi $sp, $sp, -224  # BEGIN Calling not
                               jal global_not
-                              addi $sp, $sp, 224
-                              move $fp, $sp  # END Calling not
+                              addi $sp, $sp, 224  # END Calling not
                               sw $v0, -228($fp)
                               lw $t2, -228($fp)  # Setting argument 1
                               sw $t2, -232($fp)
                               addi $sp, $sp, -232  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 232
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 232  # END Calling assertBool
                               li $t3, 3  # Operation: LT64  # Int Literal: 3
                               sw $t3, -236($fp)
                               li $t4, 2  # Int Literal: 2
@@ -624,15 +601,13 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t8, -248($fp)
                               addi $sp, $sp, -248  # BEGIN Calling not
                               jal global_not
-                              addi $sp, $sp, 248
-                              move $fp, $sp  # END Calling not
+                              addi $sp, $sp, 248  # END Calling not
                               sw $v0, -252($fp)
                               lw $t9, -252($fp)  # Setting argument 1
                               sw $t9, -256($fp)
                               addi $sp, $sp, -256  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 256
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 256  # END Calling assertBool
                               li $t0, 2  # Operation: LT64  # Int Literal: 2
                               sw $t0, -260($fp)
                               li $t1, 2  # Int Literal: 2
@@ -645,15 +620,13 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t5, -272($fp)
                               addi $sp, $sp, -272  # BEGIN Calling not
                               jal global_not
-                              addi $sp, $sp, 272
-                              move $fp, $sp  # END Calling not
+                              addi $sp, $sp, 272  # END Calling not
                               sw $v0, -276($fp)
                               lw $t6, -276($fp)  # Setting argument 1
                               sw $t6, -280($fp)
                               addi $sp, $sp, -280  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 280
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 280  # END Calling assertBool
                               li $t7, 2  # Operation: LT64  # Int Literal: 2
                               sw $t7, -284($fp)
                               li $t8, 3  # Int Literal: 3
@@ -666,8 +639,7 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t2, -296($fp)
                               addi $sp, $sp, -296  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 296
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 296  # END Calling assertBool
                               li $t3, 3  # Operation: GTE64  # Int Literal: 3
                               sw $t3, -300($fp)
                               li $t4, 2  # Int Literal: 2
@@ -681,8 +653,7 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t8, -312($fp)
                               addi $sp, $sp, -312  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 312
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 312  # END Calling assertBool
                               li $t9, 2  # Operation: GTE64  # Int Literal: 2
                               sw $t9, -316($fp)
                               li $t0, 2  # Int Literal: 2
@@ -696,8 +667,7 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t4, -328($fp)
                               addi $sp, $sp, -328  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 328
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 328  # END Calling assertBool
                               li $t5, 2  # Operation: GTE64  # Int Literal: 2
                               sw $t5, -332($fp)
                               li $t6, 3  # Int Literal: 3
@@ -711,15 +681,13 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t0, -344($fp)
                               addi $sp, $sp, -344  # BEGIN Calling not
                               jal global_not
-                              addi $sp, $sp, 344
-                              move $fp, $sp  # END Calling not
+                              addi $sp, $sp, 344  # END Calling not
                               sw $v0, -348($fp)
                               lw $t1, -348($fp)  # Setting argument 1
                               sw $t1, -352($fp)
                               addi $sp, $sp, -352  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 352
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 352  # END Calling assertBool
                               li $t2, 3  # Operation: LTE64  # Int Literal: 3
                               sw $t2, -356($fp)
                               li $t3, 2  # Int Literal: 2
@@ -733,15 +701,13 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t7, -368($fp)
                               addi $sp, $sp, -368  # BEGIN Calling not
                               jal global_not
-                              addi $sp, $sp, 368
-                              move $fp, $sp  # END Calling not
+                              addi $sp, $sp, 368  # END Calling not
                               sw $v0, -372($fp)
                               lw $t8, -372($fp)  # Setting argument 1
                               sw $t8, -376($fp)
                               addi $sp, $sp, -376  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 376
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 376  # END Calling assertBool
                               li $t9, 2  # Operation: LTE64  # Int Literal: 2
                               sw $t9, -380($fp)
                               li $t0, 2  # Int Literal: 2
@@ -755,8 +721,7 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t4, -392($fp)
                               addi $sp, $sp, -392  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 392
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 392  # END Calling assertBool
                               li $t5, 2  # Operation: LTE64  # Int Literal: 2
                               sw $t5, -396($fp)
                               li $t6, 3  # Int Literal: 3
@@ -770,8 +735,7 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t0, -408($fp)
                               addi $sp, $sp, -408  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 408
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 408  # END Calling assertBool
                               li $t1, 3  # Operation: EQ64  # Int Literal: 3
                               sw $t1, -412($fp)
                               li $t2, 2  # Int Literal: 2
@@ -785,15 +749,13 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t6, -424($fp)
                               addi $sp, $sp, -424  # BEGIN Calling not
                               jal global_not
-                              addi $sp, $sp, 424
-                              move $fp, $sp  # END Calling not
+                              addi $sp, $sp, 424  # END Calling not
                               sw $v0, -428($fp)
                               lw $t7, -428($fp)  # Setting argument 1
                               sw $t7, -432($fp)
                               addi $sp, $sp, -432  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 432
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 432  # END Calling assertBool
                               li $t8, 2  # Operation: EQ64  # Int Literal: 2
                               sw $t8, -436($fp)
                               li $t9, 2  # Int Literal: 2
@@ -807,8 +769,7 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t3, -448($fp)
                               addi $sp, $sp, -448  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 448
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 448  # END Calling assertBool
                               li $t4, 3  # Operation: NEQ64  # Int Literal: 3
                               sw $t4, -452($fp)
                               li $t5, 2  # Int Literal: 2
@@ -822,8 +783,7 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t9, -464($fp)
                               addi $sp, $sp, -464  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 464
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 464  # END Calling assertBool
                               li $t0, 2  # Operation: NEQ64  # Int Literal: 2
                               sw $t0, -468($fp)
                               li $t1, 2  # Int Literal: 2
@@ -837,15 +797,13 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t5, -480($fp)
                               addi $sp, $sp, -480  # BEGIN Calling not
                               jal global_not
-                              addi $sp, $sp, 480
-                              move $fp, $sp  # END Calling not
+                              addi $sp, $sp, 480  # END Calling not
                               sw $v0, -484($fp)
                               lw $t6, -484($fp)  # Setting argument 1
                               sw $t6, -488($fp)
                               addi $sp, $sp, -488  # BEGIN Calling assertBool
                               jal global_assertBool
-                              addi $sp, $sp, 488
-                              move $fp, $sp  # END Calling assertBool
+                              addi $sp, $sp, 488  # END Calling assertBool
                               li $t7, 2  # Operation: ADD64  # Int Literal: 2
                               sw $t7, -492($fp)
                               li $t8, 3  # Int Literal: 3
@@ -862,8 +820,7 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t3, -512($fp)
                               addi $sp, $sp, -512  # BEGIN Calling assert
                               jal global_assert
-                              addi $sp, $sp, 512
-                              move $fp, $sp  # END Calling assert
+                              addi $sp, $sp, 512  # END Calling assert
                               li $t4, 2  # Operation: SUB64  # Int Literal: 2
                               sw $t4, -516($fp)
                               li $t5, 3  # Int Literal: 3
@@ -883,8 +840,7 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t3, -540($fp)
                               addi $sp, $sp, -540  # BEGIN Calling assert
                               jal global_assert
-                              addi $sp, $sp, 540
-                              move $fp, $sp  # END Calling assert
+                              addi $sp, $sp, 540  # END Calling assert
                               li $t4, 2  # Operation: MULT64  # Int Literal: 2
                               sw $t4, -544($fp)
                               li $t5, 3  # Int Literal: 3
@@ -902,8 +858,7 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t0, -564($fp)
                               addi $sp, $sp, -564  # BEGIN Calling assert
                               jal global_assert
-                              addi $sp, $sp, 564
-                              move $fp, $sp  # END Calling assert
+                              addi $sp, $sp, 564  # END Calling assert
                               li $t1, 9  # Operation: DIV64  # Int Literal: 9
                               sw $t1, -568($fp)
                               li $t2, 4  # Int Literal: 4
@@ -921,8 +876,7 @@ global_testOperators:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t7, -588($fp)
                               addi $sp, $sp, -588  # BEGIN Calling assert
                               jal global_assert
-                              addi $sp, $sp, 588
-                              move $fp, $sp  # END Calling assert
+                              addi $sp, $sp, 588  # END Calling assert
 lbl_21:                       lw $ra, -8($fp)  # END Function body  # Restore return address
                               lw $fp, -4($fp)  # Restore frame pointer
                               jr $ra  # Return to caller
@@ -952,8 +906,7 @@ global_testShadowing:         sw $fp, -4($sp)  # Save frame pointer
                               sw $zero, -12($fp)  # Initializing returnValue
                               addi $sp, $sp, -12  # BEGIN Calling testShadowingHelper
                               jal global_testShadowingHelper
-                              addi $sp, $sp, 12
-                              move $fp, $sp  # END Calling testShadowingHelper
+                              addi $sp, $sp, 12  # END Calling testShadowingHelper
                               sw $v0, -16($fp)
                               lw $t1, -16($fp)
                               sw $t1, -12($fp)  # BEGIN Assigning returnValue  # END Assigning returnValue
@@ -965,8 +918,7 @@ global_testShadowing:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t3, -28($fp)
                               addi $sp, $sp, -28  # BEGIN Calling assert
                               jal global_assert
-                              addi $sp, $sp, 28
-                              move $fp, $sp  # END Calling assert
+                              addi $sp, $sp, 28  # END Calling assert
                               lw $t5, -12($fp)  # Setting argument 1
                               sw $t5, -36($fp)
                               li $t4, 2  # Int Literal: 2
@@ -975,8 +927,7 @@ global_testShadowing:         sw $fp, -4($sp)  # Save frame pointer
                               sw $t5, -40($fp)
                               addi $sp, $sp, -40  # BEGIN Calling assert
                               jal global_assert
-                              addi $sp, $sp, 40
-                              move $fp, $sp  # END Calling assert
+                              addi $sp, $sp, 40  # END Calling assert
 lbl_23:                       lw $ra, -8($fp)  # END Function body  # Restore return address
                               lw $fp, -4($fp)  # Restore frame pointer
                               jr $ra  # Return to caller
@@ -1044,8 +995,7 @@ global_testLongExpression:    sw $fp, -4($sp)  # Save frame pointer
                               sw $t6, -88($fp)
                               addi $sp, $sp, -88  # BEGIN Calling testLongExpression
                               jal global_testLongExpression
-                              addi $sp, $sp, 88
-                              move $fp, $sp  # END Calling testLongExpression
+                              addi $sp, $sp, 88  # END Calling testLongExpression
                               sw $v0, -92($fp)
                               lw $t8, -92($fp)
                               lw $t9, -48($fp)
@@ -1069,8 +1019,7 @@ global_testLongExpression:    sw $fp, -4($sp)  # Save frame pointer
                               sw $t7, -116($fp)
                               addi $sp, $sp, -116  # BEGIN Calling assert
                               jal global_assert
-                              addi $sp, $sp, 116
-                              move $fp, $sp  # END True Branch  # END Calling assert
+                              addi $sp, $sp, 116  # END True Branch  # END Calling assert
                               j lbl_26
 lbl_25:                       lw $t0, -56($fp)  # BEGIN False Branch  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64
                               lw $t1, -64($fp)
@@ -1106,8 +1055,7 @@ lbl_25:                       lw $t0, -56($fp)  # BEGIN False Branch  # Operatio
                               sw $t8, -152($fp)
                               addi $sp, $sp, -152  # BEGIN Calling assert
                               jal global_assert
-                              addi $sp, $sp, 152
-                              move $fp, $sp  # END Calling assert
+                              addi $sp, $sp, 152  # END Calling assert
                               lw $v0, -16($fp)  # BEGIN Return
 lbl_26:                       lw $ra, -8($fp)  # END Function body  # Restore return address
                               lw $fp, -4($fp)  # Restore frame pointer
@@ -1211,8 +1159,7 @@ global_testTonOfArguments:    sw $fp, -4($sp)  # Save frame pointer
                               sw $t8, -64($fp)
                               addi $sp, $sp, -64  # BEGIN Calling tonOfArguments
                               jal global_tonOfArguments
-                              addi $sp, $sp, 64
-                              move $fp, $sp  # END Calling tonOfArguments
+                              addi $sp, $sp, 64  # END Calling tonOfArguments
 lbl_28:                       lw $ra, -8($fp)  # END Function body  # Restore return address
                               lw $fp, -4($fp)  # Restore frame pointer
                               jr $ra  # Return to caller
@@ -1223,60 +1170,47 @@ global_main:                  sw $fp, -4($sp)  # Save frame pointer
                               sw $ra, -8($fp)  # Save return address  # BEGIN Function body
                               addi $sp, $sp, -8  # BEGIN Calling printTestHeader
                               jal global_printTestHeader
-                              addi $sp, $sp, 8
-                              move $fp, $sp  # END Calling printTestHeader
+                              addi $sp, $sp, 8  # END Calling printTestHeader
                               addi $sp, $sp, -8  # BEGIN Calling testOperators
                               jal global_testOperators
-                              addi $sp, $sp, 8
-                              move $fp, $sp  # END Calling testOperators
+                              addi $sp, $sp, 8  # END Calling testOperators
                               addi $sp, $sp, -8  # BEGIN Calling printTestHeader
                               jal global_printTestHeader
-                              addi $sp, $sp, 8
-                              move $fp, $sp  # END Calling printTestHeader
+                              addi $sp, $sp, 8  # END Calling printTestHeader
                               addi $sp, $sp, -8  # BEGIN Calling testLoops
                               jal global_testLoops
-                              addi $sp, $sp, 8
-                              move $fp, $sp  # END Calling testLoops
+                              addi $sp, $sp, 8  # END Calling testLoops
                               addi $sp, $sp, -8  # BEGIN Calling printTestHeader
                               jal global_printTestHeader
-                              addi $sp, $sp, 8
-                              move $fp, $sp  # END Calling printTestHeader
+                              addi $sp, $sp, 8  # END Calling printTestHeader
                               addi $sp, $sp, -8  # BEGIN Calling testTonOfArguments
                               jal global_testTonOfArguments
-                              addi $sp, $sp, 8
-                              move $fp, $sp  # END Calling testTonOfArguments
+                              addi $sp, $sp, 8  # END Calling testTonOfArguments
                               addi $sp, $sp, -8  # BEGIN Calling printTestHeader
                               jal global_printTestHeader
-                              addi $sp, $sp, 8
-                              move $fp, $sp  # END Calling printTestHeader
+                              addi $sp, $sp, 8  # END Calling printTestHeader
                               addi $sp, $sp, -8  # BEGIN Calling testShadowing
                               jal global_testShadowing
-                              addi $sp, $sp, 8
-                              move $fp, $sp  # END Calling testShadowing
+                              addi $sp, $sp, 8  # END Calling testShadowing
                               addi $sp, $sp, -8  # BEGIN Calling printTestHeader
                               jal global_printTestHeader
-                              addi $sp, $sp, 8
-                              move $fp, $sp  # END Calling printTestHeader
+                              addi $sp, $sp, 8  # END Calling printTestHeader
                               li $t1, 1  # Int Literal: 1
                               sw $t1, -12($fp)
                               lw $t2, -12($fp)  # Setting argument 1
                               sw $t2, -16($fp)
                               addi $sp, $sp, -16  # BEGIN Calling testLongExpression
                               jal global_testLongExpression
-                              addi $sp, $sp, 16
-                              move $fp, $sp  # END Calling testLongExpression
+                              addi $sp, $sp, 16  # END Calling testLongExpression
                               addi $sp, $sp, -16  # BEGIN Calling printTestHeader
                               jal global_printTestHeader
-                              addi $sp, $sp, 16
-                              move $fp, $sp  # END Calling printTestHeader
+                              addi $sp, $sp, 16  # END Calling printTestHeader
                               addi $sp, $sp, -16  # BEGIN Calling testFunctionPointers
                               jal global_testFunctionPointers
-                              addi $sp, $sp, 16
-                              move $fp, $sp  # END Calling testFunctionPointers
+                              addi $sp, $sp, 16  # END Calling testFunctionPointers
                               addi $sp, $sp, -16  # BEGIN Calling printSummary
                               jal global_printSummary
-                              addi $sp, $sp, 16
-                              move $fp, $sp  # END Calling printSummary
+                              addi $sp, $sp, 16  # END Calling printSummary
 lbl_29:                       lw $ra, -8($fp)  # END Function body  # Restore return address
                               lw $fp, -4($fp)  # Restore frame pointer
                               jr $ra  # Return to caller
