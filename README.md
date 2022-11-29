@@ -538,7 +538,11 @@ Optional step of the SLR parser that helps to visualize (and debug) the grammar.
 Convert the SLR automata into a Graphviz graph definition, which in turn can
 be converted into an SVG or a PNG.
 
-> NOTE: due to grammar being quite large, the resulting graph is enormous
+> NOTE: due to grammar being quite large, the resulting graph is enormous.
+>
+> To make it more practical, I commented out large portions of the grammar
+> before running the graph generation in order to reduce the size of the
+> graph.
 
 First, create a `parser.dot` text file (in the DOT format):
 
@@ -553,3 +557,6 @@ dot -Tsvg parser.dot -o parser.svg
 ```
 
 Tested with `dot v6.0.1`
+
+Example of a tiny slice of the generated graph:
+![Example of a tiny slice of the generated graph](./docs/img/graphviz-graph.png)
