@@ -1,4 +1,4 @@
-import { nameParse, run, typeCheckAst } from '../../processInput.js';
+import { nameParse, run, typeCheckAst } from '../../frontEnd.js';
 import { toQuads } from '../index.js';
 import { testProgram } from './testProgram.js';
 import { GlobalQuad } from '../definitions/GlobalQuad.js';

@@ -1,3 +1,7 @@
+/**
+ * Helpers for converting AST nodes to Quads
+ */
+
 import type { RA } from '../utils/types.js';
 import type { AstNode } from '../ast/definitions/AstNode.js';
 import { TempVariable } from './definitions/IdQuad.js';

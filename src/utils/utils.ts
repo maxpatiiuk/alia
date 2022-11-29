@@ -1,4 +1,7 @@
-/** Split array in half according to a discriminator function */
+/**
+ * A wealth of tiny utilities
+ */
+
 import type { RA } from './types.js';
 
 // Find a value in an array, and return it's mapped variant
@@ -14,6 +17,7 @@ export function mappedFind<ITEM, RETURN_TYPE>(
   return value;
 }
 
+/** Split array in half according to a discriminator function */
 export const split = <LEFT_ITEM, RIGHT_ITEM = LEFT_ITEM>(
   array: RA<LEFT_ITEM | RIGHT_ITEM>,
   // If returns true, item would go to the right array

@@ -1,3 +1,8 @@
+/**
+ * TypeScript types for tokens an their payload if applicable (for
+ * `ID`, `INTLITERAL` and `STRINGLITERAL`).
+ */
+
 import type { RR } from '../utils/types.js';
 
 export type Tokens = {

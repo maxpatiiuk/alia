@@ -1,4 +1,4 @@
-import { nameParse, run, typeCheckAst } from '../processInput.js';
+import { nameParse, run, typeCheckAst } from '../frontEnd.js';
 import type { RA } from '../utils/types.js';
 
 async function nameAnalysis(

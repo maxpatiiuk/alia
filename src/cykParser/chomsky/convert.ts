@@ -1,10 +1,12 @@
 import { isToken } from '../../tokenize/definitions.js';
 import type { R, RA } from '../../utils/types.js';
 import { simplifyGrammar } from './simplify.js';
-import {PureGrammar} from '../../grammar/utils.js';
+import { PureGrammar } from '../../grammar/utils.js';
 
 /**
  * Convert grammar to Chomsky Normal Form
+ *
+ * Required by the CYK parser
  */
 export const toChomsky = <T extends string>(
   grammar: PureGrammar<T>

@@ -2,12 +2,18 @@ import chalk from 'chalk';
 import fs from 'node:fs';
 import type { Interface } from 'node:readline/promises';
 
-import { handleInput, nameParse, run, typeCheckAst } from '../processInput.js';
+import { handleInput, nameParse, run, typeCheckAst } from '../frontEnd.js';
 import type { RA } from '../utils/types.js';
 import { AstNode } from '../ast/definitions/AstNode.js';
 import { ReturnValue } from '../ast/eval.js';
 import { Scope } from '../ast/nameAnalysis.js';
 
+/**
+ * Provide runtime environment for the interpreter. It will run in the loop
+ * asking for input and evaluating it until the user enters `return`.
+ *
+ * Optionally, a return code can be provided (`return 42`)
+ */
 export async function runtime(stream: Interface): Promise<void> {
   let symbolTable: RA<Scope> = [];
   const totalInput = [];
@@ -54,6 +60,10 @@ export async function runtime(stream: Interface): Promise<void> {
 const reSave = /^:save \s*(?<fileName>.+)$/u;
 const reType = /^:type \s*(?<expression>.+)$/u;
 
+/**
+ * Check if the input string matches one of the meta commands, and if so, handle
+ * it
+ */
 async function handleCommand(
   line: string,
   symbolTable: RA<Scope>,
@@ -68,7 +78,7 @@ async function handleCommand(
           `into a file\n`,
           `:type <expression> - type check an expression`,
           `:cancel - (when in a middle of entering multi-line expression) `,
-          `clears current expression and awaits futher input\n`,
+          `clears current expression and awaits further input\n`,
           `return 0 - exit the program with exit code 0`,
         ].join('')
       )
@@ -114,6 +124,10 @@ async function handleCommand(
   return false;
 }
 
+/**
+ * Try to create an AST from the pending input and the current symbol table.
+ * Then, run name analysis and type analysis and report errors if any.
+ */
 async function inputToAst(
   rawInput: string,
   symbolTable: RA<Scope>
@@ -123,7 +137,11 @@ async function inputToAst(
   try {
     ast = await run({ rawText: input });
   } catch {
-    // Automatically insert trailing semicolon if necessary
+    /*
+     * Automatically insert trailing semicolon if necessary.
+     * I tried modifying the grammar to make semicolons optional, but that
+     * resulted in a whole ton of ambiguity errors.
+     */
     try {
       const localInput = `${input};`;
       ast = await run({ rawText: localInput });

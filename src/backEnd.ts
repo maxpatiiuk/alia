@@ -1,9 +1,16 @@
+/**
+ * A mega function that does all the compilation steps that come after AST
+ * generation
+ *
+ * This function represents the middle-end and the back-end of the compiler.
+ */
+
 import fs from 'node:fs';
 
 import type { AstNode } from './ast/definitions/AstNode.js';
 import { GlobalQuad } from './quads/definitions/GlobalQuad.js';
 import { toQuads } from './quads/index.js';
-import { nameParse, typeCheckAst } from './processInput.js';
+import { nameParse, typeCheckAst } from './frontEnd.js';
 
 export async function processAst({
   ast,

@@ -1,12 +1,9 @@
 import { filterArray, RA } from './types.js';
 import { escapeRegExp } from './utils.js';
 
-function parseNumber(value: string | undefined): number | undefined {
-  if (value === undefined) return undefined;
-  const number = Number.parseInt(value);
-  return Number.isNaN(number) ? undefined : number;
-}
-
+/**
+ * Deduplicate a given name with respect to the existing names.
+ */
 export function getUniqueName(name: string, usedNames: RA<string>): string {
   if (!usedNames.includes(name)) return name;
   const suffix = / \((\d+)\)$/u.exec(name);
@@ -25,4 +22,10 @@ export function getUniqueName(name: string, usedNames: RA<string>): string {
   return newIndex === 1 && length === 0
     ? strippedName
     : `${strippedName}${newIndex}`;
+}
+
+function parseNumber(value: string | undefined): number | undefined {
+  if (value === undefined) return undefined;
+  const number = Number.parseInt(value);
+  return Number.isNaN(number) ? undefined : number;
 }

@@ -1,3 +1,7 @@
+/**
+ * A front-end of the compiler (everything before intermediate representation)
+ */
+
 import chalk from 'chalk';
 import fs from 'node:fs';
 import type { Interface } from 'node:readline/promises';

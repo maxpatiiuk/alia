@@ -1,3 +1,7 @@
+/**
+ * Convert SLR automata to a graphviz diagram.
+ */
+
 import fs from 'node:fs';
 
 import type { PureGrammar } from '../grammar/utils.js';

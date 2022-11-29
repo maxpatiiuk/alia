@@ -1,12 +1,16 @@
-import { RA } from '../utils/types.js';
-import { AstNode } from './definitions/AstNode.js';
-import { VariableDeclaration } from './definitions/statement/VariableDeclaration.js';
-import { GlobalsNode } from './definitions/GlobalsNode.js';
-import { IdNode } from './definitions/term/IdNode.js';
-import { FunctionDeclaration } from './definitions/FunctionDeclaration.js';
-import { WhileNode } from './definitions/statement/block/WhileNode.js';
-import { ForNode } from './definitions/statement/block/ForNode.js';
-import { IfNode } from './definitions/statement/block/IfNode.js';
+/**
+ * Helper functions that are used during namy analysis
+ */
+
+import type { RA } from '../utils/types.js';
+import type { AstNode } from './definitions/AstNode.js';
+import type { FunctionDeclaration } from './definitions/FunctionDeclaration.js';
+import type { GlobalsNode } from './definitions/GlobalsNode.js';
+import type { ForNode } from './definitions/statement/block/ForNode.js';
+import type { IfNode } from './definitions/statement/block/IfNode.js';
+import type { WhileNode } from './definitions/statement/block/WhileNode.js';
+import type { VariableDeclaration } from './definitions/statement/VariableDeclaration.js';
+import type { IdNode } from './definitions/term/IdNode.js';
 
 export type Scope = {
   readonly items: RA<FunctionDeclaration | VariableDeclaration>;

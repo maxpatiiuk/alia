@@ -1,3 +1,5 @@
+import type { Quad } from '../../quads/definitions/index.js';
+import type { QuadsContext } from '../../quads/index.js';
 import type { RA, WritableArray } from '../../utils/types.js';
 import type { EvalContext, EvalReturnValue } from '../eval.js';
 import type { NameAnalysisContext } from '../nameAnalysis.js';
@@ -6,9 +8,10 @@ import type { PrintContext } from '../unparse.js';
 import type { FunctionDeclaration } from './FunctionDeclaration.js';
 import type { VariableDeclaration } from './statement/VariableDeclaration.js';
 import type { TokenNode } from './TokenNode.js';
-import { Quad } from '../../quads/definitions/index.js';
-import { QuadsContext } from '../../quads/index.js';
 
+/**
+ * Abstract class that is extended by all AST nodes
+ */
 export abstract class AstNode {
   // eslint-disable-next-line functional/prefer-readonly-type
   public nameAnalysisContext: NameAnalysisContext;

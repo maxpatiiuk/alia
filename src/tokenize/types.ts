@@ -1,3 +1,7 @@
+/**
+ * Helpers types for representing tokens and results of tokenizing
+ */
+
 import type { State } from 'typesafe-reducer';
 
 import type { RA } from '../utils/types.js';

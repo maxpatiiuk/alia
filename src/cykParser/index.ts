@@ -1,13 +1,18 @@
-import type {Token} from '../tokenize/types.js';
-import type {IR, R, RA} from '../utils/types.js';
-import {filterArray} from '../utils/types.js';
-import {group} from '../utils/utils.js';
-import {toChomsky} from './chomsky/convert.js';
-import {getGrammarRoot} from './chomsky/uselessRules.js';
-import type {GrammarKey} from '../grammar/index.js';
-import {grammar} from '../grammar/index.js';
-import {PureGrammar, toPureGrammar} from '../grammar/utils.js';
+import type { Token } from '../tokenize/types.js';
+import type { IR, R, RA } from '../utils/types.js';
+import { filterArray } from '../utils/types.js';
+import { group } from '../utils/utils.js';
+import { toChomsky } from './chomsky/convert.js';
+import { getGrammarRoot } from './chomsky/uselessRules.js';
+import type { GrammarKey } from '../grammar/index.js';
+import { grammar } from '../grammar/index.js';
+import { PureGrammar, toPureGrammar } from '../grammar/utils.js';
 
+/**
+ * Runtime for the CYK parser
+ *
+ * Converts the grammar to chomsky normal form
+ */
 export function cykParser(tokens: RA<Token>): boolean {
   const chomskyGrammar = toChomsky(toPureGrammar(grammar()));
   const isNullable = chomskyGrammar[getGrammarRoot(chomskyGrammar)].some(
@@ -29,7 +34,9 @@ export function cykParser(tokens: RA<Token>): boolean {
  */
 function parser(tokens: RA<Token>): boolean {
   const result = powerSetIterate(tokens);
-  return result[tokensToString(tokens)].includes(getGrammarRoot(toPureGrammar(grammar())));
+  return result[tokensToString(tokens)].includes(
+    getGrammarRoot(toPureGrammar(grammar()))
+  );
 }
 
 const setJoinSymbol = ' ';
@@ -66,11 +73,11 @@ const powerSetIteratorCallback = (
   subSet.length === 1
     ? reverseIndexedGrammar[subSet[0].type]
     : subSet.flatMap((_, index) => {
-      if (index === 0) return [];
-      const left = getValue(subSet.slice(0, index));
-      const right = getValue(subSet.slice(index));
-      return matchRulePairs(getCartesianProduct(left, right));
-    });
+        if (index === 0) return [];
+        const left = getValue(subSet.slice(0, index));
+        const right = getValue(subSet.slice(index));
+        return matchRulePairs(getCartesianProduct(left, right));
+      });
 
 const getInverseGrammarIndex = <T extends string>(
   grammar: PureGrammar<T>
@@ -82,7 +89,9 @@ const getInverseGrammarIndex = <T extends string>(
       )
     )
   );
-const reverseIndexedGrammar = getInverseGrammarIndex(toChomsky(toPureGrammar(grammar())));
+const reverseIndexedGrammar = getInverseGrammarIndex(
+  toChomsky(toPureGrammar(grammar()))
+);
 
 const getCartesianProduct = <T>(
   left: RA<T>,

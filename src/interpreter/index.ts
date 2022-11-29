@@ -1,3 +1,7 @@
+/**
+ * TypeScript-based interpreter for Drewgon
+ */
+
 import { createInterface } from 'node:readline/promises';
 
 import { runtime } from './runtime.js';

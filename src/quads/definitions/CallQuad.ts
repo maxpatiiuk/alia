@@ -20,6 +20,7 @@ import { PushQ } from '../../instructions/definitions/amd/PushQ.js';
 import { PopQ } from '../../instructions/definitions/amd/PopQ.js';
 import { AddQ } from '../../instructions/definitions/amd/AddQ.js';
 import { SubQ } from '../../instructions/definitions/amd/SubQ.js';
+import { store } from '../../utils/utils.js';
 
 export class CallQuad extends Quad {
   private readonly quads: RA<readonly [RA<Quad>, Quad]>;
@@ -41,12 +42,7 @@ export class CallQuad extends Quad {
       ? this.name
       : formatGlobalVariable(this.name);
 
-    let tempRegister: undefined | Register = undefined;
-
-    function getTempRegister() {
-      tempRegister ??= context.requestTempRegister();
-      return tempRegister;
-    }
+    const getTempRegister = store(() => context.requestTempRegister());
 
     this.quads = actuals.map((actual, index) => [
       actual ?? [],

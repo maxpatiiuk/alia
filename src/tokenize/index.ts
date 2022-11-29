@@ -1,3 +1,7 @@
+/**
+ * Try to convert input source code into tokens, until failure or end of input
+ */
+
 import type { RA } from '../utils/types.js';
 import { mappedFind } from '../utils/utils.js';
 import { complexTokens, simpleTokens } from './definitions.js';

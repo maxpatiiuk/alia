@@ -1,3 +1,7 @@
+/**
+ * Output error messages in a standard format
+ */
+
 import type { Position, SyntaxError } from './tokenize/types.js';
 import type { RA } from './utils/types.js';
 

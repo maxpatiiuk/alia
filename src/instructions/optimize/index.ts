@@ -1,3 +1,7 @@
+/**
+ * Peephole optimizations for MIPS and x64 instructions
+ */
+
 import type { RA, WritableArray } from '../../utils/types.js';
 import { Jmp } from '../definitions/amd/Jmp.js';
 import type { Instruction } from '../definitions/index.js';
@@ -25,6 +29,9 @@ const define = <
   ) => WritableArray<Line>,
 });
 
+/**
+ * This includes optimizations for both MIPS and x64 instructions
+ */
 const peepHoleOptimizations: RA<ReturnType<typeof define>> = [
   // Remove jumps to next instruction
   define(J, (instruction, lines) =>
@@ -34,7 +41,7 @@ const peepHoleOptimizations: RA<ReturnType<typeof define>> = [
   define(Jmp, (instruction, lines) =>
     lines.at(1)?.label === instruction.label ? lines.slice(1) : lines
   ),
-  // Remove save followed by load
+  // Remove save followed by load (where safe)
   define(MovQ, (instruction, lines) => {
     const nextInstruction = lines.at(1)?.instruction;
     return nextInstruction instanceof MovQ &&
@@ -51,7 +58,7 @@ const peepHoleOptimizations: RA<ReturnType<typeof define>> = [
         ]
       : lines;
   }),
-  // Remove save followed by load
+  // Remove save followed by load (where safe)
   define(Sw, (instruction, lines) => {
     const nextInstruction = lines.at(1)?.instruction;
     return nextInstruction instanceof Lw &&
@@ -78,10 +85,19 @@ const peepHoleOptimizations: RA<ReturnType<typeof define>> = [
   ),
 ];
 
+/**
+ * Helps determine whether a given movq/sw instruction is safe to be eliminated
+ * (direct memory to memory moves are not supported, thus intermediate moves
+ * can't be eliminated. Additionally, moves that include stack or global
+ * variables are unsafe to optimize as they may be used in other places)
+ */
 const isAmdRegister = (name: string): boolean =>
   name.startsWith('%') || name.startsWith('$');
 const isMipsRegister = (name: string): boolean => name.startsWith('$');
 
+/**
+ * Run peephole optimization line by line using the defined optimizations
+ */
 export function optimizeInstructions(lines: RA<Line>): RA<Line> {
   const optimizedLines: WritableArray<Line> = [];
   let rawLines = lines.slice();

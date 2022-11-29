@@ -1,3 +1,7 @@
+/**
+ * All available tokens are define here
+ */
+
 import type { RA } from '../utils/types.js';
 import { sortFunction, split } from '../utils/utils.js';
 import {

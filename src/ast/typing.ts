@@ -1,3 +1,8 @@
+/**
+ * Helpers for doing type analysis. Contains definitions for primitive types and
+ * error messages.
+ */
+
 import type { RA } from '../utils/types.js';
 import { AstNode } from './definitions/AstNode.js';
 import { FunctionTypeNode } from './definitions/types/FunctionTypeNode.js';

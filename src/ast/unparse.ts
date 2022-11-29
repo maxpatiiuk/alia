@@ -1,3 +1,7 @@
+/**
+ * Helper functions for pretty printing the source code based on the AST
+ */
+
 import { AstNode } from './definitions/AstNode.js';
 import { token } from './definitions/TokenNode.js';
 import { indentation } from '../unparseParseTree/index.js';

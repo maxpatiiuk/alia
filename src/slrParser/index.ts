@@ -1,3 +1,7 @@
+/**
+ * Entry point for the SLR parser
+ */
+
 import { getGrammarRoot } from '../cykParser/chomsky/uselessRules.js';
 import type { AbstractGrammar } from '../grammar/utils.js';
 import type { Tokens } from '../tokenize/tokens.js';

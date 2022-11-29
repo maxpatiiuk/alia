@@ -1,5 +1,17 @@
+/**
+ * Run various optimizations and conversions on the context free grammar.
+ *
+ * The intention is to:
+ * - Validate the grammar and report bugs/ambiguities
+ * - Keep letting the programmer define the grammar in a more user-friendly
+ *   way
+ * - But, change the grammar on the fly in a way that improves performance and
+ *   simplifies the code (by removing epsilon productions, for example)
+ * - While doing above, preserve the semantics of the grammar
+ */
+
 import { checkValidity } from '../cykParser/chomsky/uselessRules.js';
-import {AbstractGrammar, epsilon} from './utils.js';
+import { AbstractGrammar, epsilon } from './utils.js';
 
 /**
  * Do various performance optimizations on the grammar

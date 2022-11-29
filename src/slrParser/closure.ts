@@ -1,7 +1,13 @@
+/**
+ * Generate closure states for a given position in the grammar
+ *
+ * Read more about it in http://www.egr.unlv.edu/~matt/teaching/SLR.pdf
+ */
+
 import { saturate } from '../firstFollowSets/firstSets.js';
 import type { IR, R, RA } from '../utils/types.js';
 import { filterArray } from '../utils/types.js';
-import {PureGrammar} from '../grammar/utils.js';
+import { PureGrammar } from '../grammar/utils.js';
 
 export type Closure<T extends string> = {
   readonly nonTerminal: T;

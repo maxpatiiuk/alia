@@ -1,3 +1,7 @@
+/**
+ * Functions that try to match next few source code characters to a given token
+ */
+
 import type { Tokens } from './tokens.js';
 import type { MatcherResult } from './types.js';
 

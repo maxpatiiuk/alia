@@ -7,6 +7,13 @@ const reSpecialLine = /^(> |\. )(.+)$/gmu;
 const processLines = (line: string): RA<string> =>
   line.replaceAll(reSpecialLine, '$1\n$2').split('\n');
 
+/**
+ * Give some input to the interpreter line by line and assert the output
+ * matched the expected output.
+ *
+ * This is creating a fake IO stream object to fool the interpreter code into
+ * using a mocked IO stream.
+ */
 async function fakeInterpreter(commands: string): Promise<void> {
   const lines = processLines(commands);
   let position = 0;

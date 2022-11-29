@@ -1,3 +1,10 @@
+/**
+ * Convert parse tree to an AST.
+ *
+ * AST can then be used for name analysis, type analysis and intermediate
+ * code generation.
+ */
+
 import type { GrammarKey } from '../grammar/index.js';
 import type { AbstractGrammar } from '../grammar/utils.js';
 import { epsilon } from '../grammar/utils.js';

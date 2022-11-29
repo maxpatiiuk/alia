@@ -1,5 +1,5 @@
 /**
- * Common TypeScript types. Used extensively thoughout the front-end
+ * Common TypeScript types, but made read-only. Used extensively thought the code
  *
  * @module
  */
@@ -23,13 +23,6 @@ export type RA<V> = readonly V[];
  */
 // eslint-disable-next-line functional/prefer-readonly-type
 export type WritableArray<T> = T[];
-
-/** Cast a type as defined. Throws at runtime if it is not defined */
-export function defined<T>(value: T | undefined): T {
-  // eslint-disable-next-line functional/no-throw-statement
-  if (value === undefined) throw new Error('Value is not defined');
-  else return value;
-}
 
 /** Filter undefined items out of the array */
 export const filterArray = <T>(array: RA<T | undefined>): RA<T> =>

@@ -5,7 +5,7 @@ import type { LanguageType, TypeCheckContext } from '../../typing.js';
 import { assertType, cascadeError, ErrorType } from '../../typing.js';
 import type { PrintContext } from '../../unparse.js';
 import { VariableDeclaration } from '../statement/VariableDeclaration.js';
-import { SynteticToken } from '../SynteticToken.js';
+import { SyntheticToken } from '../SyntheticToken.js';
 import type { IdNode } from '../term/IdNode.js';
 import type { TokenNode } from '../TokenNode.js';
 import { token } from '../TokenNode.js';
@@ -59,7 +59,7 @@ export class AssignmentExpression extends Expression {
   }
 
   public getToken() {
-    return new SynteticToken(this.id).getToken();
+    return new SyntheticToken(this.id).getToken();
   }
 
   public async evaluate(context: EvalContext) {

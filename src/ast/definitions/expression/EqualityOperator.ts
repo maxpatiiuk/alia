@@ -4,7 +4,7 @@ import type { LanguageType, TypeCheckContext } from '../../typing.js';
 import { assertType, BoolType, cascadeError, ErrorType } from '../../typing.js';
 import type { PrintContext } from '../../unparse.js';
 import { wrap, wrapChild } from '../../unparse.js';
-import { SynteticToken } from '../SynteticToken.js';
+import { SyntheticToken } from '../SyntheticToken.js';
 import type { TokenNode } from '../TokenNode.js';
 import { assertToken } from '../TokenNode.js';
 import { Expression } from './index.js';
@@ -58,7 +58,7 @@ export class EqualityOperator extends Expression {
   }
 
   public getToken() {
-    return new SynteticToken(this.left).getToken();
+    return new SyntheticToken(this.left).getToken();
   }
 
   public async evaluate(context: EvalContext) {

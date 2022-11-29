@@ -1,3 +1,10 @@
+/**
+ * Generate an SLR Automata for a given grammar. Will be used to generate
+ * an SLR parse table
+ *
+ * More information: http://www.egr.unlv.edu/~matt/teaching/SLR.pdf
+ */
+
 import { getGrammarRoot } from '../cykParser/chomsky/uselessRules.js';
 import { saturate } from '../firstFollowSets/firstSets.js';
 import type { IR, RA } from '../utils/types.js';
@@ -5,7 +12,7 @@ import { replaceItem } from '../utils/utils.js';
 import type { Closure } from './closure.js';
 import { getClosureStates, reduceClosure } from './closure.js';
 import { getGoToSet } from './goTo.js';
-import {PureGrammar} from '../grammar/utils.js';
+import { PureGrammar } from '../grammar/utils.js';
 
 export type DiagramNode<T extends string> = {
   readonly closure: RA<Closure<T>>;

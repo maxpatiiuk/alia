@@ -13,6 +13,9 @@ export const createPositionResolver =
     return { lineNumber: lines.length, columnNumber: lines.at(-1)!.length + 1 };
   };
 
+/**
+ * Reverses the effect of createPositionResolver
+ */
 export const createReversePositionResolver = (
   input: string
 ): ((position: Position) => number) => {

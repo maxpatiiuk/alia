@@ -1,3 +1,11 @@
+/**
+ * A grammar for Drewgon, with support for syntax directed translation
+ *
+ * Relies on the tokens defined in ./src/tokens/
+ * Also defines the rules for translation from parse tree to AST nodes
+ * defined in ./src/ast
+ */
+
 import type { RA } from '../utils/types.js';
 import { store } from '../utils/utils.js';
 import { optimizeGrammar } from './optimize.js';
@@ -40,6 +48,7 @@ import { StringLiteralNode } from '../ast/definitions/term/StringLiteralNode.js'
 import { BooleanLiteralNode } from '../ast/definitions/term/BooleanLiteralNode.js';
 import { MayhemNode } from '../ast/definitions/term/MayhemNode.js';
 
+/** Ensure a node is of an expected type */
 function type<T extends AstNode, V extends RA<new (...args: RA<any>) => T>>(
   node: AstNode,
   ...types: V

@@ -1,8 +1,13 @@
+/**
+ * Entrypoint for the compiler. Handles CLI arguments and runs the rest of the
+ * code
+ */
+
 import { program } from 'commander';
 import fs from 'node:fs';
 
-import { run } from './processInput.js';
-import { processAst } from './processAst.js';
+import { run } from './frontEnd.js';
+import { processAst } from './backEnd.js';
 
 program.name('dgc').description('The ultimate Drewgon compiler');
 

@@ -1,5 +1,5 @@
 import type { RA } from '../utils/types.js';
-import { handleInput } from '../processInput.js';
+import { handleInput } from '../frontEnd.js';
 import { Expression } from './definitions/expression/index.js';
 import { FunctionDeclaration } from './definitions/FunctionDeclaration.js';
 import { AstNode } from './definitions/AstNode.js';

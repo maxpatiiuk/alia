@@ -1,3 +1,7 @@
+/**
+ * Reformat the code based on the parse tree alone (withouth the AST)
+ */
+
 import type { GrammarKey } from '../grammar/index.js';
 import type { ParseTreeNode } from '../slrParser/index.js';
 import { simpleTokens } from '../tokenize/definitions.js';

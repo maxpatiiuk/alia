@@ -1,3 +1,9 @@
+/**
+ * Build SLR parse table using first sets, follow sets and SLR automata
+ *
+ * More information: http://www.egr.unlv.edu/~matt/teaching/SLR.pdf
+ */
+
 import type { Action } from 'typesafe-reducer';
 
 import { getGrammarRoot } from '../cykParser/chomsky/uselessRules.js';

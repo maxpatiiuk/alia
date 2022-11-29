@@ -1,8 +1,13 @@
 import type { RA } from '../utils/types.js';
 import type { Closure } from './closure.js';
 import { getClosureStates } from './closure.js';
-import {PureGrammar} from '../grammar/utils.js';
+import { PureGrammar } from '../grammar/utils.js';
 
+/**
+ * Calculate GoTo sets for the given place in the grammar
+ *
+ * More information: https://en.wikipedia.org/wiki/LR_parser#Go_to_function
+ */
 export const getGoToSet = <T extends string>(
   grammar: PureGrammar<T>,
   items: RA<Closure<T>>,

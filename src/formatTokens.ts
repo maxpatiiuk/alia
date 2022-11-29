@@ -1,3 +1,7 @@
+/**
+ * Format tokens for output when --tokensOutput argument is provided
+ */
+
 import { formatPosition } from './formatErrors.js';
 import type { Tokens } from './tokenize/tokens.js';
 import { tokenLabels } from './tokenize/tokens.js';
