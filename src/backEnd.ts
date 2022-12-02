@@ -20,6 +20,7 @@ export async function processAst({
   assemble,
   mips,
   amd,
+  llvm,
   optimize = true,
 }: {
   readonly ast: AstNode;
@@ -29,6 +30,7 @@ export async function processAst({
   readonly assemble?: string | undefined;
   readonly mips?: string | undefined;
   readonly amd?: string | undefined;
+  readonly llvm?: string | undefined;
   readonly optimize?: boolean;
 }): Promise<void> {
   const namedUnparseResults = nameParse(ast, debug);
@@ -61,4 +63,7 @@ export async function processAst({
 
   if (amd !== undefined)
     await fs.promises.writeFile(amd, globalQuad.convertToAmd());
+
+  if (llvm !== undefined)
+    await fs.promises.writeFile(llvm, globalQuad.convertToLlvm());
 }

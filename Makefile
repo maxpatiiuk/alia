@@ -2,6 +2,9 @@ LIBLINUX := -dynamic-linker /lib64/ld-linux-x86-64.so.2
 OUTFILE := outfile.s
 PROG := dev.prog
 
+CLANG := /home/a807d786/llvm_dist/bin/clang
+LLC := /home/a807d786/llvm_dist/bin/llc
+
 all:
 	npm install
 
@@ -20,3 +23,9 @@ link:
 		/usr/lib/x86_64-linux-gnu/crtn.o \
 		-o $(PROG)
 	./$(PROG)
+
+llvm:
+	$(CLANG) test.c -S -emit-llvm -o test.ll
+	$(LLC) test.ll
+	$(CLANG) test.s
+	./a.out

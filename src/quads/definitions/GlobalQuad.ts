@@ -126,15 +126,19 @@ export class GlobalQuad extends Quad {
     ];
   }
 
-  public convertToMips(): string {
+  private checkForMain(): void {
     const main = this.functions.find(
       (quad): quad is FunctionQuad =>
         quad instanceof FunctionQuad && quad.id === mainFunction
     );
     if (main === undefined)
       throw new Error(
-        'Conversion to MIPS requires there to be a main() function. Please define it'
+        'Conversion to assembly requires there to be a main() function. Please define it'
       );
+  }
+
+  public convertToMips(): string {
+    this.checkForMain();
 
     const headerInstructions = [
       new Globl([startFunction]),
@@ -165,14 +169,7 @@ export class GlobalQuad extends Quad {
   }
 
   public convertToAmd(): string {
-    const main = this.functions.find(
-      (quad): quad is FunctionQuad =>
-        quad instanceof FunctionQuad && quad.id === mainFunction
-    );
-    if (main === undefined)
-      throw new Error(
-        'Conversion to x64 requires there to be a main() function. Please define it'
-      );
+    this.checkForMain();
 
     const headerInstructions = [
       new Globl([mainFunction]),
@@ -198,6 +195,10 @@ export class GlobalQuad extends Quad {
       ],
       longestLabel
     );
+  }
+
+  public convertToLlvm(): string {
+    this.checkForMain();
   }
 }
 

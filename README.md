@@ -145,6 +145,21 @@ Example of generated MIPS assembly:
 
 ![Example MIPS output](./docs/img/mips-assembly.png)
 
+### Compiling to LLVM Assembly
+
+// TODO: update all documentation places that mention x64 (or amd) and MIPS
+//    to also use LLVM
+// TODO: add a link to llvm and llvm assembly docs
+// TODO: move all outputs into a "dist" directory
+// TODO: generate all outputs and provide them by default in "dist"
+
+
+Example call:
+
+```
+./dgc infile.dg -l llvm.ll
+```
+
 ## Running Interpreter
 
 Start the interpreter:
@@ -463,6 +478,12 @@ For example, it is much easier to permute the object, than it is to permute
 a string. It also increases type safety, as instructions can specify the types
 and order of arguments.
 
+[Documentation on compiling and executing generated MIPS assembly](#compiling-to-mips)
+
+[Documentation on compiling and executing generated x64 assembly](#compiling-to-x64)
+
+[Documentation on compiling and executing generated LLVM assembly](#compiling-to-llvm-assembly)
+
 #### Final code optimization
 
 Final code optimization consists
@@ -478,10 +499,6 @@ The optimization is made as platform-independent as possible.
 > a 1:1 representation of the AST.
 
 ### Execution
-
-[Documentation on compiling and executing generated MIPS assembly](#compiling-to-mips)
-
-[Documentation on compiling and executing generated x64 assembly](#compiling-to-x64)
 
 #### Runtime environment
 

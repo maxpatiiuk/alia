@@ -30,6 +30,11 @@ program
     'ast'
   )
   .option(
+    '-u, --unparse <string>',
+    'path to output file that would include pretty-printed program'
+  )
+  .option('-d, --debug', 'output debug information', false)
+  .option(
     '-n, --namedUnparse <string>',
     'the file to which the augmented unparse output will be written. Ignored if unparseMode is not "ast"'
   )
@@ -37,21 +42,17 @@ program
     '-a, --assemble <string>',
     'generate a 3AC representation of the program'
   )
-  .option('-d, --debug', 'output debug information', false)
   .option(
     '-d, --diagramPath <string>',
     'path to the output diagram for the grammar in the DOT format'
   )
+  .option('-m, --mips <string>', 'compile the program down to MIPS assembly')
+  .option('-o, --amd <string>', 'compile the program down to x64 assembly')
+  .option('-l, --llvm <string>', 'compile the program down to LLVM assembly')
   .option(
     '-r, --dontOptimize',
     "don't run peephole optimization or dead code removal",
     false
-  )
-  .option('-m, --mips <string>', 'compile the program down to MIPS assembly')
-  .option('-o, --amd <string>', 'compile the program down to x64 assembly')
-  .option(
-    '-u, --unparse <string>',
-    'path to output file that would include pretty-printed program'
   );
 
 program.parse();
@@ -67,6 +68,7 @@ const {
   diagramPath,
   mips,
   amd,
+  llvm,
   dontOptimize,
 } = program.opts<{
   readonly tokensOutput?: string;
@@ -79,6 +81,7 @@ const {
   readonly diagramPath?: string;
   readonly mips?: string;
   readonly amd?: string;
+  readonly llvm?: string;
   readonly dontOptimize: boolean;
 }>();
 
@@ -117,6 +120,7 @@ readFile()
       assemble,
       mips,
       amd,
+      llvm,
       optimize: !dontOptimize,
     });
   })
