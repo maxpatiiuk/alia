@@ -12,7 +12,7 @@ import { TempVariable } from './IdQuad.js';
 import { LlvmContext, Quad, quadsToString } from './index.js';
 import { Register } from './Register.js';
 import { BlankLine } from '../../instructions/definitions/amd/BlankLink.js';
-import { inlineLabels } from './GlobalQuad.js';
+import { inlineLabels, mainFunction } from './GlobalQuad.js';
 import llvm from 'llvm-bindings';
 import { TypeNode } from '../../ast/definitions/types/index.js';
 import { PrimaryTypeNode } from '../../ast/definitions/types/PrimaryTypeNode.js';
@@ -140,9 +140,12 @@ export class FunctionQuad extends Quad {
     const fn = llvm.Function.Create(
       typeToLlvm(this.type, builder, false),
       llvm.Function.LinkageTypes.ExternalLinkage,
-      this.name,
+      this.id === mainFunction ? mainFunction : this.name,
       module
     );
+
+    const entryBlock = llvm.BasicBlock.Create(thisContext, 'entry', fn);
+    builder.SetInsertPoint(entryBlock);
 
     this.formalsNode.children.forEach((node, index) => {
       const value = fn.getArg(index);
@@ -152,15 +155,13 @@ export class FunctionQuad extends Quad {
         null,
         node.id.getName()
       );
+      builder.CreateStore(value, node.llvmValue);
     });
 
-    const entryBlock = llvm.BasicBlock.Create(thisContext, 'entry', fn);
-    builder.SetInsertPoint(entryBlock);
+    this.statements.forEach((statement) => statement.toLlvm(context));
 
     if (llvm.verifyFunction(fn))
       throw new Error('Verifying LLVM function failed');
-
-    this.statements.forEach((statement) => statement.toLlvm(context));
 
     return fn;
   }

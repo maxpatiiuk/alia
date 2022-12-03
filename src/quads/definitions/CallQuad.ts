@@ -10,7 +10,7 @@ import {
 import { SetArgQuad as SetArgumentQuad } from './SetArgQuad.js';
 import { QuadsContext } from '../index.js';
 import { formatGlobalVariable } from './GlobalVarQuad.js';
-import { getPcHelper } from './GlobalQuad.js';
+import { getPcHelper, mainFunction } from './GlobalQuad.js';
 import { TempVariable } from './IdQuad.js';
 import { Register } from './Register.js';
 import { NextComment } from '../../instructions/definitions/NextComment.js';
@@ -48,9 +48,10 @@ export class CallQuad extends Quad {
     withReturn: boolean
   ) {
     super();
-    this.formattedName = isExternal
-      ? this.name
-      : formatGlobalVariable(this.name);
+    this.formattedName =
+      isExternal || this.name === mainFunction
+        ? this.name
+        : formatGlobalVariable(this.name);
 
     const getTempRegister = store(() => context.requestTempRegister());
 
@@ -91,6 +92,12 @@ export class CallQuad extends Quad {
     ];
   }
 
+  public toValue() {
+    if (this.returnQuad === undefined)
+      throw new Error("Can't get return value from CallStatement");
+    return this.returnQuad.toValue();
+  }
+
   public toMips() {
     const stackSize = this.tempsCount * mipsSize;
     return quadsToMips([
@@ -117,6 +124,10 @@ export class CallQuad extends Quad {
     ]);
   }
 
+  public toMipsValue() {
+    return this.returnQuad?.toMipsValue() ?? '$v0';
+  }
+
   public toAmd() {
     return quadsToAmd([
       new NextComment(`BEGIN Calling ${this.name}`),
@@ -140,9 +151,13 @@ export class CallQuad extends Quad {
     ]);
   }
 
+  public toAmdValue() {
+    return this.returnQuad?.toAmdValue() ?? '%rax';
+  }
+
   public toLlvm(context: LlvmContext) {
     const { module, builder } = context;
-    const fn = module.getFunction(this.name);
+    const fn = module.getFunction(this.formattedName);
     if (fn === null) throw new Error(`Function ${this.name} not found`);
 
     const actuals = this.actuals.flatMap(

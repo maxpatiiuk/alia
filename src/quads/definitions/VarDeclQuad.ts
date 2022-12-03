@@ -7,6 +7,7 @@ import type { LlvmContext } from './index.js';
 import { Quad } from './index.js';
 import { Register } from './Register.js';
 import { VariableDeclaration } from '../../ast/definitions/statement/VariableDeclaration.js';
+import llvm from 'llvm-bindings';
 
 export class VarDeclQuad extends Quad {
   public readonly assignQuad: AssignQuad;
@@ -46,6 +47,10 @@ export class VarDeclQuad extends Quad {
       typeToLlvm(this.type, builder, false),
       null,
       this.id
+    );
+    builder.CreateStore(
+      llvm.ConstantInt.get(builder.getInt64Ty(), 0, true),
+      this.varDeclNode.llvmValue
     );
     return this.varDeclNode.llvmValue;
   }

@@ -40,13 +40,6 @@ export class PostNode extends LineStatement {
   }
 
   public toQuads(context: QuadsContext) {
-    return [
-      new PostQuad(
-        this.id.getName(),
-        this.id.getTempVariable(),
-        context,
-        this.type
-      ),
-    ];
+    return [new PostQuad(this.id, context, this.type)];
   }
 }

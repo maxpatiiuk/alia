@@ -2,14 +2,16 @@ import { DecQ } from '../../instructions/definitions/amd/DecQ.js';
 import { IncQ } from '../../instructions/definitions/amd/IncQ.js';
 import type { QuadsContext } from '../index.js';
 import { AssignQuad } from './AssignQuad.js';
-import type { TempVariable } from './IdQuad.js';
-import { Quad } from './index.js';
+import { LlvmContext, Quad } from './index.js';
 import { IntLiteralQuad } from './IntLiteralQuad.js';
 import { LoadQuad } from './LoadQuad.js';
 import { OpQuad } from './OperationQuad.js';
 import { Register } from './Register.js';
 import { NextComment } from '../../instructions/definitions/NextComment.js';
 import { PrevComment } from '../../instructions/definitions/PrevComment.js';
+import { IdNode } from '../../ast/definitions/term/IdNode.js';
+import { FunctionDeclaration } from '../../ast/definitions/FunctionDeclaration.js';
+import llvm from 'llvm-bindings';
 
 export class PostQuad extends Quad {
   private readonly quad: AssignQuad;
@@ -25,16 +27,16 @@ export class PostQuad extends Quad {
   private readonly amdQuad: AssignQuad;
 
   public constructor(
-    private readonly id: string,
-    tempVariable: TempVariable,
+    private readonly id: IdNode,
     context: QuadsContext,
     private readonly type: '--' | '++'
   ) {
     super();
+    const tempVariable = this.id.getTempVariable();
     const tempRegister = context.requestTempRegister();
-    this.quad = new AssignQuad(this.id, tempVariable, [
+    this.quad = new AssignQuad(this.id.getName(), tempVariable, [
       new OpQuad(
-        new Register(this.id),
+        new Register(this.id.getName()),
         this.type,
         new Register('1'),
         tempRegister
@@ -59,7 +61,7 @@ export class PostQuad extends Quad {
   }
 
   public toValue() {
-    return this.id;
+    return this.id.getName();
   }
 
   public toMips() {
@@ -90,5 +92,20 @@ export class PostQuad extends Quad {
     return this.amdQuad.toAmdValue();
   }
 
-  // FIXME: implement toLlvm
+  public toLlvm({ builder }: LlvmContext) {
+    const declaration = this.id.getDeclaration()!;
+    if (declaration instanceof FunctionDeclaration)
+      throw new TypeError('Unexpected function declaration');
+    const loaded = builder.CreateLoad(
+      declaration.llvmValue.getAllocatedType(),
+      declaration.llvmValue,
+      this.id.getName()
+    );
+    const result = builder.CreateAdd(
+      loaded,
+      llvm.ConstantInt.get(builder.getInt64Ty(), 1, true),
+      'addtmp'
+    );
+    return builder.CreateStore(result, declaration.llvmValue);
+  }
 }

@@ -9,7 +9,6 @@ import { assertToken } from '../TokenNode.js';
 import { Expression } from './index.js';
 import { OperationQuad } from '../../../quads/definitions/OperationQuad.js';
 import { IntLiteralNode } from '../term/IntLiteralNode.js';
-import { PostQuad } from '../../../quads/definitions/PostQuad.js';
 
 export class DecimalOperator extends Expression {
   public readonly operator: '-' | '*' | '/' | '+';
@@ -76,34 +75,15 @@ export class DecimalOperator extends Expression {
       )
     )
       return rightQuads;
-    else if (context.optimize && rightInt instanceof IntLiteralNode) {
-      if (
-        uselessActions.some(
-          ([operator, value]) =>
-            operator === this.operator && value.toString() === rightInt.pretty()
-        )
+    else if (
+      context.optimize &&
+      rightInt instanceof IntLiteralNode &&
+      uselessActions.some(
+        ([operator, value]) =>
+          operator === this.operator && value.toString() === rightInt.pretty()
       )
-        return leftQuads;
-      else if (rightInt.pretty() === '1') {
-        const mappedOperator =
-          this.operator === '+'
-            ? '++'
-            : this.operator === '-'
-            ? '--'
-            : undefined;
-        if (typeof mappedOperator === 'string') {
-          const tempVariable = context.requestTemp();
-          return [
-            new PostQuad(
-              tempVariable.toValue(),
-              tempVariable,
-              context,
-              mappedOperator
-            ),
-          ];
-        }
-      }
-    }
+    )
+      return leftQuads;
     return [new OperationQuad(leftQuads, this.operator, rightQuads, context)];
   }
 }
