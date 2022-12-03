@@ -135,3 +135,4 @@ readFile()
 // TODO: add "Architecture" section for LLVM
 // TODO: add "Compiling" section for LLVM
 // TODO: go over TODOs in README.md (they are not picked up by the IDE)
+// TODO: mention https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl05.html was used as a reference

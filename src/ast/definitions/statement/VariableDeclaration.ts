@@ -76,7 +76,7 @@ export class VariableDeclaration extends Statement {
     const name = this.id.getName();
     this.tempVariable = context.declareVar(name);
     return typeof this.tempVariable.variable === 'number'
-      ? [new VarDeclQuad(name, this.tempVariable)]
+      ? [new VarDeclQuad(name, this.type, this.tempVariable, this)]
       : [];
   }
 }

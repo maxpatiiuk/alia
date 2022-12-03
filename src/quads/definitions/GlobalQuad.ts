@@ -216,8 +216,7 @@ export class GlobalQuad extends Quad {
       ...this.functions,
     ].forEach((quad) => quad.toLlvm(globalContext));
 
-    module.setDataLayout();
-    // FIXME: TheModule->setDataLayout(TheJIT->getTargetMachine().createDataLayout());
+    // FIXME: check if this is needed: TheModule->setDataLayout(TheJIT->getTargetMachine().createDataLayout());
 
     if (llvm.verifyModule(module))
       throw new Error('Verifying LLVM module failed');

@@ -33,7 +33,6 @@ import { SltiU } from '../../instructions/definitions/mips/SltiU.js';
 import { Xor } from '../../instructions/definitions/mips/Xor.js';
 import { Andi } from '../../instructions/definitions/mips/Andi.js';
 import { CmpQ } from '../../instructions/definitions/amd/CmpQ.js';
-import llvm from 'llvm-bindings';
 
 const operationTranslations = {
   '--': 'SUB64',
@@ -169,41 +168,35 @@ export class OpQuad extends Quad {
 
   public toLlvm(context: LlvmContext) {
     const { builder } = context;
-    const leftValues = this.left?.toLlvm(context) ?? [];
-    const left = leftValues.at(-1)!;
-    const rightValues = this.right.toLlvm(context);
-    const right = rightValues.at(-1)!;
+    const left = this.left?.toLlvm(context)!;
+    const right = this.right.toLlvm(context);
 
-    let result: llvm.Value;
     if (this.type === '--' || this.type === '-')
-      result = builder.CreateSub(left, right, 'subtmp');
+      return builder.CreateSub(left, right, 'subtmp');
     else if (this.type === '++' || this.type === '+')
-      result = builder.CreateAdd(left, right, 'addtmp');
+      return builder.CreateAdd(left, right, 'addtmp');
     else if (this.type === '*')
-      result = builder.CreateMul(left, right, 'multtmp');
+      return builder.CreateMul(left, right, 'multtmp');
     else if (this.type === '/')
-      result = builder.CreateSDiv(left, right, 'divtmp');
-    else if (this.type === 'or')
-      result = builder.CreateOr(left, right, 'ortmp');
+      return builder.CreateSDiv(left, right, 'divtmp');
+    else if (this.type === 'or') return builder.CreateOr(left, right, 'ortmp');
     else if (this.type === 'and')
-      result = builder.CreateAnd(left, right, 'andtmp');
+      return builder.CreateAnd(left, right, 'andtmp');
     else if (this.type === '<')
-      result = builder.CreateICmpSLT(left, right, 'slttmp');
+      return builder.CreateICmpSLT(left, right, 'slttmp');
     else if (this.type === '>')
-      result = builder.CreateICmpSGT(left, right, 'sgttmp');
+      return builder.CreateICmpSGT(left, right, 'sgttmp');
     else if (this.type === '<=')
-      result = builder.CreateICmpSLE(left, right, 'sletmp');
+      return builder.CreateICmpSLE(left, right, 'sletmp');
     else if (this.type === '>=')
-      result = builder.CreateICmpSGE(left, right, 'sgetmp');
+      return builder.CreateICmpSGE(left, right, 'sgetmp');
     else if (this.type === '==')
-      result = builder.CreateICmpEQ(left, right, 'setmp');
+      return builder.CreateICmpEQ(left, right, 'setmp');
     else if (this.type === '!=')
-      result = builder.CreateICmpNE(left, right, 'setmp');
-    else if (this.type === '!') result = builder.CreateNot(left, 'nottmp');
-    else if (this.type === 'neg') result = builder.CreateNeg(right, 'negtmp');
+      return builder.CreateICmpNE(left, right, 'setmp');
+    else if (this.type === '!') return builder.CreateNot(left, 'nottmp');
+    else if (this.type === 'neg') return builder.CreateNeg(right, 'negtmp');
     else throw new TypeError(`Unknown operation ${this.type}`);
-
-    return [...leftValues.slice(1), ...rightValues.slice(1), result];
   }
 }
 

@@ -47,7 +47,7 @@ export class IdQuad extends Quad {
   public toLlvm() {
     if (this.declaration instanceof FunctionDeclaration)
       throw new TypeError('Unexpected function declaration');
-    return [this.declaration.llvmValue];
+    return this.declaration.llvmValue;
   }
 }
 

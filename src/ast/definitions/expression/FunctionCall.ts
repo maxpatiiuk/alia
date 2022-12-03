@@ -12,7 +12,6 @@ import { token } from '../TokenNode.js';
 import { Expression } from './index.js';
 import { QuadsContext } from '../../../quads/index.js';
 import { CallQuad } from '../../../quads/definitions/CallQuad.js';
-import { GetRetQuad } from '../../../quads/definitions/GetRetQuad.js';
 import { VariableDeclaration } from '../statement/VariableDeclaration.js';
 
 export class FunctionCall extends Expression {
@@ -86,7 +85,7 @@ export class FunctionCall extends Expression {
     else throw new Error('Cannot call non-function');
   }
 
-  toPartialQuads(context: QuadsContext) {
+  toPartialQuads(context: QuadsContext, withReturn: boolean) {
     const declaration = this.id.getDeclaration();
     if (declaration === undefined)
       throw new Error('Cannot call undefined function');
@@ -100,15 +99,13 @@ export class FunctionCall extends Expression {
         false,
         declaration instanceof VariableDeclaration
           ? declaration.tempVariable
-          : undefined
+          : undefined,
+        withReturn
       ),
     ];
   }
 
   toQuads(context: QuadsContext) {
-    return [
-      ...this.toPartialQuads(context),
-      new GetRetQuad(context.requestTemp()),
-    ];
+    return this.toPartialQuads(context, true);
   }
 }

@@ -52,7 +52,7 @@ export class IntLiteralQuad extends Quad {
   }
 
   public toLlvm({ builder }: LlvmContext) {
-    return [llvm.ConstantInt.get(builder.getInt64Ty(), this.value!, true)];
+    return llvm.ConstantInt.get(builder.getInt64Ty(), this.value!, true);
   }
 }
 

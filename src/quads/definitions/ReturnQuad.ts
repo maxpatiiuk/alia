@@ -58,11 +58,9 @@ export class ReturnQuad extends Quad {
 
   public toLlvm(context: LlvmContext) {
     const { builder } = context;
-    const values = this.quads?.flatMap((quad) => quad.toLlvm(context)) ?? [];
-    const value = values.at(-1);
-    return [
-      ...values.slice(0, -1),
-      value === undefined ? builder.CreateRetVoid() : builder.CreateRet(value),
-    ];
+    const value = this.quads?.map((quad) => quad.toLlvm(context)).at(-1);
+    return value === undefined
+      ? builder.CreateRetVoid()
+      : builder.CreateRet(value);
   }
 }

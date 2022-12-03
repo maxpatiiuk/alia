@@ -78,10 +78,11 @@ export class IfQuad extends Quad {
   }
 
   public toLlvm(context: LlvmContext) {
+    // FIXME: refactor to get rid of Phi Nodes
     const { builder, context: thisContext } = context;
 
     const condition = this.condition
-      .flatMap((condition) => condition.toLlvm(context))
+      .map((condition) => condition.toLlvm(context))
       .at(-1)!;
     const boolCondition = builder.CreateICmpNE(
       condition,
@@ -100,7 +101,7 @@ export class IfQuad extends Quad {
     builder.SetInsertPoint(thenBlock);
 
     const thenValue = this.trueQuads
-      .flatMap((quad) => quad.toLlvm(context))
+      .map((quad) => quad.toLlvm(context))
       .at(-1)!;
 
     builder.CreateBr(mergeBlock);
@@ -111,7 +112,7 @@ export class IfQuad extends Quad {
     builder.SetInsertPoint(elseBlock);
 
     const elseValue =
-      this.falseCase?.quads.flatMap((quad) => quad.toLlvm(context)).at(-1) ??
+      this.falseCase?.quads.map((quad) => quad.toLlvm(context)).at(-1) ??
       llvm.ConstantInt.get(builder.getInt64Ty(), 0, true);
 
     builder.CreateBr(mergeBlock);
@@ -129,7 +130,7 @@ export class IfQuad extends Quad {
 
     phiNode.addIncoming(thenValue, thenBlock);
     phiNode.addIncoming(elseValue, elseBlock);
-    return [phiNode];
+    return phiNode;
   }
 }
 

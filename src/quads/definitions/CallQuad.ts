@@ -28,6 +28,7 @@ import { PopQ } from '../../instructions/definitions/amd/PopQ.js';
 import { AddQ } from '../../instructions/definitions/amd/AddQ.js';
 import { SubQ } from '../../instructions/definitions/amd/SubQ.js';
 import { store } from '../../utils/utils.js';
+import { GetRetQuad } from './GetRetQuad.js';
 
 export class CallQuad extends Quad {
   private readonly quads: RA<readonly [RA<Quad>, Quad]>;
@@ -36,13 +37,15 @@ export class CallQuad extends Quad {
   private readonly formattedName: string;
   private readonly preStackOffset: number;
   private readonly postStackOffset: number;
+  private readonly returnQuad: GetRetQuad | undefined;
 
   public constructor(
     context: QuadsContext,
     private readonly actuals: RA<RA<Quad>>,
     private readonly name: string,
     isExternal: boolean,
-    private readonly dynamicTempVariable: TempVariable | undefined
+    private readonly dynamicTempVariable: TempVariable | undefined,
+    withReturn: boolean
   ) {
     super();
     this.formattedName = isExternal
@@ -72,6 +75,10 @@ export class CallQuad extends Quad {
     this.needsAlignment = stackSize % 2 !== stackPushCount % 2;
     this.preStackOffset = stackSize + (this.needsAlignment ? 1 : 0);
     this.postStackOffset = this.preStackOffset + actuals.length;
+
+    this.returnQuad = withReturn
+      ? new GetRetQuad(context.requestTemp())
+      : undefined;
   }
 
   public toString() {
@@ -80,6 +87,7 @@ export class CallQuad extends Quad {
         .flatMap(([quads, setArgumentQuad]) => [...quads, setArgumentQuad])
         .flatMap((quad) => quad.toString()),
       `call ${this.name}`,
+      ...(this.returnQuad?.toString() ?? []),
     ];
   }
 
@@ -105,6 +113,7 @@ export class CallQuad extends Quad {
           ]),
       new Addi('$sp', '$sp', stackSize),
       new PrevComment(`END Calling ${this.name}`),
+      ...(this.returnQuad === undefined ? [] : [this.returnQuad]),
     ]);
   }
 
@@ -127,6 +136,7 @@ export class CallQuad extends Quad {
         .map((register) => new PopQ(register)),
       new AddQ(`$${this.postStackOffset * amdSize}`, '%rsp'),
       new PrevComment(`END Calling ${this.name}`),
+      ...(this.returnQuad === undefined ? [] : [this.returnQuad]),
     ]);
   }
 
@@ -136,8 +146,8 @@ export class CallQuad extends Quad {
     if (fn === null) throw new Error(`Function ${this.name} not found`);
 
     const actuals = this.actuals.flatMap(
-      (quads) => quads.flatMap((quad) => quad.toLlvm(context)).at(-1)!
+      (quads) => quads.map((quad) => quad.toLlvm(context)).at(-1)!
     );
-    return [builder.CreateCall(fn, actuals, 'calltmp')];
+    return builder.CreateCall(fn, actuals, 'calltmp');
   }
 }

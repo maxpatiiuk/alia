@@ -74,11 +74,10 @@ export class Quad {
     throw new Error('Not implemented');
   }
 
-  // REFACTOR: consider switching return type to Value
   /**
    * Convert Quad to LLVM IR instructions
    */
-  public toLlvm(_context: LlvmContext): RA<Value> {
+  public toLlvm(_context: LlvmContext): Value {
     throw new Error('Not implemented');
   }
 }
