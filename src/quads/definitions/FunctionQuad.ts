@@ -9,10 +9,14 @@ import { FunctionPrologueQuad } from './FunctionPrologueQuad.js';
 import { GetArgQuad as GetArgumentQuad } from './GetArgQuad.js';
 import { formatGlobalVariable } from './GlobalVarQuad.js';
 import { TempVariable } from './IdQuad.js';
-import { Quad, quadsToString } from './index.js';
+import { LlvmContext, Quad, quadsToString } from './index.js';
 import { Register } from './Register.js';
 import { BlankLine } from '../../instructions/definitions/amd/BlankLink.js';
 import { inlineLabels } from './GlobalQuad.js';
+import llvm from 'llvm-bindings';
+import { TypeNode } from '../../ast/definitions/types/index.js';
+import { PrimaryTypeNode } from '../../ast/definitions/types/PrimaryTypeNode.js';
+import { FunctionTypeNode } from '../../ast/definitions/types/FunctionTypeNode.js';
 
 export class FunctionQuad extends Quad {
   private readonly enter: FunctionPrologueQuad;
@@ -33,8 +37,9 @@ export class FunctionQuad extends Quad {
   private readonly formals: RA<FormalQuad>;
 
   public constructor(
+    private readonly type: FunctionTypeNode,
     public readonly id: string,
-    formalsNode: FormalsDeclNode,
+    private readonly formalsNode: FormalsDeclNode,
     statements: StatementList,
     context: QuadsContext
   ) {
@@ -77,7 +82,7 @@ export class FunctionQuad extends Quad {
     this.leave = new FunctionEpilogueQuad(newContext.returnLabel, this.id);
 
     const tempRegister = newContext.requestTempRegister();
-    this.formals = formalsNode.toQuads(newContext);
+    this.formals = this.formalsNode.toQuads(newContext);
     this.getArgs = this.formals.map(
       (formal, index, { length }) =>
         new GetArgumentQuad(index, formal, tempRegister, length)
@@ -128,6 +133,28 @@ export class FunctionQuad extends Quad {
       new BlankLine(),
     ];
   }
+
+  public toLlvm({ builder, module }: LlvmContext) {
+    // Function
+    const fn = llvm.Function.Create(
+      typeToLlvm(this.type, builder, false),
+      llvm.Function.LinkageTypes.ExternalLinkage,
+      this.name,
+      module
+    );
+
+    /*const entryBB = llvm.BasicBlock.Create(context, 'entry', fn);
+    builder.SetInsertPoint(entryBB);
+    const a = fn.getArg(0);
+    const b = fn.getArg(1);
+    const result = builder.CreateFAdd(a, b, 'addtmp');
+    builder.CreateRet(result);*/
+
+    if (llvm.verifyFunction(fn))
+      throw new Error('Verifying LLVM function failed');
+
+    return fn;
+  }
 }
 
 const formatLocal = (variableName: string): string =>
@@ -143,6 +170,22 @@ const reTempVar = /^\$t(?<index>\d+)$/;
 export function parseTempVar(index: string): number | undefined {
   const value = reTempVar.exec(index)?.groups?.index;
   return typeof value === 'string' ? Number.parseInt(value) : undefined;
+}
+
+export function typeToLlvm(
+  type: TypeNode,
+  builder: llvm.IRBuilder,
+  pointer: boolean
+): llvm.Type {
+  if (type instanceof PrimaryTypeNode) return builder.getInt64Ty();
+  else if (type instanceof FunctionTypeNode) {
+    const returnType = typeToLlvm(type.returnType, builder, true);
+    const formals = type.typeList.children.map((formal) =>
+      typeToLlvm(formal, builder, true)
+    );
+    const functionType = llvm.FunctionType.get(returnType, formals, false);
+    return pointer ? llvm.PointerType.get(functionType, 0) : functionType;
+  } else throw new Error('Unsupported type');
 }
 
 const tempRegisterCount = 10;

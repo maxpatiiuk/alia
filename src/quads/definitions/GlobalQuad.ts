@@ -11,6 +11,7 @@ import type { QuadsContext } from '../index.js';
 import { FunctionQuad } from './FunctionQuad.js';
 import {
   formatGlobalVariable,
+  GlobalVarQuad,
   GlobalVarQuad as GlobalVariableQuad,
 } from './GlobalVarQuad.js';
 import { Quad, quadsToAmd, quadsToMips, quadsToString } from './index.js';
@@ -35,9 +36,10 @@ import {
   linesToString,
 } from '../../instructions/index.js';
 import { optimizeInstructions } from '../../instructions/optimize/index.js';
+import llvm from 'llvm-bindings';
 
 export class GlobalQuad extends Quad {
-  private readonly globalQuads: RA<Quad>;
+  private readonly globalQuads: RA<GlobalVarQuad | StringDefQuad>;
 
   private readonly functions: RA<Quad>;
 
@@ -199,6 +201,25 @@ export class GlobalQuad extends Quad {
 
   public convertToLlvm(): string {
     this.checkForMain();
+
+    const context = new llvm.LLVMContext();
+    const module = new llvm.Module('dgc', context);
+    const builder = new llvm.IRBuilder(context);
+
+    const globalContext = { context, module, builder };
+
+    [
+      ...this.globalQuads.filter(
+        (quad) =>
+          !(quad instanceof GlobalVarQuad) || typeof quad.value === 'number'
+      ),
+      ...this.functions,
+    ].forEach((quad) => quad.toLlvm(globalContext));
+
+    if (llvm.verifyModule(module))
+      throw new Error('Verifying LLVM module failed');
+
+    return module.print();
   }
 }
 

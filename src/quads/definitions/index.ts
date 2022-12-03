@@ -1,9 +1,11 @@
+import type { IRBuilder, LLVMContext, Module, Value } from 'llvm-bindings';
+
 import type { AmdInstruction } from '../../instructions/definitions/amd/index.js';
-import type { MipsInstruction } from '../../instructions/definitions/mips/index.js';
-import type { RA } from '../../utils/types.js';
 import { Label } from '../../instructions/definitions/Label.js';
+import type { MipsInstruction } from '../../instructions/definitions/mips/index.js';
 import { NextComment } from '../../instructions/definitions/NextComment.js';
 import { PrevComment } from '../../instructions/definitions/PrevComment.js';
+import type { RA } from '../../utils/types.js';
 
 /**
  * Base Quad class
@@ -71,10 +73,17 @@ export class Quad {
   public toAmdValue(): string {
     throw new Error('Not implemented');
   }
+
+  /**
+   * Convert Quad to LLVM IR instructions
+   */
+  public toLlvm(_context: LlvmContext): Value {
+    throw new Error('Not implemented');
+  }
 }
 
 export const quadsToString = (
-  quads: RA<Quad | Label | string | NextComment | PrevComment>
+  quads: RA<Label | NextComment | PrevComment | Quad | string>
 ): RA<Label | string> =>
   quads.flatMap((quad) =>
     quad instanceof PrevComment || quad instanceof NextComment
@@ -105,3 +114,9 @@ export const mipsSize = 4;
  * 8*8 = 64 bits
  */
 export const amdSize = 8;
+
+export type LlvmContext = {
+  readonly context: LLVMContext;
+  readonly module: Module;
+  readonly builder: IRBuilder;
+};

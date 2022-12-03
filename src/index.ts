@@ -125,3 +125,13 @@ readFile()
     });
   })
   .catch(console.error);
+
+// TODO: rename the language
+// TODO: update all documentation places that mention x64 (or amd) and MIPS
+//    to also use LLVM
+// TODO: add a link to llvm and llvm assembly docs
+// TODO: move all outputs into a "dist" directory
+// TODO: generate all outputs and provide them by default in "dist"
+// TODO: add "Architecture" section for LLVM
+// TODO: add "Compiling" section for LLVM
+// TODO: go over TODOs in README.md (they are not picked up by the IDE)

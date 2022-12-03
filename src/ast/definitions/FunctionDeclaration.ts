@@ -120,6 +120,7 @@ export class FunctionDeclaration extends AstNode {
   public toQuads(context: QuadsContext): RA<Quad> {
     return [
       new FunctionQuad(
+        this.typeNode.type,
         this.id.getName(),
         this.formals,
         this.statements,

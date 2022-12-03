@@ -1,7 +1,8 @@
-import { Quad } from './index.js';
+import { LlvmContext, Quad } from './index.js';
 import { QuadGlobal } from '../../instructions/definitions/amd/QuadGlobal.js';
 import { WordGlobal } from '../../instructions/definitions/mips/WordGlobal.js';
 import { Label } from '../../instructions/definitions/Label.js';
+import llvm from 'llvm-bindings';
 
 export class GlobalVarQuad extends Quad {
   private readonly name: string;
@@ -10,7 +11,7 @@ export class GlobalVarQuad extends Quad {
 
   public constructor(
     private readonly id: string,
-    private readonly value: number | undefined
+    public readonly value: number | undefined
   ) {
     super();
 
@@ -33,6 +34,17 @@ export class GlobalVarQuad extends Quad {
     return this.labelQuad === undefined || this.value === undefined
       ? []
       : [this.labelQuad, new QuadGlobal(this.value)];
+  }
+
+  public toLlvm({ module, builder }: LlvmContext) {
+    return new llvm.GlobalVariable(
+      module,
+      builder.getInt64Ty(),
+      false,
+      llvm.GlobalVariable.LinkageTypes.ExternalLinkage,
+      llvm.ConstantInt.get(builder.getInt64Ty(), this.value!, true),
+      this.name
+    );
   }
 }
 
