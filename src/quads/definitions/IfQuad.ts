@@ -1,6 +1,12 @@
 import type { RA } from '../../utils/types.js';
 import { GoToQuad } from './GoToQuad.js';
-import { Quad, quadsToAmd, quadsToMips, quadsToString } from './index.js';
+import {
+  LlvmContext,
+  Quad,
+  quadsToAmd,
+  quadsToMips,
+  quadsToString,
+} from './index.js';
 import { QuadsContext } from '../index.js';
 import { LoadQuad } from './LoadQuad.js';
 import { Register } from './Register.js';
@@ -10,6 +16,7 @@ import { Je } from '../../instructions/definitions/amd/Je.js';
 import { Beq } from '../../instructions/definitions/mips/Beq.js';
 import { Label } from '../../instructions/definitions/Label.js';
 import { CmpQ } from '../../instructions/definitions/amd/CmpQ.js';
+import llvm from 'llvm-bindings';
 
 export class IfQuad extends Quad {
   private readonly quads: RA<Quad | NextComment | PrevComment | Label>;
@@ -18,7 +25,9 @@ export class IfQuad extends Quad {
   public constructor(
     private readonly condition: RA<Quad>,
     private readonly trueQuads: RA<Quad>,
-    falseCase: { readonly quads: RA<Quad>; readonly label: string } | undefined,
+    private readonly falseCase:
+      | { readonly quads: RA<Quad>; readonly label: string }
+      | undefined,
     context: QuadsContext
   ) {
     super();
@@ -66,6 +75,61 @@ export class IfQuad extends Quad {
       ...quadsToAmd(this.quads),
       new PrevComment('END if'),
     ];
+  }
+
+  public toLlvm(context: LlvmContext) {
+    const { builder, context: thisContext } = context;
+
+    const condition = this.condition
+      .flatMap((condition) => condition.toLlvm(context))
+      .at(-1)!;
+    const boolCondition = builder.CreateICmpNE(
+      condition,
+      llvm.ConstantInt.get(builder.getInt64Ty(), 0, true),
+      'ifcond'
+    );
+
+    const fn = builder.GetInsertBlock()!.getParent()!;
+
+    let thenBlock = llvm.BasicBlock.Create(thisContext, 'then', fn);
+    let elseBlock = llvm.BasicBlock.Create(thisContext, 'else');
+    const mergeBlock = llvm.BasicBlock.Create(thisContext, 'ifcont');
+
+    builder.CreateCondBr(boolCondition, thenBlock, elseBlock);
+
+    builder.SetInsertPoint(thenBlock);
+
+    const thenValue = this.trueQuads
+      .flatMap((quad) => quad.toLlvm(context))
+      .at(-1)!;
+
+    builder.CreateBr(mergeBlock);
+    // Need to re-set thenBlock (because IfQuad could be nested)
+    thenBlock = builder.GetInsertBlock() ?? thenBlock;
+
+    fn.addBasicBlock(elseBlock);
+    builder.SetInsertPoint(elseBlock);
+
+    const elseValue =
+      this.falseCase?.quads.flatMap((quad) => quad.toLlvm(context)).at(-1) ??
+      llvm.ConstantInt.get(builder.getInt64Ty(), 0, true);
+
+    builder.CreateBr(mergeBlock);
+    // Need to re-set thenBlock (because IfQuad could be nested)
+    elseBlock = builder.GetInsertBlock() ?? elseBlock;
+
+    // Emit merge block.
+    fn.addBasicBlock(mergeBlock);
+    builder.SetInsertPoint(mergeBlock);
+    const phiNode = builder.CreatePHI(
+      llvm.Type.getDoubleTy(thisContext),
+      2,
+      'iftmp'
+    );
+
+    phiNode.addIncoming(thenValue, thenBlock);
+    phiNode.addIncoming(elseValue, elseBlock);
+    return [phiNode];
   }
 }
 

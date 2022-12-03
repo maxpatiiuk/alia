@@ -49,4 +49,6 @@ export class ForQuad extends Quad {
       new PrevComment('END for loop'),
     ];
   }
+
+  // FIXME: implement toLlvm
 }

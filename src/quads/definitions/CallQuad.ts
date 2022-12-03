@@ -136,7 +136,7 @@ export class CallQuad extends Quad {
     if (fn === null) throw new Error(`Function ${this.name} not found`);
 
     const actuals = this.actuals.flatMap(
-      (quads) => quads.map((quad) => quad.toLlvm(context).at(-1)!).at(-1)!
+      (quads) => quads.flatMap((quad) => quad.toLlvm(context)).at(-1)!
     );
     return [builder.CreateCall(fn, actuals, 'calltmp')];
   }

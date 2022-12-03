@@ -89,4 +89,6 @@ export class PostQuad extends Quad {
   public toAmdValue() {
     return this.amdQuad.toAmdValue();
   }
+
+  // FIXME: implement toLlvm
 }

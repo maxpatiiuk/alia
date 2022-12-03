@@ -60,4 +60,6 @@ export class ReportQuad extends Quad {
       new PrevComment('END Output'),
     ];
   }
+
+  // FIXME: implement toLlvm
 }

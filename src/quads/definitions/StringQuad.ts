@@ -24,4 +24,6 @@ export class StringQuad extends TermQuad {
   public toAmdValue() {
     return `$${this.name}`;
   }
+
+  // FIXME: implement toLlvm
 }

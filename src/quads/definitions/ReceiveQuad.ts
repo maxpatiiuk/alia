@@ -52,4 +52,6 @@ export class ReceiveQuad extends Quad {
       new PrevComment(`END Input ${this.id}`),
     ];
   }
+
+  // FIXME: implement toLlvm
 }

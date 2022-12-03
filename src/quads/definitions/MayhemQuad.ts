@@ -54,4 +54,6 @@ export class MayhemQuad extends Quad {
   public toAmdValue() {
     return this.tempVariable.toAmdValue();
   }
+
+  // FIXME: implement toLlvm
 }

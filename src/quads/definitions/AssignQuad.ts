@@ -71,4 +71,6 @@ export class AssignQuad extends Quad {
   public toAmdValue() {
     return this.tempVariable.toAmdValue();
   }
+
+  // FIXME: implement toLlvm
 }

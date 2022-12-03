@@ -36,4 +36,8 @@ export class GetRetQuad extends Quad {
   public toAmdValue() {
     return this.tempVariable.toAmdValue();
   }
+
+  public toLlvm() {
+    return [];
+  }
 }

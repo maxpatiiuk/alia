@@ -305,6 +305,8 @@ export class OperationQuad extends Quad {
   public toAmdValue() {
     return this.assignUniversal.toAmdValue();
   }
+
+  // FIXME: implement toLlvm
 }
 
 const lowRegisterMapping: IR<string> = {
