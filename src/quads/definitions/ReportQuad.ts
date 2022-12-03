@@ -25,7 +25,8 @@ export class ReportQuad extends Quad {
       [],
       isString ? 'printString' : isBool ? 'printBool' : 'printInt',
       true,
-      undefined
+      undefined,
+      false
     );
   }
 

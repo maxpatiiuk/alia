@@ -1,4 +1,4 @@
-import { amdSize, mipsSize, Quad } from './index.js';
+import { amdSize, LlvmContext, mipsSize, Quad } from './index.js';
 import { TermQuad } from './TermQuad.js';
 import { formatGlobalVariable } from './GlobalVarQuad.js';
 import { formatTemp } from '../index.js';
@@ -44,10 +44,14 @@ export class IdQuad extends Quad {
     return this.tempVariable.toAmdValue();
   }
 
-  public toLlvm() {
+  public toLlvm({ builder }: LlvmContext) {
     if (this.declaration instanceof FunctionDeclaration)
       throw new TypeError('Unexpected function declaration');
-    return this.declaration.llvmValue;
+    return builder.CreateLoad(
+      this.declaration.llvmValue.getAllocatedType(),
+      this.declaration.llvmValue,
+      this.name
+    );
   }
 }
 

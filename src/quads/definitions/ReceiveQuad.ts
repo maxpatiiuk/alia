@@ -26,7 +26,8 @@ export class ReceiveQuad extends Quad {
       [],
       type === 'bool' ? 'getBool' : 'getInt',
       true,
-      undefined
+      undefined,
+      false
     );
   }
 

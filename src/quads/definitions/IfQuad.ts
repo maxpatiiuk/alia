@@ -77,13 +77,13 @@ export class IfQuad extends Quad {
     ];
   }
 
-  public toLlvm(context: LlvmContext) {
-    // FIXME: refactor to get rid of Phi Nodes
+  public toLlvm(context: LlvmContext, loopbackBlock?: llvm.BasicBlock) {
     const { builder, context: thisContext } = context;
 
     const condition = this.condition
       .map((condition) => condition.toLlvm(context))
       .at(-1)!;
+
     const boolCondition = builder.CreateICmpNE(
       condition,
       llvm.ConstantInt.get(builder.getInt64Ty(), 0, true),
@@ -99,38 +99,18 @@ export class IfQuad extends Quad {
     builder.CreateCondBr(boolCondition, thenBlock, elseBlock);
 
     builder.SetInsertPoint(thenBlock);
-
-    const thenValue = this.trueQuads
-      .map((quad) => quad.toLlvm(context))
-      .at(-1)!;
-
+    this.trueQuads.forEach((quad) => quad.toLlvm(context));
     builder.CreateBr(mergeBlock);
-    // Need to re-set thenBlock (because IfQuad could be nested)
-    thenBlock = builder.GetInsertBlock() ?? thenBlock;
 
     fn.addBasicBlock(elseBlock);
     builder.SetInsertPoint(elseBlock);
+    this.falseCase?.quads.forEach((quad) => quad.toLlvm(context));
+    builder.CreateBr(loopbackBlock ?? mergeBlock);
 
-    const elseValue =
-      this.falseCase?.quads.map((quad) => quad.toLlvm(context)).at(-1) ??
-      llvm.ConstantInt.get(builder.getInt64Ty(), 0, true);
-
-    builder.CreateBr(mergeBlock);
-    // Need to re-set thenBlock (because IfQuad could be nested)
-    elseBlock = builder.GetInsertBlock() ?? elseBlock;
-
-    // Emit merge block.
     fn.addBasicBlock(mergeBlock);
     builder.SetInsertPoint(mergeBlock);
-    const phiNode = builder.CreatePHI(
-      llvm.Type.getDoubleTy(thisContext),
-      2,
-      'iftmp'
-    );
 
-    phiNode.addIncoming(thenValue, thenBlock);
-    phiNode.addIncoming(elseValue, elseBlock);
-    return phiNode;
+    return llvm.ConstantInt.get(builder.getInt64Ty(), 0, true);
   }
 }
 

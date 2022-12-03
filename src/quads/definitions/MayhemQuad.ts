@@ -18,7 +18,7 @@ export class MayhemQuad extends Quad {
   public constructor(context: QuadsContext) {
     super();
     this.tempVariable = context.requestTemp();
-    this.callQuad = new CallQuad(context, [], 'mayhem', true, undefined);
+    this.callQuad = new CallQuad(context, [], 'mayhem', true, undefined, false);
   }
 
   public toString() {

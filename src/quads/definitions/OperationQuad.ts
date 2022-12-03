@@ -299,7 +299,16 @@ export class OperationQuad extends Quad {
     return this.assignUniversal.toAmdValue();
   }
 
-  // FIXME: implement toLlvm
+  public toLlvm(context: LlvmContext) {
+    this.left?.slice(0, -1).forEach((quad) => quad.toLlvm(context));
+    this.right?.slice(0, -1).forEach((quad) => quad.toLlvm(context));
+    return new OpQuad(
+      this.left?.at(-1),
+      this.type,
+      this.right.at(-1)!,
+      new Register('none')
+    ).toLlvm(context);
+  }
 }
 
 const lowRegisterMapping: IR<string> = {

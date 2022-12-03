@@ -10,10 +10,7 @@ import type { IdNode } from '../term/IdNode.js';
 import type { TokenNode } from '../TokenNode.js';
 import { token } from '../TokenNode.js';
 import { Expression } from './index.js';
-import { AssignQuad } from '../../../quads/definitions/AssignQuad.js';
-import { LoadQuad } from '../../../quads/definitions/LoadQuad.js';
-import { IdQuad, TempVariable } from '../../../quads/definitions/IdQuad.js';
-import { Register } from '../../../quads/definitions/Register.js';
+import { AssignExpClass } from '../../../quads/definitions/AssignQuad.js';
 
 export class AssignmentExpression extends Expression {
   public constructor(
@@ -76,19 +73,8 @@ export class AssignmentExpression extends Expression {
   }
 
   public toQuads(context: QuadsContext) {
-    const tempRegister = context.requestTempRegister();
-    const quads = this.expression.toQuads(context);
-    const lastQuad = quads.at(-1)!;
-    const isFunction = lastQuad instanceof IdQuad && lastQuad.isFunction;
-    const mipsValue = lastQuad.toMipsValue();
-    const amdValue = lastQuad.toAmdValue();
-    const register = new Register(mipsValue, amdValue) as TempVariable;
     return [
-      ...quads,
-      new LoadQuad(tempRegister, register, isFunction),
-      new AssignQuad(this.id.getName(), this.id.getTempVariable(), [
-        tempRegister,
-      ]),
+      new AssignExpClass(this.id, this.expression.toQuads(context), context),
     ];
   }
 }

@@ -145,8 +145,13 @@ export class FunctionQuad extends Quad {
     );
 
     this.formalsNode.children.forEach((node, index) => {
-      node.llvmValue = fn.getArg(index);
-      node.llvmValue.setName(node.id.getName());
+      const value = fn.getArg(index);
+      value.setName(node.id.getName());
+      node.llvmValue = builder.CreateAlloca(
+        typeToLlvm(node.type, builder, false),
+        null,
+        node.id.getName()
+      );
     });
 
     const entryBlock = llvm.BasicBlock.Create(thisContext, 'entry', fn);
