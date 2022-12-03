@@ -6,6 +6,7 @@ import type { MipsInstruction } from '../../instructions/definitions/mips/index.
 import { NextComment } from '../../instructions/definitions/NextComment.js';
 import { PrevComment } from '../../instructions/definitions/PrevComment.js';
 import type { RA } from '../../utils/types.js';
+import llvm from 'llvm-bindings';
 
 /**
  * Base Quad class
@@ -119,4 +120,5 @@ export type LlvmContext = {
   readonly context: LLVMContext;
   readonly module: Module;
   readonly builder: IRBuilder;
+  readonly validate: boolean;
 };

@@ -135,7 +135,7 @@ export class FunctionQuad extends Quad {
   }
 
   public toLlvm(context: LlvmContext) {
-    const { builder, module, context: thisContext } = context;
+    const { builder, module, context: thisContext, validate } = context;
     // Function
     const fn = llvm.Function.Create(
       typeToLlvm(this.type, builder, false),
@@ -160,7 +160,9 @@ export class FunctionQuad extends Quad {
 
     this.statements.forEach((statement) => statement.toLlvm(context));
 
-    if (llvm.verifyFunction(fn))
+    builder.CreateRet(llvm.ConstantInt.get(builder.getInt64Ty(), 0, true));
+
+    if (llvm.verifyFunction(fn) && validate)
       throw new Error('Verifying LLVM function failed');
 
     return fn;

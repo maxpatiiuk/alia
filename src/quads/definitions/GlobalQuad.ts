@@ -199,14 +199,14 @@ export class GlobalQuad extends Quad {
     );
   }
 
-  public convertToLlvm(): string {
+  public convertToLlvm(debug: boolean): string {
     this.checkForMain();
 
     const context = new llvm.LLVMContext();
     const module = new llvm.Module('dgc', context);
     const builder = new llvm.IRBuilder(context);
 
-    const globalContext = { context, module, builder };
+    const globalContext = { context, module, builder, validate: !debug };
 
     [
       ...this.globalQuads.filter(
@@ -218,7 +218,7 @@ export class GlobalQuad extends Quad {
 
     // FIXME: check if this is needed: TheModule->setDataLayout(TheJIT->getTargetMachine().createDataLayout());
 
-    if (llvm.verifyModule(module))
+    if (llvm.verifyModule(module) && !debug)
       throw new Error('Verifying LLVM module failed');
 
     return module.print();

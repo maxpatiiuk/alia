@@ -60,11 +60,7 @@ export class ForQuad extends Quad {
   }
 
   public toLlvm(context: LlvmContext) {
-    const { builder, context: thisContext } = context;
     this.declaration.forEach((quad) => quad.toLlvm(context));
-
-    const fn = builder.GetInsertBlock()!.getParent()!;
-    const loopBlock = llvm.BasicBlock.Create(thisContext, 'loop', fn);
-    return this.ifQuad.toLlvm(context, loopBlock);
+    return this.ifQuad.toLlvm(context, true);
   }
 }

@@ -65,5 +65,5 @@ export async function processAst({
     await fs.promises.writeFile(amd, globalQuad.convertToAmd());
 
   if (llvm !== undefined)
-    await fs.promises.writeFile(llvm, globalQuad.convertToLlvm());
+    await fs.promises.writeFile(llvm, globalQuad.convertToLlvm(debug));
 }

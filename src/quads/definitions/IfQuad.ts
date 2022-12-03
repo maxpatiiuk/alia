@@ -77,12 +77,18 @@ export class IfQuad extends Quad {
     ];
   }
 
-  public toLlvm(context: LlvmContext, loopbackBlock?: llvm.BasicBlock) {
+  public toLlvm(context: LlvmContext, loopBack: boolean = false) {
     const { builder, context: thisContext } = context;
 
-    const condition = this.condition
+    const rawCondition = this.condition
       .map((condition) => condition.toLlvm(context))
       .at(-1)!;
+
+    const condition = builder.CreateIntCast(
+      rawCondition,
+      builder.getInt64Ty(),
+      true
+    );
 
     const boolCondition = builder.CreateICmpNE(
       condition,
@@ -92,20 +98,22 @@ export class IfQuad extends Quad {
 
     const fn = builder.GetInsertBlock()!.getParent()!;
 
-    let thenBlock = llvm.BasicBlock.Create(thisContext, 'then', fn);
-    let elseBlock = llvm.BasicBlock.Create(thisContext, 'else');
+    const thenBlock = llvm.BasicBlock.Create(thisContext, 'then', fn);
+    const elseBlock = llvm.BasicBlock.Create(thisContext, 'else');
     const mergeBlock = llvm.BasicBlock.Create(thisContext, 'ifcont');
 
     builder.CreateCondBr(boolCondition, thenBlock, elseBlock);
 
     builder.SetInsertPoint(thenBlock);
-    this.trueQuads.forEach((quad) => quad.toLlvm(context));
-    builder.CreateBr(mergeBlock);
+    this.trueQuads
+      .filter((quad) => !(quad instanceof GoToQuad))
+      .forEach((quad) => quad.toLlvm(context));
+    builder.CreateBr(loopBack ? thenBlock : mergeBlock);
 
     fn.addBasicBlock(elseBlock);
     builder.SetInsertPoint(elseBlock);
     this.falseCase?.quads.forEach((quad) => quad.toLlvm(context));
-    builder.CreateBr(loopbackBlock ?? mergeBlock);
+    builder.CreateBr(mergeBlock);
 
     fn.addBasicBlock(mergeBlock);
     builder.SetInsertPoint(mergeBlock);

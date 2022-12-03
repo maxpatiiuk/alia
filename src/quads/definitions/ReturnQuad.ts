@@ -7,6 +7,7 @@ import { filterArray } from '../../utils/types.js';
 import { LlvmContext, Quad } from './index.js';
 import { LoadQuad } from './LoadQuad.js';
 import { Register } from './Register.js';
+import llvm from 'llvm-bindings';
 
 export class ReturnQuad extends Quad {
   private readonly loadQuad: LoadQuad;
@@ -56,11 +57,27 @@ export class ReturnQuad extends Quad {
     ];
   }
 
+  /**
+   * Each block must end with a terminator. There can be only one terminator per
+   * block. Due to these constraints, have to create an unreachable block after
+   * the return statement. Otherwise, there may be code printed after the
+   * terminator.
+   */
   public toLlvm(context: LlvmContext) {
-    const { builder } = context;
+    const { builder, context: thisContext } = context;
+
+    const fn = builder.GetInsertBlock()!.getParent()!;
+
     const value = this.quads?.map((quad) => quad.toLlvm(context)).at(-1);
-    return value === undefined
-      ? builder.CreateRetVoid()
-      : builder.CreateRet(value);
+    builder.CreateRet(
+      value ?? llvm.ConstantInt.get(builder.getInt64Ty(), 0, true)
+    );
+    const returnEndBlock = llvm.BasicBlock.Create(
+      thisContext,
+      'deadCodeAfterReturn'
+    );
+    fn.addBasicBlock(returnEndBlock);
+    builder.SetInsertPoint(returnEndBlock);
+    return returnEndBlock;
   }
 }

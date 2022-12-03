@@ -191,9 +191,9 @@ export class OpQuad extends Quad {
     else if (this.type === '>=')
       return builder.CreateICmpSGE(left, right, 'sgetmp');
     else if (this.type === '==')
-      return builder.CreateICmpEQ(left, right, 'setmp');
+      return builder.CreateICmpEQ(left, right, 'seteq');
     else if (this.type === '!=')
-      return builder.CreateICmpNE(left, right, 'setmp');
+      return builder.CreateICmpNE(left, right, 'setne');
     else if (this.type === '!') return builder.CreateNot(left, 'nottmp');
     else if (this.type === 'neg') return builder.CreateNeg(right, 'negtmp');
     else throw new TypeError(`Unknown operation ${this.type}`);
