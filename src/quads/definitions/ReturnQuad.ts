@@ -4,7 +4,7 @@ import { NextComment } from '../../instructions/definitions/NextComment.js';
 import { PrevComment } from '../../instructions/definitions/PrevComment.js';
 import type { RA } from '../../utils/types.js';
 import { filterArray } from '../../utils/types.js';
-import { Quad } from './index.js';
+import { LlvmContext, Quad } from './index.js';
 import { LoadQuad } from './LoadQuad.js';
 import { Register } from './Register.js';
 
@@ -53,6 +53,16 @@ export class ReturnQuad extends Quad {
       ...this.loadQuad.toAmd(),
       new Jmp(this.returnLabel),
       new PrevComment('END Return'),
+    ];
+  }
+
+  public toLlvm(context: LlvmContext) {
+    const { builder } = context;
+    const values = this.quads?.flatMap((quad) => quad.toLlvm(context)) ?? [];
+    const value = values.at(-1);
+    return [
+      ...values.slice(0, -1),
+      value === undefined ? builder.CreateRetVoid() : builder.CreateRet(value),
     ];
   }
 }

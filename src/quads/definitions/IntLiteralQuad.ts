@@ -1,11 +1,12 @@
 import type { TempVariable } from './IdQuad.js';
-import { Quad } from './index.js';
+import { LlvmContext, Quad } from './index.js';
 import { TermQuad } from './TermQuad.js';
 import { Register } from './Register.js';
 import { MovQ } from '../../instructions/definitions/amd/MovQ.js';
 import { NextComment } from '../../instructions/definitions/NextComment.js';
 import { Li } from '../../instructions/definitions/mips/Li.js';
 import { Sw } from '../../instructions/definitions/mips/Sw.js';
+import llvm from 'llvm-bindings';
 
 export class IntLiteralQuad extends Quad {
   private readonly termQuad: TermQuad;
@@ -48,6 +49,10 @@ export class IntLiteralQuad extends Quad {
 
   public toAmdValue() {
     return this.tempVariable.toAmdValue();
+  }
+
+  public toLlvm({ builder }: LlvmContext) {
+    return [llvm.ConstantInt.get(builder.getInt64Ty(), this.value!, true)];
   }
 }
 

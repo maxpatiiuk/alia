@@ -1,6 +1,6 @@
 import type { IR, RA } from '../../utils/types.js';
 import { AssignQuad } from './AssignQuad.js';
-import { Quad, quadsToAmd, quadsToMips } from './index.js';
+import { LlvmContext, Quad, quadsToAmd, quadsToMips } from './index.js';
 import { QuadsContext } from '../index.js';
 import { LoadQuad } from './LoadQuad.js';
 import { Register } from './Register.js';
@@ -33,6 +33,7 @@ import { SltiU } from '../../instructions/definitions/mips/SltiU.js';
 import { Xor } from '../../instructions/definitions/mips/Xor.js';
 import { Andi } from '../../instructions/definitions/mips/Andi.js';
 import { CmpQ } from '../../instructions/definitions/amd/CmpQ.js';
+import llvm from 'llvm-bindings';
 
 const operationTranslations = {
   '--': 'SUB64',
@@ -159,11 +160,50 @@ export class OpQuad extends Quad {
       return [new CmpQ(right, left), new SetNe(lowTemp), new AndQ('$1', temp)];
     else if (this.type === '!') return [new MovQ(right, temp), new Not(temp)];
     else if (this.type === 'neg') return [new MovQ(right, temp), new Neg(temp)];
-    else throw new Error(`Unknown operation ${this.type}`);
+    else throw new TypeError(`Unknown operation ${this.type}`);
   }
 
   public toAmdValue() {
     return this.tempRegister.toAmdValue();
+  }
+
+  public toLlvm(context: LlvmContext) {
+    const { builder } = context;
+    const leftValues = this.left?.toLlvm(context) ?? [];
+    const left = leftValues.at(-1)!;
+    const rightValues = this.right.toLlvm(context);
+    const right = rightValues.at(-1)!;
+
+    let result: llvm.Value;
+    if (this.type === '--' || this.type === '-')
+      result = builder.CreateSub(left, right, 'subtmp');
+    else if (this.type === '++' || this.type === '+')
+      result = builder.CreateAdd(left, right, 'addtmp');
+    else if (this.type === '*')
+      result = builder.CreateMul(left, right, 'multtmp');
+    else if (this.type === '/')
+      result = builder.CreateSDiv(left, right, 'divtmp');
+    else if (this.type === 'or')
+      result = builder.CreateOr(left, right, 'ortmp');
+    else if (this.type === 'and')
+      result = builder.CreateAnd(left, right, 'andtmp');
+    else if (this.type === '<')
+      result = builder.CreateICmpSLT(left, right, 'slttmp');
+    else if (this.type === '>')
+      result = builder.CreateICmpSGT(left, right, 'sgttmp');
+    else if (this.type === '<=')
+      result = builder.CreateICmpSLE(left, right, 'sletmp');
+    else if (this.type === '>=')
+      result = builder.CreateICmpSGE(left, right, 'sgetmp');
+    else if (this.type === '==')
+      result = builder.CreateICmpEQ(left, right, 'setmp');
+    else if (this.type === '!=')
+      result = builder.CreateICmpNE(left, right, 'setmp');
+    else if (this.type === '!') result = builder.CreateNot(left, 'nottmp');
+    else if (this.type === 'neg') result = builder.CreateNeg(right, 'negtmp');
+    else throw new TypeError(`Unknown operation ${this.type}`);
+
+    return [...leftValues.slice(1), ...rightValues.slice(1), result];
   }
 }
 

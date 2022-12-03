@@ -28,7 +28,7 @@ export class StringDefQuad extends Quad {
   }
 
   public toLlvm({ builder, module }: LlvmContext) {
-    return builder.CreateGlobalString(this.value, this.name, 0, module);
+    return [builder.CreateGlobalString(this.value, this.name, 0, module)];
   }
 }
 

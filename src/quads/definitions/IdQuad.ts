@@ -3,6 +3,8 @@ import { TermQuad } from './TermQuad.js';
 import { formatGlobalVariable } from './GlobalVarQuad.js';
 import { formatTemp } from '../index.js';
 import { Register } from './Register.js';
+import { FunctionDeclaration } from '../../ast/definitions/FunctionDeclaration.js';
+import { VariableDeclaration } from '../../ast/definitions/statement/VariableDeclaration.js';
 
 export class IdQuad extends Quad {
   private readonly quad: Quad;
@@ -10,6 +12,7 @@ export class IdQuad extends Quad {
   public constructor(
     private readonly name: string,
     private readonly tempVariable: TempVariable,
+    private readonly declaration: FunctionDeclaration | VariableDeclaration,
     public readonly isFunction: boolean,
     public readonly type: string
   ) {
@@ -39,6 +42,12 @@ export class IdQuad extends Quad {
 
   public toAmdValue() {
     return this.tempVariable.toAmdValue();
+  }
+
+  public toLlvm() {
+    if (this.declaration instanceof FunctionDeclaration)
+      throw new TypeError('Unexpected function declaration');
+    return [this.declaration.llvmValue];
   }
 }
 

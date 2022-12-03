@@ -1,5 +1,12 @@
 import type { RA } from '../../utils/types.js';
-import { amdSize, mipsSize, Quad, quadsToAmd, quadsToMips } from './index.js';
+import {
+  amdSize,
+  LlvmContext,
+  mipsSize,
+  Quad,
+  quadsToAmd,
+  quadsToMips,
+} from './index.js';
 import { SetArgQuad as SetArgumentQuad } from './SetArgQuad.js';
 import { QuadsContext } from '../index.js';
 import { formatGlobalVariable } from './GlobalVarQuad.js';
@@ -32,7 +39,7 @@ export class CallQuad extends Quad {
 
   public constructor(
     context: QuadsContext,
-    actuals: RA<RA<Quad>>,
+    private readonly actuals: RA<RA<Quad>>,
     private readonly name: string,
     isExternal: boolean,
     private readonly dynamicTempVariable: TempVariable | undefined
@@ -44,7 +51,7 @@ export class CallQuad extends Quad {
 
     const getTempRegister = store(() => context.requestTempRegister());
 
-    this.quads = actuals.map((actual, index) => [
+    this.quads = this.actuals.map((actual, index) => [
       actual ?? [],
       new SetArgumentQuad(
         index + 1,
@@ -121,5 +128,16 @@ export class CallQuad extends Quad {
       new AddQ(`$${this.postStackOffset * amdSize}`, '%rsp'),
       new PrevComment(`END Calling ${this.name}`),
     ]);
+  }
+
+  public toLlvm(context: LlvmContext) {
+    const { module, builder } = context;
+    const fn = module.getFunction(this.name);
+    if (fn === null) throw new Error(`Function ${this.name} not found`);
+
+    const actuals = this.actuals.flatMap(
+      (quads) => quads.map((quad) => quad.toLlvm(context).at(-1)!).at(-1)!
+    );
+    return [builder.CreateCall(fn, actuals, 'calltmp')];
   }
 }

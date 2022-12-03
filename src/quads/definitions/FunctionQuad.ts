@@ -134,7 +134,7 @@ export class FunctionQuad extends Quad {
     ];
   }
 
-  public toLlvm({ builder, module }: LlvmContext) {
+  public toLlvm({ builder, module, context }: LlvmContext) {
     // Function
     const fn = llvm.Function.Create(
       typeToLlvm(this.type, builder, false),
@@ -143,17 +143,20 @@ export class FunctionQuad extends Quad {
       module
     );
 
-    /*const entryBB = llvm.BasicBlock.Create(context, 'entry', fn);
-    builder.SetInsertPoint(entryBB);
-    const a = fn.getArg(0);
-    const b = fn.getArg(1);
-    const result = builder.CreateFAdd(a, b, 'addtmp');
-    builder.CreateRet(result);*/
+    // FIXME: call quad
+
+    this.formalsNode.children.forEach((node, index) => {
+      node.llvmValue = fn.getArg(index);
+      node.llvmValue.setName(node.id.getName());
+    });
+
+    const entryBlock = llvm.BasicBlock.Create(context, 'entry', fn);
+    builder.SetInsertPoint(entryBlock);
 
     if (llvm.verifyFunction(fn))
       throw new Error('Verifying LLVM function failed');
 
-    return fn;
+    return [fn];
   }
 }
 

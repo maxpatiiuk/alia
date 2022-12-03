@@ -37,14 +37,16 @@ export class GlobalVarQuad extends Quad {
   }
 
   public toLlvm({ module, builder }: LlvmContext) {
-    return new llvm.GlobalVariable(
-      module,
-      builder.getInt64Ty(),
-      false,
-      llvm.GlobalVariable.LinkageTypes.ExternalLinkage,
-      llvm.ConstantInt.get(builder.getInt64Ty(), this.value!, true),
-      this.name
-    );
+    return [
+      new llvm.GlobalVariable(
+        module,
+        builder.getInt64Ty(),
+        false,
+        llvm.GlobalVariable.LinkageTypes.ExternalLinkage,
+        llvm.ConstantInt.get(builder.getInt64Ty(), this.value!, true),
+        this.name
+      ),
+    ];
   }
 }
 

@@ -1,23 +1,30 @@
+import type llvm from 'llvm-bindings';
+
+import { TempVariable } from '../../../quads/definitions/IdQuad.js';
+import type { Quad } from '../../../quads/definitions/index.js';
+import { VarDeclQuad } from '../../../quads/definitions/VarDeclQuad.js';
+import type { QuadsContext } from '../../../quads/index.js';
 import type { RA } from '../../../utils/types.js';
 import type { EvalContext, EvalValue } from '../../eval.js';
 import type { NameAnalysisContext } from '../../nameAnalysis.js';
 import { getScope } from '../../nameAnalysis.js';
-import type { Quad } from '../../../quads/definitions/index.js';
 import type { LanguageType, TypeCheckContext } from '../../typing.js';
 import { BoolType, IntType, StringType, VoidType } from '../../typing.js';
 import type { PrintContext } from '../../unparse.js';
+import { FunctionDeclaration } from '../FunctionDeclaration.js';
 import type { IdNode } from '../term/IdNode.js';
 import type { TypeNode } from '../types/index.js';
 import { PrimaryTypeNode } from '../types/PrimaryTypeNode.js';
 import { Statement } from './index.js';
-import { QuadsContext } from '../../../quads/index.js';
-import { FunctionDeclaration } from '../FunctionDeclaration.js';
-import { VarDeclQuad } from '../../../quads/definitions/VarDeclQuad.js';
-import { TempVariable } from '../../../quads/definitions/IdQuad.js';
 
 export class VariableDeclaration extends Statement {
   // eslint-disable-next-line functional/prefer-readonly-type
   public value: EvalValue;
+
+  // eslint-disable-next-line functional/prefer-readonly-type
+  public llvmValue: llvm.Value = undefined!;
+
+  // eslint-disable-next-line functional/prefer-readonly-type
   public tempVariable: TempVariable = new TempVariable(-1);
 
   public constructor(
@@ -78,7 +85,7 @@ export function toPrimitiveValue(value: EvalValue): number {
   if (typeof value === 'number') return value;
   else if (typeof value === 'boolean') return value ? 1 : 0;
   else if (typeof value === 'string') {
-    throw new Error('String variables are not supported');
+    throw new TypeError('String variables are not supported');
   } else if (value instanceof FunctionDeclaration)
     throw new Error('Cannot convert function to primitive value');
   // Happens for undefined pointers
