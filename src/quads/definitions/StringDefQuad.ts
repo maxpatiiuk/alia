@@ -7,7 +7,7 @@ export class StringDefQuad extends Quad {
   private readonly label: Label;
 
   public constructor(
-    private readonly name: string,
+    public readonly name: string,
     private readonly value: string
   ) {
     super();
@@ -28,7 +28,18 @@ export class StringDefQuad extends Quad {
   }
 
   public toLlvm({ builder, module }: LlvmContext) {
-    return builder.CreateGlobalString(this.value, this.name, 0, module);
+    return builder.CreateGlobalStringPtr(
+      // Trim the quotes
+      this.value
+        .slice(1, -1)
+        .replaceAll('\\n', '\n')
+        .replaceAll('\\t', '\t')
+        .replaceAll('\\\\', '\\')
+        .replaceAll('\\"', '"'),
+      this.name,
+      0,
+      module
+    );
   }
 }
 

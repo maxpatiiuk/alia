@@ -1,12 +1,12 @@
 import type { IRBuilder, LLVMContext, Module, Value } from 'llvm-bindings';
+import type llvm from 'llvm-bindings';
 
 import type { AmdInstruction } from '../../instructions/definitions/amd/index.js';
 import { Label } from '../../instructions/definitions/Label.js';
 import type { MipsInstruction } from '../../instructions/definitions/mips/index.js';
 import { NextComment } from '../../instructions/definitions/NextComment.js';
 import { PrevComment } from '../../instructions/definitions/PrevComment.js';
-import type { RA } from '../../utils/types.js';
-import llvm from 'llvm-bindings';
+import type { IR, RA } from '../../utils/types.js';
 
 /**
  * Base Quad class
@@ -121,4 +121,5 @@ export type LlvmContext = {
   readonly module: Module;
   readonly builder: IRBuilder;
   readonly validate: boolean;
+  readonly strings: IR<llvm.GlobalVariable>;
 };

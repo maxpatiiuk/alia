@@ -1,5 +1,6 @@
 import { TermQuad } from './TermQuad.js';
 import { NextComment } from '../../instructions/definitions/NextComment.js';
+import { LlvmContext } from './index.js';
 
 export class StringQuad extends TermQuad {
   public constructor(
@@ -25,5 +26,7 @@ export class StringQuad extends TermQuad {
     return `$${this.name}`;
   }
 
-  // FIXME: implement toLlvm
+  public toLlvm({ strings }: LlvmContext) {
+    return strings[this.name];
+  }
 }

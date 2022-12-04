@@ -1,5 +1,5 @@
-import type { RA, WritableArray } from '../../utils/types.js';
-import { filterArray } from '../../utils/types.js';
+import llvm from 'llvm-bindings';
+
 import { FunctionDeclaration } from '../../ast/definitions/FunctionDeclaration.js';
 import type { GlobalsNode } from '../../ast/definitions/GlobalsNode.js';
 import { StatementList } from '../../ast/definitions/statement/StatementList.js';
@@ -7,39 +7,44 @@ import {
   toPrimitiveValue,
   VariableDeclaration,
 } from '../../ast/definitions/statement/VariableDeclaration.js';
-import type { QuadsContext } from '../index.js';
-import { FunctionQuad } from './FunctionQuad.js';
-import {
-  formatGlobalVariable,
-  GlobalVarQuad,
-  GlobalVarQuad as GlobalVariableQuad,
-} from './GlobalVarQuad.js';
-import { Quad, quadsToAmd, quadsToMips, quadsToString } from './index.js';
-import { formatStringQuad, StringDefQuad } from './StringDefQuad.js';
-import { Globl } from '../../instructions/definitions/Globl.js';
+import { BlankLine } from '../../instructions/definitions/amd/BlankLink.js';
 import { DataSection } from '../../instructions/definitions/DataSection.js';
-import { TextSection } from '../../instructions/definitions/TextSection.js';
+import { Globl } from '../../instructions/definitions/Globl.js';
+import type { Instruction } from '../../instructions/definitions/index.js';
 import {
   getLongestLabel,
   Label,
 } from '../../instructions/definitions/Label.js';
-import { Jr } from '../../instructions/definitions/mips/Jr.js';
-import { Syscall } from '../../instructions/definitions/Syscall.js';
-import { BlankLine } from '../../instructions/definitions/amd/BlankLink.js';
 import { Jal } from '../../instructions/definitions/mips/Jal.js';
-import { Instruction } from '../../instructions/definitions/index.js';
-import { NextComment } from '../../instructions/definitions/NextComment.js';
+import { Jr } from '../../instructions/definitions/mips/Jr.js';
 import { Li } from '../../instructions/definitions/mips/Li.js';
 import { Move } from '../../instructions/definitions/mips/Move.js';
+import { NextComment } from '../../instructions/definitions/NextComment.js';
+import { declareLinkages } from '../../instructions/definitions/std/llvm.js';
+import { Syscall } from '../../instructions/definitions/Syscall.js';
+import { TextSection } from '../../instructions/definitions/TextSection.js';
 import {
   instructionsToLines,
   linesToString,
 } from '../../instructions/index.js';
 import { optimizeInstructions } from '../../instructions/optimize/index.js';
-import llvm from 'llvm-bindings';
+import type { RA, WritableArray } from '../../utils/types.js';
+import { filterArray } from '../../utils/types.js';
+import type { QuadsContext } from '../index.js';
+import { FunctionQuad } from './FunctionQuad.js';
+import {
+  formatGlobalVariable,
+  GlobalVarQuad as GlobalVariableQuad,
+  GlobalVarQuad,
+} from './GlobalVarQuad.js';
+import type { LlvmContext } from './index.js';
+import { Quad, quadsToAmd, quadsToMips, quadsToString } from './index.js';
+import { formatStringQuad, StringDefQuad } from './StringDefQuad.js';
 
 export class GlobalQuad extends Quad {
-  private readonly globalQuads: RA<GlobalVarQuad | StringDefQuad>;
+  private readonly globalQuads: RA<GlobalVarQuad>;
+
+  private readonly globalStrings: RA<StringDefQuad>;
 
   private readonly functions: RA<Quad>;
 
@@ -86,7 +91,7 @@ export class GlobalQuad extends Quad {
         })
     );
 
-    const globalQuads = globals.map(
+    this.globalQuads = globals.map(
       ({ name, value }) => new GlobalVariableQuad(name, value)
     );
 
@@ -98,10 +103,9 @@ export class GlobalQuad extends Quad {
       )
     );
 
-    const stringQuads = strings.flatMap(
+    this.globalStrings = strings.flatMap(
       (value) => new StringDefQuad(newContext.requestString(value), value)
     );
-    this.globalQuads = [...globalQuads, ...stringQuads];
 
     this.mipsBootloader = [
       new Label(startFunction),
@@ -122,6 +126,7 @@ export class GlobalQuad extends Quad {
       ...quadsToString([
         '[BEGIN GLOBALS]',
         ...this.globalQuads,
+        ...this.globalStrings,
         '[END GLOBALS]',
       ]),
       ...quadsToString(this.functions),
@@ -146,6 +151,7 @@ export class GlobalQuad extends Quad {
       new Globl([startFunction]),
       new DataSection(),
       ...quadsToMips(this.globalQuads),
+      ...quadsToMips(this.globalStrings),
       new TextSection(),
       ...quadsToMips(this.mipsBootloader),
       new BlankLine(),
@@ -177,6 +183,7 @@ export class GlobalQuad extends Quad {
       new Globl([mainFunction]),
       new DataSection(),
       ...quadsToAmd(this.globalQuads),
+      ...quadsToAmd(this.globalStrings),
       new TextSection(),
     ];
     const functionInstructions = this.functions.map((quad) => quad.toAmd());
@@ -206,17 +213,34 @@ export class GlobalQuad extends Quad {
     const module = new llvm.Module('dgc', context);
     const builder = new llvm.IRBuilder(context);
 
-    const globalContext = { context, module, builder, validate: !debug };
+    const partialContext: LlvmContext = {
+      context,
+      module,
+      builder,
+      validate: !debug,
+      strings: {},
+    };
+
+    const globalContext: LlvmContext = {
+      ...partialContext,
+      strings: Object.fromEntries(
+        this.globalStrings.map((quad) => [
+          quad.name,
+          quad.toLlvm(partialContext),
+        ])
+      ),
+    };
+
+    declareLinkages(globalContext);
 
     [
       ...this.globalQuads.filter(
         (quad) =>
           !(quad instanceof GlobalVarQuad) || typeof quad.value === 'number'
       ),
+      ...this.globalStrings,
       ...this.functions,
     ].forEach((quad) => quad.toLlvm(globalContext));
-
-    // FIXME: check if this is needed: TheModule->setDataLayout(TheJIT->getTargetMachine().createDataLayout());
 
     if (llvm.verifyModule(module) && !debug)
       throw new Error('Verifying LLVM module failed');

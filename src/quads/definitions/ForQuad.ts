@@ -12,7 +12,6 @@ import {
 import { Label } from '../../instructions/definitions/Label.js';
 import { PrevComment } from '../../instructions/definitions/PrevComment.js';
 import { NextComment } from '../../instructions/definitions/NextComment.js';
-import llvm from 'llvm-bindings';
 
 export class ForQuad extends Quad {
   private readonly instructions: RA<Quad | Label>;

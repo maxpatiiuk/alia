@@ -8,7 +8,7 @@ import { Syscall } from '../../instructions/definitions/Syscall.js';
 import type { QuadsContext } from '../index.js';
 import { CallQuad } from './CallQuad.js';
 import type { TempVariable } from './IdQuad.js';
-import { Quad } from './index.js';
+import { LlvmContext, Quad } from './index.js';
 
 export class MayhemQuad extends Quad {
   private readonly tempVariable: TempVariable;
@@ -55,5 +55,7 @@ export class MayhemQuad extends Quad {
     return this.tempVariable.toAmdValue();
   }
 
-  // FIXME: implement toLlvm
+  public toLlvm(context: LlvmContext) {
+    return this.callQuad.toLlvm(context);
+  }
 }

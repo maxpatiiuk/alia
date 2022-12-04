@@ -163,6 +163,10 @@ export class CallQuad extends Quad {
     const actuals = this.actuals.flatMap(
       (quads) => quads.map((quad) => quad.toLlvm(context)).at(-1)!
     );
-    return builder.CreateCall(fn, actuals, 'calltmp');
+    return builder.CreateCall(
+      fn,
+      actuals,
+      fn.getReturnType().isVoidTy() ? undefined : 'calltmp'
+    );
   }
 }

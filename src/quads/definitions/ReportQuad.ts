@@ -9,21 +9,25 @@ import type { RA } from '../../utils/types.js';
 import type { QuadsContext } from '../index.js';
 import { CallQuad } from './CallQuad.js';
 import { IdQuad } from './IdQuad.js';
+import type { LlvmContext } from './index.js';
 import { Quad } from './index.js';
 import { StringQuad } from './StringQuad.js';
 
 export class ReportQuad extends Quad {
   private readonly callQuad: CallQuad;
 
+  private readonly name: string;
+
   public constructor(private readonly quads: RA<Quad>, context: QuadsContext) {
     super();
     const quad = this.quads.at(-1)!;
     const isString = quad instanceof StringQuad;
     const isBool = quad instanceof IdQuad && quad.type === 'bool';
+    this.name = isString ? 'printString' : isBool ? 'printBool' : 'printInt';
     this.callQuad = new CallQuad(
       context,
       [],
-      isString ? 'printString' : isBool ? 'printBool' : 'printInt',
+      this.name,
       true,
       undefined,
       false
@@ -62,5 +66,11 @@ export class ReportQuad extends Quad {
     ];
   }
 
-  // FIXME: implement toLlvm
+  public toLlvm(context: LlvmContext) {
+    const { builder, module } = context;
+    const value = this.quads.map((quad) => quad.toLlvm(context)).at(-1)!;
+
+    const fn = module.getFunction(this.name)!;
+    return builder.CreateCall(fn, [value]);
+  }
 }

@@ -44,13 +44,6 @@ export class InputNode extends LineStatement {
   }
 
   public toQuads(context: QuadsContext) {
-    return [
-      new ReceiveQuad(
-        this.id.getName(),
-        this.id.getTempVariable(),
-        this.id.getDeclaration()!.type.children[0].toString(),
-        context
-      ),
-    ];
+    return [new ReceiveQuad(this.id, context)];
   }
 }
