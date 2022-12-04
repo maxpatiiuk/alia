@@ -72,6 +72,7 @@ run in an [interpreter](#running-interpreter).
   * [Development Documentation](#development-documentation)
   * [Appendix 1: Extending the language](#appendix-1-extending-the-language)
   * [Appendix 2: Generating a graph of the grammar](#appendix-2-generating-a-graph-of-the-grammar)
+  * [Appendix 3: Sources](#appendix-3-sources)
 
 ## Prerequisites
 
@@ -125,6 +126,8 @@ Example of generated x64 assembly:
 
 ![Example x64 output](./docs/img/amd-assembly.png)
 
+[Full example](./src/quads/__tests__/__snapshots__/toAmd.test.ts.snap)
+
 ### Compiling to MIPS
 
 Example call:
@@ -145,20 +148,26 @@ Example of generated MIPS assembly:
 
 ![Example MIPS output](./docs/img/mips-assembly.png)
 
+[Full example](./src/quads/__tests__/__snapshots__/toMips.test.ts.snap)
+
 ### Compiling to LLVM Assembly
 
-// TODO: update all documentation places that mention x64 (or amd) and MIPS
-//    to also use LLVM
-// TODO: add a link to llvm and llvm assembly docs
-// TODO: move all outputs into a "dist" directory
-// TODO: generate all outputs and provide them by default in "dist"
-
+// TODO: extend this
 
 Example call:
 
 ```
+# Compile to LLVM assembly
 ./dgc infile.dg -l llvm.ll
+
+# Compile to target machine assembly, create executable and run it
+make llvm LLC=/home/a807d786/llvm_dist/bin/llc LLVM_AS=llvm.ll
 ```
+
+
+![Example LLVM output](./docs/img/llvm-assembly.png)
+
+[Full example](./src/quads/__tests__/__snapshots__/toLlvm.test.ts.snap)
 
 ## Running Interpreter
 
@@ -513,7 +522,7 @@ The code takes advantage of its syscalls.
 
 x64 runtime environment is any x64 capable machine. It does not make syscalls
 directly, but rather
-uses [a tiny C helpers library](./src/instructions/definitions/amd/amdStd.c).
+uses [a tiny C helpers library](src/instructions/definitions/std/amd.c).
 
 This greatly simplifies the code generation process, as printing numbers/strings
 to the screen or receiving input from the IO stream using bare syscalls is too
@@ -614,3 +623,59 @@ Tested with `dot v6.0.1`
 
 Example of a tiny slice of the generated graph:
 ![Example of a tiny slice of the generated graph](./docs/img/graphviz-graph.png)
+
+## Appendix 3: Sources
+
+The following pages have been helpful during the development of the compiler.
+
+### CYK Parser
+
+- https://www.geeksforgeeks.org/cyk-algorithm-for-context-free-grammar/
+- https://www.xarg.org/tools/cyk-algorithm/
+- https://www.youtube.com/watch?v=VTH1k-xiswM
+
+### SLR Parser
+
+- https://www.geeksforgeeks.org/slr-parser-with-examples/
+
+### MIPS
+
+- https://godbolt.org/
+- http://courses.missouristate.edu/kenvollmar/mars/
+- https://inst.eecs.berkeley.edu/~cs61c/resources/MIPS_Green_Sheet.pdf
+- https://uweb.engr.arizona.edu/~ece369/Resources/spim/MIPSReference.pdf
+- https://stackoverflow.com/questions/15331033/how-to-get-current-pc-register-value-on-mips-arch
+- https://courses.cs.washington.edu/courses/cse378/09wi/lectures/lec04-annotated.pdf
+- https://courses.missouristate.edu/kenvollmar/mars/help/SyscallHelp.html
+- https://ecs-network.serv.pacific.edu/ecpe-170/tutorials/mips-example-programs
+- https://www.quora.com/What-is-the-actual-difference-between-x86-ARM-and-MIPS-architectures
+
+### x64
+
+- https://godbolt.org/
+- https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/x64-architecture
+- https://cs.brown.edu/courses/cs033/docs/guides/x64_cheatsheet.pdf
+- https://stackoverflow.com/questions/20637569/assembly-registers-in-64-bit-architecture
+- https://wiki.cdot.senecacollege.ca/wiki/X86_64_Register_and_Instruction_Quick_Start
+- https://learn.microsoft.com/en-us/cpp/build/stack-usage?view=msvc-170#stack-allocation
+- https://www.cs.swarthmore.edu/~newhall/cs31/resources/ia32_gdb.php
+- http://web.cecs.pdx.edu/~apt/cs510comp/gdb.pdf
+- https://stackoverflow.com/questions/2420813/using-gdb-to-single-step-assembly-code-outside-specified-executable-causes-error
+
+### LLVM
+
+- https://godbolt.org/
+- https://mapping-high-level-constructs-to-llvm-ir.readthedocs.io/en/latest/README.html
+- https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl01.html
+- https://clang.llvm.org/doxygen/index.html
+- https://releases.llvm.org/2.6/docs/LangRef.html
+- https://formulae.brew.sh/formula/llvm
+- https://www.embecosm.com/appnotes/ean10/ean10-howto-llvmas-1.0.html
+- https://llvm.org/devmtg/2013-11/slides/Zakai-Emscripten.pdf
+- https://www.oreilly.com/library/view/llvm-cookbook/9781785285981/ch01s04.html
+- https://manpages.ubuntu.com/manpages/impish/man1/ld.lld.1.html
+- https://www.npmjs.com/package/llvm-bindings
+- https://www.npmjs.com/package/llvm-node
+- https://groups.google.com/g/llvm-dev/c/-ihkMNlDvEQ
+- https://purelyfunctional.org/posts/2018-04-02-llvm-hs-jit-external-function.html
+- https://llvm.org/docs/SourceLevelDebugging.html#llvm-dbg-declare
