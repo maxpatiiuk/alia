@@ -2,7 +2,7 @@
 
 The ultimate Drewgon compiler and interpreter.
 
-// TODO: rename the language
+// TODO: rename the language (check for references to dg, dgc, dragon, Drewgon)
 
 Written in TypeScript.
 

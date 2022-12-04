@@ -20,7 +20,7 @@ source_filename = \\"dgc\\"
 @str_13 = private unnamed_addr constant [3 x i8] c\\"\\\\0A\\\\0A\\\\00\\", align 1
 @str_14 = private unnamed_addr constant [8 x i8] c\\"Passed \\\\00\\", align 1
 @str_15 = private unnamed_addr constant [5 x i8] c\\" of \\\\00\\", align 1
-@str_16 = private unnamed_addr constant [7 x i8] c\\" tests\\\\00\\", align 1
+@str_16 = private unnamed_addr constant [10 x i8] c\\" tests\\\\0A\\\\0A\\\\0A\\\\00\\", align 1
 @str_17 = private unnamed_addr constant [10 x i8] c\\"Section #\\\\00\\", align 1
 @str_18 = private unnamed_addr constant [3 x i8] c\\":\\\\0A\\\\00\\", align 1
 @global_globalPointer = global i64 (i64)* null
@@ -44,7 +44,7 @@ source_filename = \\"dgc\\"
 @str_13.14 = private unnamed_addr constant [3 x i8] c\\"\\\\0A\\\\0A\\\\00\\", align 1
 @str_14.15 = private unnamed_addr constant [8 x i8] c\\"Passed \\\\00\\", align 1
 @str_15.16 = private unnamed_addr constant [5 x i8] c\\" of \\\\00\\", align 1
-@str_16.17 = private unnamed_addr constant [7 x i8] c\\" tests\\\\00\\", align 1
+@str_16.17 = private unnamed_addr constant [10 x i8] c\\" tests\\\\0A\\\\0A\\\\0A\\\\00\\", align 1
 @str_17.18 = private unnamed_addr constant [10 x i8] c\\"Section #\\\\00\\", align 1
 @str_18.19 = private unnamed_addr constant [3 x i8] c\\":\\\\0A\\\\00\\", align 1
 
@@ -56,7 +56,7 @@ declare extern_weak void @printInt(i64)
 
 declare extern_weak void @printString(i8*)
 
-declare extern_weak i1 @getBool()
+declare extern_weak i64 @getBool()
 
 declare extern_weak i64 @getInt()
 
@@ -251,7 +251,7 @@ entry:
   call void @printString(i8* getelementptr inbounds ([5 x i8], [5 x i8]* @str_15, i32 0, i32 0))
   %totalCount1 = load i64, i64* @global_totalCount, align 4
   call void @printInt(i64 %totalCount1)
-  call void @printString(i8* getelementptr inbounds ([7 x i8], [7 x i8]* @str_16, i32 0, i32 0))
+  call void @printString(i8* getelementptr inbounds ([10 x i8], [10 x i8]* @str_16, i32 0, i32 0))
   ret i64 0
 }
 

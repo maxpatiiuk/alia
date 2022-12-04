@@ -24,7 +24,7 @@ str_12:                       .asciz \\"\\\\nReceived:\\"
 str_13:                       .asciz \\"\\\\n\\\\n\\"
 str_14:                       .asciz \\"Passed \\"
 str_15:                       .asciz \\" of \\"
-str_16:                       .asciz \\" tests\\"
+str_16:                       .asciz \\" tests\\\\n\\\\n\\\\n\\"
 str_17:                       .asciz \\"Section #\\"
 str_18:                       .asciz \\":\\\\n\\"
 .text
@@ -669,7 +669,7 @@ global_printSummary:          push %rbp
                               popq %r12
                               popq %rbx
                               addq $24, %rsp  # END Output  # END Calling printInt
-                              movq $str_16, %rdi  # BEGIN Output  # String Literal: \\" tests\\"
+                              movq $str_16, %rdi  # BEGIN Output  # String Literal: \\" tests\\\\n\\\\n\\\\n\\"
                               subq $24, %rsp  # BEGIN Calling printString
                               push %rbx
                               push %r12

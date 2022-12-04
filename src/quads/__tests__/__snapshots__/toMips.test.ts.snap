@@ -24,7 +24,7 @@ str_12:                       .asciiz \\"\\\\nReceived:\\"
 str_13:                       .asciiz \\"\\\\n\\\\n\\"
 str_14:                       .asciiz \\"Passed \\"
 str_15:                       .asciiz \\" of \\"
-str_16:                       .asciiz \\" tests\\"
+str_16:                       .asciiz \\" tests\\\\n\\\\n\\\\n\\"
 str_17:                       .asciiz \\"Section #\\"
 str_18:                       .asciiz \\":\\\\n\\"
 .text
@@ -323,7 +323,7 @@ global_printSummary:          sw $fp, -4($sp)  # Save frame pointer
                               lw $a0, global_totalCount  # BEGIN Output
                               addi $v0, $zero, 1
                               syscall  # END Output
-                              la $a0, str_16  # BEGIN Output  # String Literal: \\" tests\\"
+                              la $a0, str_16  # BEGIN Output  # String Literal: \\" tests\\\\n\\\\n\\\\n\\"
                               addi $v0, $zero, 4
                               syscall  # END Output
 lbl_14:                       lw $ra, -8($fp)  # END Function body  # Restore return address
