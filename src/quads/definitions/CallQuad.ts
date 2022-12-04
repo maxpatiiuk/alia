@@ -29,8 +29,6 @@ import { SubQ } from '../../instructions/definitions/amd/SubQ.js';
 import { store } from '../../utils/utils.js';
 import { GetRetQuad } from './GetRetQuad.js';
 import { VariableDeclaration } from '../../ast/definitions/statement/VariableDeclaration.js';
-import { FunctionTypeNode } from '../../ast/definitions/types/FunctionTypeNode.js';
-import { PrimaryTypeNode } from '../../ast/definitions/types/PrimaryTypeNode.js';
 
 export class CallQuad extends Quad {
   private readonly quads: RA<readonly [RA<Quad>, Quad]>;
@@ -159,8 +157,6 @@ export class CallQuad extends Quad {
 
   public toLlvm(context: LlvmContext) {
     const { module, builder } = context;
-    // FIXME: test assignment to globals
-    // FIXME: test global function pointer
 
     const actuals = this.actuals.flatMap(
       (quads) => quads.map((quad) => quad.toLlvm(context)).at(-1)!
@@ -179,17 +175,8 @@ export class CallQuad extends Quad {
         this.varDecl.id.getName()
       );
 
-      const isVoidReturn =
-        this.varDecl.type instanceof FunctionTypeNode &&
-        this.varDecl.type.returnType instanceof PrimaryTypeNode &&
-        this.varDecl.type.returnType.token.token.type === 'VOID';
       const functionType = typeToLlvm(this.varDecl.type, builder, false);
-      return builder.CreateCall(
-        functionType,
-        fn,
-        actuals,
-        isVoidReturn ? undefined : 'calltmp'
-      );
+      return builder.CreateCall(functionType, fn, actuals, 'calltmp');
     }
   }
 }

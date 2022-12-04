@@ -156,7 +156,7 @@ export class FunctionQuad extends Quad {
       const value = fn.getArg(index);
       value.setName(node.id.getName());
       node.llvmValue = builder.CreateAlloca(
-        typeToLlvm(node.type, builder, false),
+        typeToLlvm(node.type, builder, true),
         null,
         node.id.getName()
       );
@@ -165,7 +165,13 @@ export class FunctionQuad extends Quad {
 
     this.statements.forEach((statement) => statement.toLlvm(context));
 
-    builder.CreateRet(llvm.ConstantInt.get(builder.getInt64Ty(), 0, true));
+    builder.CreateRet(
+      this.type.returnType instanceof FunctionTypeNode
+        ? llvm.ConstantPointerNull.get(
+            typeToLlvm(this.type.returnType, builder, true)
+          )
+        : llvm.ConstantInt.get(builder.getInt64Ty(), 0, true)
+    );
 
     if (llvm.verifyFunction(fn) && validate)
       throw new Error('Verifying LLVM function failed');

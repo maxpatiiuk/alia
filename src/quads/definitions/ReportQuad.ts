@@ -12,6 +12,7 @@ import { IdQuad } from './IdQuad.js';
 import type { LlvmContext } from './index.js';
 import { Quad } from './index.js';
 import { StringQuad } from './StringQuad.js';
+import { BoolLiteralQuad } from './IntLiteralQuad.js';
 
 export class ReportQuad extends Quad {
   private readonly callQuad: CallQuad;
@@ -22,7 +23,9 @@ export class ReportQuad extends Quad {
     super();
     const quad = this.quads.at(-1)!;
     const isString = quad instanceof StringQuad;
-    const isBool = quad instanceof IdQuad && quad.type === 'bool';
+    const isBool =
+      (quad instanceof IdQuad && quad.type === 'bool') ||
+      quad instanceof BoolLiteralQuad;
     this.name = isString ? 'printString' : isBool ? 'printBool' : 'printInt';
     this.callQuad = new CallQuad(
       context,

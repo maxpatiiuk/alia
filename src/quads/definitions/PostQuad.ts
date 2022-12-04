@@ -103,7 +103,7 @@ export class PostQuad extends Quad {
       declaration.llvmValue,
       this.id.getName()
     );
-    const result = builder.CreateAdd(
+    const result = builder[this.type === '++' ? 'CreateAdd' : 'CreateSub'](
       loaded,
       llvm.ConstantInt.get(builder.getInt64Ty(), 1, true),
       'addtmp'

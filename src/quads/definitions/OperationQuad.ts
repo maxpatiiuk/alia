@@ -33,6 +33,7 @@ import { SltiU } from '../../instructions/definitions/mips/SltiU.js';
 import { Xor } from '../../instructions/definitions/mips/Xor.js';
 import { Andi } from '../../instructions/definitions/mips/Andi.js';
 import { CmpQ } from '../../instructions/definitions/amd/CmpQ.js';
+import llvm from 'llvm-bindings';
 
 const operationTranslations = {
   '--': 'SUB64',
@@ -171,6 +172,9 @@ export class OpQuad extends Quad {
     const left = this.left?.toLlvm(context)!;
     const right = this.right.toLlvm(context);
 
+    const toQuad = (value: llvm.Value): llvm.Value =>
+      builder.CreateIntCast(value, builder.getInt64Ty(), true);
+
     if (this.type === '--' || this.type === '-')
       return builder.CreateSub(left, right, 'subtmp');
     else if (this.type === '++' || this.type === '+')
@@ -183,18 +187,25 @@ export class OpQuad extends Quad {
     else if (this.type === 'and')
       return builder.CreateAnd(left, right, 'andtmp');
     else if (this.type === '<')
-      return builder.CreateICmpSLT(left, right, 'slttmp');
+      return toQuad(builder.CreateICmpSLT(left, right, 'slttmp'));
     else if (this.type === '>')
-      return builder.CreateICmpSGT(left, right, 'sgttmp');
+      return toQuad(builder.CreateICmpSGT(left, right, 'sgttmp'));
     else if (this.type === '<=')
-      return builder.CreateICmpSLE(left, right, 'sletmp');
+      return toQuad(builder.CreateICmpSLE(left, right, 'sletmp'));
     else if (this.type === '>=')
-      return builder.CreateICmpSGE(left, right, 'sgetmp');
+      return toQuad(builder.CreateICmpSGE(left, right, 'sgetmp'));
     else if (this.type === '==')
-      return builder.CreateICmpEQ(left, right, 'seteq');
+      return toQuad(builder.CreateICmpEQ(left, right, 'seteq'));
     else if (this.type === '!=')
-      return builder.CreateICmpNE(left, right, 'setne');
-    else if (this.type === '!') return builder.CreateNot(left, 'nottmp');
+      return toQuad(builder.CreateICmpNE(left, right, 'setne'));
+    else if (this.type === '!')
+      return toQuad(
+        builder.CreateTrunc(
+          builder.CreateNot(right, 'nottmp'),
+          builder.getInt1Ty(),
+          'booltmp'
+        )
+      );
     else if (this.type === 'neg') return builder.CreateNeg(right, 'negtmp');
     else throw new TypeError(`Unknown operation ${this.type}`);
   }

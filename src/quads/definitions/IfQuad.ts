@@ -77,18 +77,12 @@ export class IfQuad extends Quad {
     ];
   }
 
-  public toLlvm(context: LlvmContext, loopBack: boolean = false) {
+  public toLlvm(context: LlvmContext, loopBack?: llvm.BasicBlock) {
     const { builder, context: thisContext } = context;
 
-    const rawCondition = this.condition
+    const condition = this.condition
       .map((condition) => condition.toLlvm(context))
       .at(-1)!;
-
-    const condition = builder.CreateIntCast(
-      rawCondition,
-      builder.getInt64Ty(),
-      true
-    );
 
     const boolCondition = builder.CreateICmpNE(
       condition,
@@ -108,7 +102,7 @@ export class IfQuad extends Quad {
     this.trueQuads
       .filter((quad) => !(quad instanceof GoToQuad))
       .forEach((quad) => quad.toLlvm(context));
-    builder.CreateBr(loopBack ? thenBlock : mergeBlock);
+    builder.CreateBr(loopBack ?? mergeBlock);
 
     fn.addBasicBlock(elseBlock);
     builder.SetInsertPoint(elseBlock);

@@ -50,11 +50,12 @@ export class VarDeclQuad extends Quad {
       this.id
     );
     const isPointer = this.varDeclNode.type instanceof FunctionTypeNode;
-    if (!isPointer)
-      builder.CreateStore(
-        llvm.ConstantInt.get(builder.getInt64Ty(), 0, true),
-        this.varDeclNode.llvmValue
-      );
+    builder.CreateStore(
+      isPointer
+        ? llvm.ConstantPointerNull.get(typeToLlvm(this.type, builder, true))
+        : llvm.ConstantInt.get(builder.getInt64Ty(), 0, true),
+      this.varDeclNode.llvmValue
+    );
     return this.varDeclNode.llvmValue;
   }
 }
