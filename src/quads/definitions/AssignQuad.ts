@@ -10,25 +10,24 @@ import { Register } from './Register.js';
 import { LoadQuad } from './LoadQuad.js';
 import { QuadsContext } from '../index.js';
 import { IdNode } from '../../ast/definitions/term/IdNode.js';
-import { FunctionDeclaration } from '../../ast/definitions/FunctionDeclaration.js';
 
 export class AssignExpClass extends Quad {
   private readonly quads: RA<Quad>;
 
   public constructor(
     private readonly id: IdNode,
-    expression: RA<Quad>,
+    private readonly expression: RA<Quad>,
     context: QuadsContext
   ) {
     super();
     const tempRegister = context.requestTempRegister();
-    const lastQuad = expression.at(-1)!;
+    const lastQuad = this.expression.at(-1)!;
     const isFunction = lastQuad instanceof IdQuad && lastQuad.isFunction;
     const mipsValue = lastQuad.toMipsValue();
     const amdValue = lastQuad.toAmdValue();
     const register = new Register(mipsValue, amdValue) as TempVariable;
     this.quads = [
-      ...expression,
+      ...this.expression,
       new LoadQuad(tempRegister, register, isFunction),
       new AssignQuad(this.id.getName(), this.id.getTempVariable(), [
         tempRegister,
@@ -61,10 +60,8 @@ export class AssignExpClass extends Quad {
   }
 
   public toLlvm(context: LlvmContext) {
-    const value = this.quads.map((quad) => quad.toLlvm(context)).at(-1)!;
+    const value = this.expression.map((quad) => quad.toLlvm(context)).at(-1)!;
     const declaration = this.id.getDeclaration()!;
-    if (declaration instanceof FunctionDeclaration)
-      throw new TypeError('Unexpected function');
     return context.builder.CreateStore(value, declaration.llvmValue);
   }
 }

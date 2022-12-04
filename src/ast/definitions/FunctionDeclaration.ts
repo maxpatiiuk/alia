@@ -18,9 +18,13 @@ import { TypeListNode } from './types/TypeListNode.js';
 import { Quad } from '../../quads/definitions/index.js';
 import { QuadsContext } from '../../quads/index.js';
 import { FunctionQuad } from '../../quads/definitions/FunctionQuad.js';
+import llvm from 'llvm-bindings';
 
 export class FunctionDeclaration extends AstNode {
   public readonly typeNode: FunctionType;
+
+  // eslint-disable-next-line functional/prefer-readonly-type
+  public llvmValue: llvm.Function = undefined!;
 
   // eslint-disable-next-line functional/prefer-readonly-type
   public returnType: LanguageType;
@@ -124,6 +128,7 @@ export class FunctionDeclaration extends AstNode {
         this.id.getName(),
         this.formals,
         this.statements,
+        this,
         context
       ),
     ];

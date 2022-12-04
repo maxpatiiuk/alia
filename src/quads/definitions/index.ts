@@ -121,5 +121,5 @@ export type LlvmContext = {
   readonly module: Module;
   readonly builder: IRBuilder;
   readonly validate: boolean;
-  readonly strings: IR<llvm.GlobalVariable>;
+  readonly strings: IR<llvm.Constant>;
 };

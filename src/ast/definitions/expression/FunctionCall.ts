@@ -97,9 +97,7 @@ export class FunctionCall extends Expression {
         ),
         this.id.getName(),
         false,
-        declaration instanceof VariableDeclaration
-          ? declaration.tempVariable
-          : undefined,
+        declaration instanceof VariableDeclaration ? declaration : undefined,
         withReturn
       ),
     ];

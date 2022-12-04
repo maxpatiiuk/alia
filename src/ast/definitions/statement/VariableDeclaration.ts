@@ -22,7 +22,7 @@ export class VariableDeclaration extends Statement {
   public value: EvalValue;
 
   // eslint-disable-next-line functional/prefer-readonly-type
-  public llvmValue: llvm.AllocaInst = undefined!;
+  public llvmValue: llvm.AllocaInst | llvm.GlobalVariable = undefined!;
 
   // eslint-disable-next-line functional/prefer-readonly-type
   public tempVariable: TempVariable = new TempVariable(-1);

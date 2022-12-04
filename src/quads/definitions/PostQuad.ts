@@ -97,7 +97,9 @@ export class PostQuad extends Quad {
     if (declaration instanceof FunctionDeclaration)
       throw new TypeError('Unexpected function declaration');
     const loaded = builder.CreateLoad(
-      declaration.llvmValue.getAllocatedType(),
+      declaration.llvmValue instanceof llvm.AllocaInst
+        ? declaration.llvmValue.getAllocatedType()
+        : declaration.llvmValue.getValueType(),
       declaration.llvmValue,
       this.id.getName()
     );

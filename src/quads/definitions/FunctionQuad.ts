@@ -1,22 +1,25 @@
-import type { RA, WritableArray } from '../../utils/types.js';
+import llvm from 'llvm-bindings';
+
 import type { FormalsDeclNode } from '../../ast/definitions/FormalsDeclNode.js';
+import type { FunctionDeclaration } from '../../ast/definitions/FunctionDeclaration.js';
 import type { StatementList } from '../../ast/definitions/statement/StatementList.js';
+import { FunctionTypeNode } from '../../ast/definitions/types/FunctionTypeNode.js';
+import type { TypeNode } from '../../ast/definitions/types/index.js';
+import { PrimaryTypeNode } from '../../ast/definitions/types/PrimaryTypeNode.js';
+import { BlankLine } from '../../instructions/definitions/amd/BlankLink.js';
+import type { RA, WritableArray } from '../../utils/types.js';
 import type { QuadsContext } from '../index.js';
 import { formatTemp } from '../index.js';
 import type { FormalQuad } from './FormalQuad.js';
 import { FunctionEpilogueQuad } from './FunctionEpilogueQuad.js';
 import { FunctionPrologueQuad } from './FunctionPrologueQuad.js';
 import { GetArgQuad as GetArgumentQuad } from './GetArgQuad.js';
+import { inlineLabels, mainFunction } from './GlobalQuad.js';
 import { formatGlobalVariable } from './GlobalVarQuad.js';
 import { TempVariable } from './IdQuad.js';
-import { LlvmContext, Quad, quadsToString } from './index.js';
+import type { LlvmContext } from './index.js';
+import { Quad, quadsToString } from './index.js';
 import { Register } from './Register.js';
-import { BlankLine } from '../../instructions/definitions/amd/BlankLink.js';
-import { inlineLabels, mainFunction } from './GlobalQuad.js';
-import llvm from 'llvm-bindings';
-import { TypeNode } from '../../ast/definitions/types/index.js';
-import { PrimaryTypeNode } from '../../ast/definitions/types/PrimaryTypeNode.js';
-import { FunctionTypeNode } from '../../ast/definitions/types/FunctionTypeNode.js';
 
 export class FunctionQuad extends Quad {
   private readonly enter: FunctionPrologueQuad;
@@ -41,6 +44,7 @@ export class FunctionQuad extends Quad {
     public readonly id: string,
     private readonly formalsNode: FormalsDeclNode,
     statements: StatementList,
+    private readonly node: FunctionDeclaration,
     context: QuadsContext
   ) {
     super();
@@ -143,6 +147,7 @@ export class FunctionQuad extends Quad {
       this.id === mainFunction ? mainFunction : this.name,
       module
     );
+    this.node.llvmValue = fn;
 
     const entryBlock = llvm.BasicBlock.Create(thisContext, 'entry', fn);
     builder.SetInsertPoint(entryBlock);

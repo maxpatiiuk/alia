@@ -81,18 +81,18 @@ export class GlobalQuad extends Quad {
           if (child instanceof VariableDeclaration) {
             child.toQuads(newContext);
             return {
-              name: child.id.getName(),
+              node: child,
               value: toPrimitiveValue(child.value),
             };
           } else
             return child instanceof FunctionDeclaration
-              ? { name: child.id.getName(), value: undefined }
+              ? { node: child, value: undefined }
               : undefined;
         })
     );
 
     this.globalQuads = globals.map(
-      ({ name, value }) => new GlobalVariableQuad(name, value)
+      ({ node, value }) => new GlobalVariableQuad(node, value)
     );
 
     this.functions = filterArray(

@@ -1,10 +1,12 @@
-import { amdSize, LlvmContext, mipsSize, Quad } from './index.js';
-import { TermQuad } from './TermQuad.js';
-import { formatGlobalVariable } from './GlobalVarQuad.js';
-import { formatTemp } from '../index.js';
-import { Register } from './Register.js';
 import { FunctionDeclaration } from '../../ast/definitions/FunctionDeclaration.js';
-import { VariableDeclaration } from '../../ast/definitions/statement/VariableDeclaration.js';
+import type { VariableDeclaration } from '../../ast/definitions/statement/VariableDeclaration.js';
+import { formatTemp } from '../index.js';
+import { formatGlobalVariable } from './GlobalVarQuad.js';
+import type { LlvmContext } from './index.js';
+import { amdSize, mipsSize, Quad } from './index.js';
+import { Register } from './Register.js';
+import { TermQuad } from './TermQuad.js';
+import llvm from 'llvm-bindings';
 
 export class IdQuad extends Quad {
   private readonly quad: Quad;
@@ -45,18 +47,20 @@ export class IdQuad extends Quad {
   }
 
   public toLlvm({ builder }: LlvmContext) {
-    if (this.declaration instanceof FunctionDeclaration)
-      throw new TypeError('Unexpected function declaration');
-    return builder.CreateLoad(
-      this.declaration.llvmValue.getAllocatedType(),
-      this.declaration.llvmValue,
-      this.name
-    );
+    return this.declaration instanceof FunctionDeclaration
+      ? this.declaration.llvmValue
+      : builder.CreateLoad(
+          this.declaration.llvmValue instanceof llvm.AllocaInst
+            ? this.declaration.llvmValue.getAllocatedType()
+            : this.declaration.llvmValue.getValueType(),
+          this.declaration.llvmValue,
+          this.name
+        );
   }
 }
 
 export class TempVariable extends Register {
-  public constructor(public readonly variable: string | number) {
+  public constructor(public readonly variable: number | string) {
     super(reg(variable), ref(variable));
   }
 
@@ -69,7 +73,7 @@ export class TempVariable extends Register {
  * Resolve global variable name or temporary variable index into a MIPS register
  * name
  */
-export const reg = (tempVariable: string | number): string =>
+export const reg = (tempVariable: number | string): string =>
   typeof tempVariable === 'string'
     ? formatGlobalVariable(tempVariable)
     : `${tempVariable > 0 ? '-' : ''}${Math.abs(tempVariable) * mipsSize}($fp)`;
@@ -78,7 +82,7 @@ export const reg = (tempVariable: string | number): string =>
  * Resolve global variable name or temporary variable index into an x64 register
  * name
  */
-const ref = (tempVariable: string | number): string =>
+const ref = (tempVariable: number | string): string =>
   typeof tempVariable === 'string'
     ? formatGlobalVariable(tempVariable)
     : `${tempVariable > 0 ? '-' : ''}${Math.abs(tempVariable) * amdSize}(%rbp)`;
