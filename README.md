@@ -2,6 +2,8 @@
 
 The ultimate Drewgon compiler and interpreter.
 
+// TODO: rename the language
+
 Written in TypeScript.
 
 Drewgon follows c-like syntax. Example code:
@@ -34,7 +36,7 @@ A larger example is provided in [`./infile.dg`](./infile.dg). It includes an
 implementation of a tiny testing library, that is then used to test the very
 language it is written in.
 
-Drewgon can be compiled down to [x64 or MIPS](#running-compiler). It can also be
+Drewgon can be compiled down to [x64, MIPS and LLVM assembly](#running-compiler). It can also be
 run in an [interpreter](#running-interpreter).
 
 ## Contents
@@ -46,6 +48,7 @@ run in an [interpreter](#running-interpreter).
   * [Running Compiler](#running-compiler)
     + [Compiling to x64](#compiling-to-x64)
     + [Compiling to MIPS](#compiling-to-mips)
+    + [Compiling to LLVM Assembly](#compiling-to-llvm-assembly)
   * [Running Interpreter](#running-interpreter)
   * [Testing](#testing)
   * [Architecture](#architecture)
@@ -66,13 +69,18 @@ run in an [interpreter](#running-interpreter).
     + [Execution](#execution)
       - [Runtime environment](#runtime-environment)
         * [MIPS](#mips)
-        * [x64](#x64)
+        * [x64 and LLVM](#x64-and-llvm)
       - [Interpreter](#interpreter)
   * [`dgc` Documentation](#dgc-documentation)
   * [Development Documentation](#development-documentation)
   * [Appendix 1: Extending the language](#appendix-1-extending-the-language)
   * [Appendix 2: Generating a graph of the grammar](#appendix-2-generating-a-graph-of-the-grammar)
   * [Appendix 3: Sources](#appendix-3-sources)
+    + [CYK Parser](#cyk-parser)
+    + [SLR Parser](#slr-parser)
+    + [MIPS](#mips-1)
+    + [x64](#x64)
+    + [LLVM](#llvm)
 
 ## Prerequisites
 
@@ -81,11 +89,17 @@ run in an [interpreter](#running-interpreter).
 
 ## Installation
 
-Install dependencies:
+1. [Follow `llvm-bindings` installation instructions](https://github.com/ApsarasX/llvm-bindings/tree/69c93f7aae697c3cb3e75d01e447554b0565e3d5#install)
 
-```sh
-make all
-```
+   Also, you may have
+   to [explicitly specify the location of LLVM](https://github.com/ApsarasX/llvm-bindings/tree/69c93f7aae697c3cb3e75d01e447554b0565e3d5#custom-llvm-installation),
+   if it isn't found automatically.
+
+2. Install dgc dependencies:
+
+   ```sh
+   npm install
+   ```
 
 ## Running Compiler
 
@@ -152,18 +166,23 @@ Example of generated MIPS assembly:
 
 ### Compiling to LLVM Assembly
 
-// TODO: extend this
-
-Example call:
+Workflow for an x64 machine:
 
 ```
 # Compile to LLVM assembly
 ./dgc infile.dg -l llvm.ll
 
-# Compile to target machine assembly, create executable and run it
-make llvm LLC=/home/a807d786/llvm_dist/bin/llc LLVM_AS=llvm.ll
-```
+# Optimize the LLVM assembly
+# NOTE, you will have to change the paths to the LLVM binaries
+/home/a807d786/llvm_dist/bin/opt -O3 -S llvm.ll -o llvm.opt.ll
 
+# Compile to target machine assembly
+/home/a807d786/llvm_dist/bin/llc llvm.opt.ll -o llvm.s
+
+# Create executable and run it
+make link OUTFILE=llvm.s
+
+```
 
 ![Example LLVM output](./docs/img/llvm-assembly.png)
 
@@ -186,7 +205,7 @@ Several restrictions are lifted when running Drewgon in an interpreter:
   emit an error
 - Statements can be included outside of the function
 - `output` statements always include a trailing newline
- 
+
 Example Interpreter session:
 
 ![Example Interpreter session](./docs/img/interpreter-session.png)
@@ -426,7 +445,7 @@ Example annotated output:
 
 The intermediate code is generated from the AST. The intermediate code is
 a pseudo-assembly language (also called 3AC or Quads) that is used for
-intermediate code optimization and generation for MIPS and x64 assembly code.
+intermediate code optimization and generation for MIPS, x64 and LLVM assembly code.
 
 [More information](https://en.wikipedia.org/wiki/Three-address_code)
 
@@ -443,6 +462,12 @@ For debugging purposes, you can make the compiler output the intermediate code:
 ```sh
 ./dgc infile.dg -a 3ac.txt
 ```
+
+Example Quads output:
+
+![Example Quads output](./docs/img/quads-output.png)
+
+[Full example](./src/quads/__tests__/__snapshots__/toQuads.test.ts.snap)
 
 #### Intermediate code optimization
 
@@ -463,8 +488,8 @@ more), but those are outside of the scope of this project.
 
 ### Final code generation
 
-Final code is assembly. The compiler can generate code for MIPS (32-bit) and
-x64 (64-bit).
+Final code is assembly. The compiler can generate code for MIPS (32-bit),
+x64 (64-bit) and LLVM (64-bit).
 
 The code of the compiler is trying to output universal assembly as much as
 possible. This is helpful for ensuring consistency between the assembly code
@@ -518,10 +543,12 @@ is [MARS](http://courses.missouristate.edu/kenvollmar/mars/)
 
 The code takes advantage of its syscalls.
 
-##### x64
+##### x64 and LLVM
 
-x64 runtime environment is any x64 capable machine. It does not make syscalls
-directly, but rather
+x64 runtime environment is any x64 capable machine. LLVM assembly can be
+compiled to run on any machine.
+
+The generated assembly code does not make syscalls directly, but rather
 uses [a tiny C helpers library](src/instructions/definitions/std/amd.c).
 
 This greatly simplifies the code generation process, as printing numbers/strings
@@ -542,7 +569,8 @@ in [`./src/ast/definition/`](./src/ast/definitions).
 
 Each AST node has an `evaluate()` method that is called during interpretation.
 
-Each variable declaration has a `.value` property, that stores the current value.
+Each variable declaration has a `.value` property, that stores the current
+value.
 
 Since function pointers are supported, variable value may point at function
 declaration.
@@ -584,14 +612,16 @@ follow [the assembly debugging commands](http://web.cecs.pdx.edu/~apt/cs510comp/
 A high level overview of the steps necessary to extend the Drewgon language:
 
 - Read the [Compiler Architecture](#architecture) section of this document
-- If necessary, add additional tokens. See [Lexical Analysis](#lexical-analysis-tokenizing)
+- If necessary, add additional tokens.
+  See [Lexical Analysis](#lexical-analysis-tokenizing)
 - Modify the grammar to add rules for the new tokens / new combinations of
   existing tokens. See [Syntax Analysis](#syntactic-analysis-parsing)
 - Add new AST nodes for the new rules.
   See [AST](#abstract-syntax-tree-ast-generation)
 - Add new Quads for the new AST nodes.
   See [Intermediate code generation](#intermediate-code-generation)
-- If necessary, define new instructions. See [Final code generation](#final-code-generation)
+- If necessary, define new instructions.
+  See [Final code generation](#final-code-generation)
 - Add test cases for the changes made in each of the above steps.
 
 ## Appendix 2: Generating a graph of the grammar
@@ -602,8 +632,8 @@ Convert the SLR automata into a Graphviz graph definition, which in turn can
 be converted into an SVG or a PNG.
 
 > NOTE: due to grammar being quite large, the resulting graph is enormous.
-> 
-> To make it more practical, I commented out large portions of the grammar 
+>
+> To make it more practical, I commented out large portions of the grammar
 > before running the graph generation in order to reduce the size of the
 > graph.
 
@@ -679,3 +709,8 @@ The following pages have been helpful during the development of the compiler.
 - https://groups.google.com/g/llvm-dev/c/-ihkMNlDvEQ
 - https://purelyfunctional.org/posts/2018-04-02-llvm-hs-jit-external-function.html
 - https://llvm.org/docs/SourceLevelDebugging.html#llvm-dbg-declare
+
+### Misc
+
+- https://ecotrust-canada.github.io/markdown-toc/
+- https://carbon.now.sh/

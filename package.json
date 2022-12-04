@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "The ultimate Drewgon compiler",
   "scripts": {
-    "test": "jest"
+    "test": "tsc && jest"
   },
   "repository": {
     "type": "git",
@@ -18,7 +18,8 @@
   "homepage": "https://github.com/maxxxxxdlp/tts-reader#readme",
   "dependencies": {
     "chalk": "^5.1.2",
-    "commander": "^9.4.0"
+    "commander": "^9.4.0",
+    "llvm-bindings": "^0.4.2"
   },
   "devDependencies": {
     "@maxxxxxdlp/eslint-config": "^3.0.2",

@@ -92,7 +92,7 @@ void printSummary() {
   output totalCount-failCount;
   output " of ";
   output totalCount;
-  output " tests";
+  output " tests\n\n\n";
 }
 
 int testNumber;
