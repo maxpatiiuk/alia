@@ -20,8 +20,7 @@ export const declareLinkages = ({ builder, module }: LlvmContext): void =>
       [builder.getInt8PtrTy()],
       false
     ),
-    // FIXME: test this
-    getBool: llvm.FunctionType.get(builder.getInt1Ty(), [], false),
+    getBool: llvm.FunctionType.get(builder.getInt64Ty(), [], false),
     getInt: llvm.FunctionType.get(builder.getInt64Ty(), [], false),
   }).forEach(([name, type]) =>
     llvm.Function.Create(

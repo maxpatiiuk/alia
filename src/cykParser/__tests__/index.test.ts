@@ -98,21 +98,16 @@ fn(int, fn () -> fn () -> void) -> void bar() {
 
  if(false) {}
 
-  // TODO: test 3 * 4 == 42
  if(3 * 4) {} else {
    // test
  }
 
   val = 4;
-  // TODO: test 4--
-// TODO: test 5++
 
   return 4;
   output 10;
   input des;
   output 10*4;
-  // TODO: test output 10 != 4;
-  // TODO: test output 10 <= 4;
   output 10 < 4;
 
   some();

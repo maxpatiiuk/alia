@@ -1,0 +1,832 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`toQuads 1`] = `
+"[BEGIN GLOBALS]
+break
+left
+right
+twice
+globalPointer
+testFunctionPointers
+failCount
+totalCount
+assertBool
+not
+assert
+printSummary
+testNumber
+printTestHeader
+testLoops
+testOperators
+var
+testShadowingHelper
+testShadowing
+testLongExpression
+tonOfArguments
+testTonOfArguments
+main
+str_0 \\"left_\\"
+str_1 \\"\\\\n\\"
+str_2 \\"right_\\"
+str_3 \\"Calling a function using pointer:\\\\n\\"
+str_4 \\"Function as an actual:\\\\n\\"
+str_5 \\"Calling a function returned from another function:\\\\n\\"
+str_6 \\"Test #\\"
+str_7 \\": \\"
+str_8 \\"Pass\\\\n\\"
+str_9 \\"Fail\\\\n\\"
+str_10 \\"FAIL\\\\n\\"
+str_11 \\"Expected: \\"
+str_12 \\"\\\\nReceived:\\"
+str_13 \\"\\\\n\\\\n\\"
+str_14 \\"Passed \\"
+str_15 \\" of \\"
+str_16 \\" tests\\\\n\\\\n\\\\n\\"
+str_17 \\"Section #\\"
+str_18 \\":\\\\n\\"
+[END GLOBALS]
+
+[BEGIN break LOCALS]
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+[END break LOCALS]
+fun_break:  nop
+            enter break
+lbl_0:      nop
+            leave break
+
+
+[BEGIN left LOCALS]
+a (formal arg of 8 bytes)
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+tmp2 (tmp var of 8 bytes)
+[END left LOCALS]
+fun_left:  nop
+           enter left
+           getarg 1 [a]
+           REPORT str_0
+           REPORT [a]
+           REPORT str_1
+lbl_1:     nop
+           leave left
+
+
+[BEGIN right LOCALS]
+a (formal arg of 8 bytes)
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+tmp2 (tmp var of 8 bytes)
+[END right LOCALS]
+fun_right:  nop
+            enter right
+            getarg 1 [a]
+            REPORT str_2
+            REPORT [a]
+            REPORT str_1
+lbl_2:      nop
+            leave right
+
+
+[BEGIN twice LOCALS]
+f (formal arg of 8 bytes)
+a (formal arg of 8 bytes)
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+tmp2 (tmp var of 8 bytes)
+tmp3 (tmp var of 8 bytes)
+tmp4 (tmp var of 8 bytes)
+tmp5 (tmp var of 8 bytes)
+[END twice LOCALS]
+fun_twice:  nop
+            enter twice
+            getarg 1 [f]
+            getarg 2 [a]
+            setarg 1 [a]
+            call f
+            setarg 1 [a]
+            call f
+            setret [f]
+            goto lbl_3
+lbl_3:      nop
+            leave twice
+
+
+[BEGIN testFunctionPointers LOCALS]
+localPointer (local var of 8 bytes)
+a (local var of 8 bytes)
+b (local var of 8 bytes)
+result (local var of 8 bytes)
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+tmp2 (tmp var of 8 bytes)
+tmp3 (tmp var of 8 bytes)
+tmp4 (tmp var of 8 bytes)
+tmp5 (tmp var of 8 bytes)
+tmp6 (tmp var of 8 bytes)
+tmp7 (tmp var of 8 bytes)
+tmp8 (tmp var of 8 bytes)
+tmp9 (tmp var of 8 bytes)
+tmp10 (tmp var of 8 bytes)
+tmp11 (tmp var of 8 bytes)
+tmp12 (tmp var of 8 bytes)
+tmp13 (tmp var of 8 bytes)
+[END testFunctionPointers LOCALS]
+fun_testFunctionPointers:  nop
+                           enter testFunctionPointers
+                           MAYHEM [tmp5]
+                           [a] := [tmp1]
+                           MAYHEM [tmp7]
+                           [b] := [tmp2]
+                           IFZ [tmp8] GOTO lbl_5
+                           [globalPointer] := [tmp6]
+                           [localPointer] := [tmp7]
+                           goto lbl_6
+lbl_5:                     nop
+                           [globalPointer] := [tmp8]
+                           [localPointer] := [tmp9]
+lbl_6:                     nop
+                           call break
+                           REPORT str_3
+                           setarg 1 [b]
+                           call localPointer
+                           REPORT str_4
+                           setarg 1 [globalPointer]
+                           setarg 2 [a]
+                           call twice
+                           getret [tmp13]
+                           [result] := [tmp3]
+                           REPORT str_5
+                           setarg 1 [a]
+                           call result
+lbl_4:                     nop
+                           leave testFunctionPointers
+
+
+[BEGIN assertBool LOCALS]
+result (formal arg of 8 bytes)
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+tmp2 (tmp var of 8 bytes)
+tmp3 (tmp var of 8 bytes)
+tmp4 (tmp var of 8 bytes)
+[END assertBool LOCALS]
+fun_assertBool:  nop
+                 enter assertBool
+                 getarg 1 [result]
+                 [totalCount] := [totalCount] ADD64 1
+                 REPORT str_6
+                 REPORT [totalCount]
+                 REPORT str_7
+                 IFZ [result] GOTO lbl_8
+                 REPORT str_8
+                 goto lbl_9
+lbl_8:           nop
+                 REPORT str_9
+                 [failCount] := [failCount] ADD64 1
+lbl_9:           nop
+lbl_7:           nop
+                 leave assertBool
+
+
+[BEGIN not LOCALS]
+a (formal arg of 8 bytes)
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+tmp2 (tmp var of 8 bytes)
+tmp3 (tmp var of 8 bytes)
+[END not LOCALS]
+fun_not:  nop
+          enter not
+          getarg 1 [a]
+          [tmp4] := NOT64 [a]
+          setret [tmp4]
+          goto lbl_10
+lbl_10:   nop
+          leave not
+
+
+[BEGIN assert LOCALS]
+result (formal arg of 8 bytes)
+expected (formal arg of 8 bytes)
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+tmp2 (tmp var of 8 bytes)
+tmp3 (tmp var of 8 bytes)
+tmp4 (tmp var of 8 bytes)
+tmp5 (tmp var of 8 bytes)
+tmp6 (tmp var of 8 bytes)
+[END assert LOCALS]
+fun_assert:  nop
+             enter assert
+             getarg 1 [result]
+             getarg 2 [expected]
+             [totalCount] := [totalCount] ADD64 1
+             REPORT str_6
+             REPORT [totalCount]
+             REPORT str_7
+             IFZ [tmp6] GOTO lbl_12
+             REPORT str_8
+             goto lbl_13
+lbl_12:      nop
+             REPORT str_10
+             REPORT str_11
+             REPORT [expected]
+             REPORT str_12
+             REPORT [result]
+             REPORT str_13
+             [failCount] := [failCount] ADD64 1
+lbl_13:      nop
+lbl_11:      nop
+             leave assert
+
+
+[BEGIN printSummary LOCALS]
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+tmp2 (tmp var of 8 bytes)
+[END printSummary LOCALS]
+fun_printSummary:  nop
+                   enter printSummary
+                   REPORT str_14
+                   [tmp3] := [totalCount] SUB64 [failCount]
+                   REPORT [tmp3]
+                   REPORT str_15
+                   REPORT [totalCount]
+                   REPORT str_16
+lbl_14:            nop
+                   leave printSummary
+
+
+[BEGIN printTestHeader LOCALS]
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+tmp2 (tmp var of 8 bytes)
+[END printTestHeader LOCALS]
+fun_printTestHeader:  nop
+                      enter printTestHeader
+                      [testNumber] := [testNumber] ADD64 1
+                      REPORT str_17
+                      REPORT [testNumber]
+                      REPORT str_18
+lbl_15:               nop
+                      leave printTestHeader
+
+
+[BEGIN testLoops LOCALS]
+i (local var of 8 bytes)
+b (local var of 8 bytes)
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+tmp2 (tmp var of 8 bytes)
+tmp3 (tmp var of 8 bytes)
+tmp4 (tmp var of 8 bytes)
+tmp5 (tmp var of 8 bytes)
+tmp6 (tmp var of 8 bytes)
+tmp7 (tmp var of 8 bytes)
+tmp8 (tmp var of 8 bytes)
+tmp9 (tmp var of 8 bytes)
+tmp10 (tmp var of 8 bytes)
+[END testLoops LOCALS]
+fun_testLoops:  nop
+                enter testLoops
+lbl_17:         nop
+                IFZ [tmp5] GOTO lbl_18
+                REPORT [i]
+                REPORT str_1
+                [i] := [i] ADD64 1
+                goto lbl_17
+lbl_18:         nop
+                [b] := [tmp9]
+lbl_19:         nop
+                IFZ [tmp10] GOTO lbl_20
+                REPORT [b]
+                REPORT str_1
+                [b] := [b] SUB64 1
+                goto lbl_19
+lbl_20:         nop
+lbl_16:         nop
+                leave testLoops
+
+
+[BEGIN testOperators LOCALS]
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+tmp2 (tmp var of 8 bytes)
+tmp3 (tmp var of 8 bytes)
+tmp4 (tmp var of 8 bytes)
+tmp5 (tmp var of 8 bytes)
+tmp6 (tmp var of 8 bytes)
+tmp7 (tmp var of 8 bytes)
+tmp8 (tmp var of 8 bytes)
+tmp9 (tmp var of 8 bytes)
+tmp10 (tmp var of 8 bytes)
+tmp11 (tmp var of 8 bytes)
+tmp12 (tmp var of 8 bytes)
+tmp13 (tmp var of 8 bytes)
+tmp14 (tmp var of 8 bytes)
+tmp15 (tmp var of 8 bytes)
+tmp16 (tmp var of 8 bytes)
+tmp17 (tmp var of 8 bytes)
+tmp18 (tmp var of 8 bytes)
+tmp19 (tmp var of 8 bytes)
+tmp20 (tmp var of 8 bytes)
+tmp21 (tmp var of 8 bytes)
+tmp22 (tmp var of 8 bytes)
+tmp23 (tmp var of 8 bytes)
+tmp24 (tmp var of 8 bytes)
+tmp25 (tmp var of 8 bytes)
+tmp26 (tmp var of 8 bytes)
+tmp27 (tmp var of 8 bytes)
+tmp28 (tmp var of 8 bytes)
+tmp29 (tmp var of 8 bytes)
+tmp30 (tmp var of 8 bytes)
+tmp31 (tmp var of 8 bytes)
+tmp32 (tmp var of 8 bytes)
+tmp33 (tmp var of 8 bytes)
+tmp34 (tmp var of 8 bytes)
+tmp35 (tmp var of 8 bytes)
+tmp36 (tmp var of 8 bytes)
+tmp37 (tmp var of 8 bytes)
+tmp38 (tmp var of 8 bytes)
+tmp39 (tmp var of 8 bytes)
+tmp40 (tmp var of 8 bytes)
+tmp41 (tmp var of 8 bytes)
+tmp42 (tmp var of 8 bytes)
+tmp43 (tmp var of 8 bytes)
+tmp44 (tmp var of 8 bytes)
+tmp45 (tmp var of 8 bytes)
+tmp46 (tmp var of 8 bytes)
+tmp47 (tmp var of 8 bytes)
+tmp48 (tmp var of 8 bytes)
+tmp49 (tmp var of 8 bytes)
+tmp50 (tmp var of 8 bytes)
+tmp51 (tmp var of 8 bytes)
+tmp52 (tmp var of 8 bytes)
+tmp53 (tmp var of 8 bytes)
+tmp54 (tmp var of 8 bytes)
+tmp55 (tmp var of 8 bytes)
+tmp56 (tmp var of 8 bytes)
+tmp57 (tmp var of 8 bytes)
+tmp58 (tmp var of 8 bytes)
+tmp59 (tmp var of 8 bytes)
+tmp60 (tmp var of 8 bytes)
+tmp61 (tmp var of 8 bytes)
+tmp62 (tmp var of 8 bytes)
+tmp63 (tmp var of 8 bytes)
+tmp64 (tmp var of 8 bytes)
+tmp65 (tmp var of 8 bytes)
+tmp66 (tmp var of 8 bytes)
+tmp67 (tmp var of 8 bytes)
+tmp68 (tmp var of 8 bytes)
+tmp69 (tmp var of 8 bytes)
+tmp70 (tmp var of 8 bytes)
+tmp71 (tmp var of 8 bytes)
+tmp72 (tmp var of 8 bytes)
+tmp73 (tmp var of 8 bytes)
+tmp74 (tmp var of 8 bytes)
+tmp75 (tmp var of 8 bytes)
+tmp76 (tmp var of 8 bytes)
+tmp77 (tmp var of 8 bytes)
+tmp78 (tmp var of 8 bytes)
+tmp79 (tmp var of 8 bytes)
+tmp80 (tmp var of 8 bytes)
+tmp81 (tmp var of 8 bytes)
+tmp82 (tmp var of 8 bytes)
+tmp83 (tmp var of 8 bytes)
+tmp84 (tmp var of 8 bytes)
+tmp85 (tmp var of 8 bytes)
+tmp86 (tmp var of 8 bytes)
+tmp87 (tmp var of 8 bytes)
+tmp88 (tmp var of 8 bytes)
+tmp89 (tmp var of 8 bytes)
+tmp90 (tmp var of 8 bytes)
+tmp91 (tmp var of 8 bytes)
+tmp92 (tmp var of 8 bytes)
+tmp93 (tmp var of 8 bytes)
+tmp94 (tmp var of 8 bytes)
+tmp95 (tmp var of 8 bytes)
+tmp96 (tmp var of 8 bytes)
+tmp97 (tmp var of 8 bytes)
+tmp98 (tmp var of 8 bytes)
+tmp99 (tmp var of 8 bytes)
+tmp100 (tmp var of 8 bytes)
+tmp101 (tmp var of 8 bytes)
+tmp102 (tmp var of 8 bytes)
+tmp103 (tmp var of 8 bytes)
+tmp104 (tmp var of 8 bytes)
+tmp105 (tmp var of 8 bytes)
+tmp106 (tmp var of 8 bytes)
+tmp107 (tmp var of 8 bytes)
+tmp108 (tmp var of 8 bytes)
+tmp109 (tmp var of 8 bytes)
+tmp110 (tmp var of 8 bytes)
+tmp111 (tmp var of 8 bytes)
+tmp112 (tmp var of 8 bytes)
+tmp113 (tmp var of 8 bytes)
+tmp114 (tmp var of 8 bytes)
+tmp115 (tmp var of 8 bytes)
+tmp116 (tmp var of 8 bytes)
+tmp117 (tmp var of 8 bytes)
+tmp118 (tmp var of 8 bytes)
+tmp119 (tmp var of 8 bytes)
+tmp120 (tmp var of 8 bytes)
+tmp121 (tmp var of 8 bytes)
+tmp122 (tmp var of 8 bytes)
+tmp123 (tmp var of 8 bytes)
+tmp124 (tmp var of 8 bytes)
+tmp125 (tmp var of 8 bytes)
+tmp126 (tmp var of 8 bytes)
+tmp127 (tmp var of 8 bytes)
+tmp128 (tmp var of 8 bytes)
+tmp129 (tmp var of 8 bytes)
+tmp130 (tmp var of 8 bytes)
+tmp131 (tmp var of 8 bytes)
+tmp132 (tmp var of 8 bytes)
+tmp133 (tmp var of 8 bytes)
+tmp134 (tmp var of 8 bytes)
+tmp135 (tmp var of 8 bytes)
+tmp136 (tmp var of 8 bytes)
+tmp137 (tmp var of 8 bytes)
+tmp138 (tmp var of 8 bytes)
+tmp139 (tmp var of 8 bytes)
+tmp140 (tmp var of 8 bytes)
+tmp141 (tmp var of 8 bytes)
+tmp142 (tmp var of 8 bytes)
+tmp143 (tmp var of 8 bytes)
+tmp144 (tmp var of 8 bytes)
+tmp145 (tmp var of 8 bytes)
+tmp146 (tmp var of 8 bytes)
+[END testOperators LOCALS]
+fun_testOperators:  nop
+                    enter testOperators
+                    [tmp5] := 1 AND64 1
+                    setarg 1 [tmp5]
+                    call assertBool
+                    [tmp9] := 1 OR64 1
+                    setarg 1 [tmp9]
+                    call assertBool
+                    [tmp13] := 1 AND64 0
+                    setarg 1 [tmp13]
+                    call not
+                    getret [tmp15]
+                    setarg 1 [tmp15]
+                    call assertBool
+                    [tmp19] := 1 OR64 0
+                    setarg 1 [tmp19]
+                    call assertBool
+                    [tmp23] := 0 AND64 1
+                    setarg 1 [tmp23]
+                    call not
+                    getret [tmp25]
+                    setarg 1 [tmp25]
+                    call assertBool
+                    [tmp29] := 0 OR64 1
+                    setarg 1 [tmp29]
+                    call assertBool
+                    [tmp33] := 0 AND64 0
+                    setarg 1 [tmp33]
+                    call not
+                    getret [tmp35]
+                    setarg 1 [tmp35]
+                    call assertBool
+                    [tmp39] := 0 OR64 0
+                    setarg 1 [tmp39]
+                    call not
+                    getret [tmp41]
+                    setarg 1 [tmp41]
+                    call assertBool
+                    [tmp45] := 3 GT64 2
+                    setarg 1 [tmp45]
+                    call assertBool
+                    [tmp49] := 2 GT64 2
+                    setarg 1 [tmp49]
+                    call not
+                    getret [tmp51]
+                    setarg 1 [tmp51]
+                    call assertBool
+                    [tmp55] := 2 GT64 3
+                    setarg 1 [tmp55]
+                    call not
+                    getret [tmp57]
+                    setarg 1 [tmp57]
+                    call assertBool
+                    [tmp61] := 3 LT64 2
+                    setarg 1 [tmp61]
+                    call not
+                    getret [tmp63]
+                    setarg 1 [tmp63]
+                    call assertBool
+                    [tmp67] := 2 LT64 2
+                    setarg 1 [tmp67]
+                    call not
+                    getret [tmp69]
+                    setarg 1 [tmp69]
+                    call assertBool
+                    [tmp73] := 2 LT64 3
+                    setarg 1 [tmp73]
+                    call assertBool
+                    [tmp77] := 3 GTE64 2
+                    setarg 1 [tmp77]
+                    call assertBool
+                    [tmp81] := 2 GTE64 2
+                    setarg 1 [tmp81]
+                    call assertBool
+                    [tmp85] := 2 GTE64 3
+                    setarg 1 [tmp85]
+                    call not
+                    getret [tmp87]
+                    setarg 1 [tmp87]
+                    call assertBool
+                    [tmp91] := 3 LTE64 2
+                    setarg 1 [tmp91]
+                    call not
+                    getret [tmp93]
+                    setarg 1 [tmp93]
+                    call assertBool
+                    [tmp97] := 2 LTE64 2
+                    setarg 1 [tmp97]
+                    call assertBool
+                    [tmp101] := 2 LTE64 3
+                    setarg 1 [tmp101]
+                    call assertBool
+                    [tmp105] := 3 EQ64 2
+                    setarg 1 [tmp105]
+                    call not
+                    getret [tmp107]
+                    setarg 1 [tmp107]
+                    call assertBool
+                    [tmp111] := 2 EQ64 2
+                    setarg 1 [tmp111]
+                    call assertBool
+                    [tmp115] := 3 NEQ64 2
+                    setarg 1 [tmp115]
+                    call assertBool
+                    [tmp119] := 2 NEQ64 2
+                    setarg 1 [tmp119]
+                    call not
+                    getret [tmp121]
+                    setarg 1 [tmp121]
+                    call assertBool
+                    [tmp125] := 2 ADD64 3
+                    setarg 1 [tmp125]
+                    setarg 2 5
+                    call assert
+                    [tmp131] := 2 SUB64 3
+                    setarg 1 [tmp131]
+                    [tmp133] := NEG64 1
+                    setarg 2 [tmp133]
+                    call assert
+                    [tmp138] := 2 MULT64 3
+                    setarg 1 [tmp138]
+                    setarg 2 6
+                    call assert
+                    [tmp144] := 9 DIV64 4
+                    setarg 1 [tmp144]
+                    setarg 2 2
+                    call assert
+lbl_21:             nop
+                    leave testOperators
+
+
+[BEGIN testShadowingHelper LOCALS]
+var (local var of 8 bytes)
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+tmp2 (tmp var of 8 bytes)
+tmp3 (tmp var of 8 bytes)
+tmp4 (tmp var of 8 bytes)
+[END testShadowingHelper LOCALS]
+fun_testShadowingHelper:  nop
+                          enter testShadowingHelper
+                          [var] := [tmp2]
+                          [var] := [tmp4]
+                          setret [var]
+                          goto lbl_22
+lbl_22:                   nop
+                          leave testShadowingHelper
+
+
+[BEGIN testShadowing LOCALS]
+returnValue (local var of 8 bytes)
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+tmp2 (tmp var of 8 bytes)
+tmp3 (tmp var of 8 bytes)
+tmp4 (tmp var of 8 bytes)
+tmp5 (tmp var of 8 bytes)
+tmp6 (tmp var of 8 bytes)
+tmp7 (tmp var of 8 bytes)
+tmp8 (tmp var of 8 bytes)
+tmp9 (tmp var of 8 bytes)
+[END testShadowing LOCALS]
+fun_testShadowing:  nop
+                    enter testShadowing
+                    call testShadowingHelper
+                    getret [tmp4]
+                    [returnValue] := [tmp1]
+                    setarg 1 [var]
+                    setarg 2 4
+                    call assert
+                    setarg 1 [returnValue]
+                    setarg 2 2
+                    call assert
+lbl_23:             nop
+                    leave testShadowing
+
+
+[BEGIN testLongExpression LOCALS]
+isFirstCall (formal arg of 8 bytes)
+a (local var of 8 bytes)
+b (local var of 8 bytes)
+c (local var of 8 bytes)
+d (local var of 8 bytes)
+e (local var of 8 bytes)
+f (local var of 8 bytes)
+g (local var of 8 bytes)
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+tmp2 (tmp var of 8 bytes)
+tmp3 (tmp var of 8 bytes)
+tmp4 (tmp var of 8 bytes)
+tmp5 (tmp var of 8 bytes)
+tmp6 (tmp var of 8 bytes)
+tmp7 (tmp var of 8 bytes)
+tmp8 (tmp var of 8 bytes)
+tmp9 (tmp var of 8 bytes)
+tmp10 (tmp var of 8 bytes)
+tmp11 (tmp var of 8 bytes)
+tmp12 (tmp var of 8 bytes)
+tmp13 (tmp var of 8 bytes)
+tmp14 (tmp var of 8 bytes)
+tmp15 (tmp var of 8 bytes)
+tmp16 (tmp var of 8 bytes)
+tmp17 (tmp var of 8 bytes)
+tmp18 (tmp var of 8 bytes)
+tmp19 (tmp var of 8 bytes)
+tmp20 (tmp var of 8 bytes)
+tmp21 (tmp var of 8 bytes)
+tmp22 (tmp var of 8 bytes)
+tmp23 (tmp var of 8 bytes)
+tmp24 (tmp var of 8 bytes)
+tmp25 (tmp var of 8 bytes)
+tmp26 (tmp var of 8 bytes)
+tmp27 (tmp var of 8 bytes)
+tmp28 (tmp var of 8 bytes)
+tmp29 (tmp var of 8 bytes)
+tmp30 (tmp var of 8 bytes)
+tmp31 (tmp var of 8 bytes)
+tmp32 (tmp var of 8 bytes)
+tmp33 (tmp var of 8 bytes)
+tmp34 (tmp var of 8 bytes)
+tmp35 (tmp var of 8 bytes)
+tmp36 (tmp var of 8 bytes)
+tmp37 (tmp var of 8 bytes)
+[END testLongExpression LOCALS]
+fun_testLongExpression:  nop
+                         enter testLongExpression
+                         getarg 1 [isFirstCall]
+                         [a] := [tmp2]
+                         [b] := [tmp4]
+                         [c] := [tmp6]
+                         [d] := [tmp8]
+                         [e] := [tmp0]
+                         [f] := [tmp2]
+                         [g] := [tmp4]
+                         IFZ [isFirstCall] GOTO lbl_25
+                         [tmp18] := [a] ADD64 [b]
+                         [tmp19] := [d] DIV64 [c]
+                         [tmp20] := [tmp18] MULT64 [tmp19]
+                         setarg 1 0
+                         call testLongExpression
+                         getret [tmp23]
+                         [tmp24] := [tmp23] DIV64 [e]
+                         [tmp25] := [tmp20] SUB64 [tmp24]
+                         [a] := [tmp2]
+                         setarg 1 [a]
+                         [tmp27] := NEG64 2
+                         setarg 2 [tmp27]
+                         call assert
+                         goto lbl_26
+lbl_25:                  nop
+                         [tmp30] := [f] ADD64 [g]
+                         [tmp31] := [e] ADD64 [tmp30]
+                         [tmp32] := [d] ADD64 [tmp31]
+                         [tmp33] := [c] ADD64 [tmp32]
+                         [tmp34] := [b] ADD64 [tmp33]
+                         [tmp35] := [a] ADD64 [tmp34]
+                         [a] := [tmp6]
+                         setarg 1 [a]
+                         setarg 2 28
+                         call assert
+                         setret [a]
+                         goto lbl_24
+lbl_26:                  nop
+lbl_24:                  nop
+                         leave testLongExpression
+
+
+[BEGIN tonOfArguments LOCALS]
+a (formal arg of 8 bytes)
+b (formal arg of 8 bytes)
+c (formal arg of 8 bytes)
+d (formal arg of 8 bytes)
+e (formal arg of 8 bytes)
+f (formal arg of 8 bytes)
+g (formal arg of 8 bytes)
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+tmp2 (tmp var of 8 bytes)
+tmp3 (tmp var of 8 bytes)
+tmp4 (tmp var of 8 bytes)
+tmp5 (tmp var of 8 bytes)
+tmp6 (tmp var of 8 bytes)
+tmp7 (tmp var of 8 bytes)
+tmp8 (tmp var of 8 bytes)
+[END tonOfArguments LOCALS]
+fun_tonOfArguments:  nop
+                     enter tonOfArguments
+                     getarg 1 [a]
+                     getarg 2 [b]
+                     getarg 3 [c]
+                     getarg 4 [d]
+                     getarg 5 [e]
+                     getarg 6 [f]
+                     getarg 7 [g]
+                     REPORT [a]
+                     REPORT str_1
+                     REPORT [b]
+                     REPORT str_1
+                     REPORT [c]
+                     REPORT str_1
+                     REPORT [d]
+                     REPORT str_1
+                     REPORT [e]
+                     REPORT str_1
+                     REPORT [f]
+                     REPORT str_1
+                     REPORT [g]
+                     REPORT str_1
+lbl_27:              nop
+                     leave tonOfArguments
+
+
+[BEGIN testTonOfArguments LOCALS]
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+tmp2 (tmp var of 8 bytes)
+tmp3 (tmp var of 8 bytes)
+tmp4 (tmp var of 8 bytes)
+tmp5 (tmp var of 8 bytes)
+tmp6 (tmp var of 8 bytes)
+tmp7 (tmp var of 8 bytes)
+tmp8 (tmp var of 8 bytes)
+tmp9 (tmp var of 8 bytes)
+tmp10 (tmp var of 8 bytes)
+tmp11 (tmp var of 8 bytes)
+tmp12 (tmp var of 8 bytes)
+tmp13 (tmp var of 8 bytes)
+tmp14 (tmp var of 8 bytes)
+tmp15 (tmp var of 8 bytes)
+[END testTonOfArguments LOCALS]
+fun_testTonOfArguments:  nop
+                         enter testTonOfArguments
+                         setarg 1 11
+                         setarg 2 22
+                         setarg 3 33
+                         setarg 4 44
+                         setarg 5 55
+                         setarg 6 66
+                         setarg 7 77
+                         call tonOfArguments
+lbl_28:                  nop
+                         leave testTonOfArguments
+
+
+[BEGIN main LOCALS]
+tmp0 (tmp var of 8 bytes)
+tmp1 (tmp var of 8 bytes)
+tmp2 (tmp var of 8 bytes)
+tmp3 (tmp var of 8 bytes)
+[END main LOCALS]
+fun_main:  nop
+           enter main
+           call printTestHeader
+           call testOperators
+           call printTestHeader
+           call testLoops
+           call printTestHeader
+           call testTonOfArguments
+           call printTestHeader
+           call testShadowing
+           call printTestHeader
+           setarg 1 1
+           call testLongExpression
+           call printTestHeader
+           call testFunctionPointers
+           call printSummary
+lbl_29:    nop
+           leave main
+
+"
+`;

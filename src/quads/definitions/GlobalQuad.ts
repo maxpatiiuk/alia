@@ -128,6 +128,7 @@ export class GlobalQuad extends Quad {
         ...this.globalQuads,
         ...this.globalStrings,
         '[END GLOBALS]',
+        '',
       ]),
       ...quadsToString(this.functions),
     ];

@@ -113,6 +113,8 @@ export class FunctionQuad extends Quad {
           ...this.leave.toString(),
         ])
       ),
+      '',
+      '',
     ];
   }
 
