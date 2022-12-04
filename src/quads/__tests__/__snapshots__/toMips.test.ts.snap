@@ -164,16 +164,16 @@ lbl_6:                        addi $sp, $sp, -32  # BEGIN Calling break
                               la $a0, str_4  # BEGIN Output  # String Literal: \\"Function as an actual:\\\\n\\"
                               addi $v0, $zero, 4
                               syscall  # END Output
-                              lw $t3, global_globalPointer  # Setting argument 1
-                              sw $t3, -44($fp)
-                              lw $t3, -16($fp)  # Setting argument 2
-                              sw $t3, -48($fp)
+                              lw $t2, global_globalPointer  # Setting argument 1
+                              sw $t2, -44($fp)
+                              lw $t2, -16($fp)  # Setting argument 2
+                              sw $t2, -48($fp)
                               addi $sp, $sp, -48  # BEGIN Calling twice
                               jal global_twice
                               addi $sp, $sp, 48  # END Calling twice
                               sw $v0, -52($fp)
-                              lw $t2, -52($fp)
-                              sw $t2, -40($fp)  # BEGIN Assigning result  # END Assigning result
+                              lw $t3, -52($fp)
+                              sw $t3, -40($fp)  # BEGIN Assigning result  # END Assigning result
                               la $a0, str_5  # BEGIN Output  # String Literal: \\"Calling a function returned from another function:\\\\n\\"
                               addi $v0, $zero, 4
                               syscall  # END Output
@@ -378,10 +378,10 @@ lbl_17:                       li $t1, 10  # BEGIN if  # BEGIN If Condition  # Op
                               sw $t5, -12($fp)  # END PostInc
                               j lbl_17  # END for loop  # END if  # END True Branch
 lbl_18:                       sw $zero, -28($fp)  # Initializing b
-                              li $t9, 10  # Int Literal: 10
-                              sw $t9, -32($fp)
-                              lw $t8, -32($fp)
-                              sw $t8, -28($fp)  # BEGIN Assigning b  # END Assigning b
+                              li $t8, 10  # Int Literal: 10
+                              sw $t8, -32($fp)
+                              lw $t9, -32($fp)
+                              sw $t9, -28($fp)  # BEGIN Assigning b  # END Assigning b
 lbl_19:                       li $t0, 0  # BEGIN for loop  # BEGIN if  # BEGIN If Condition  # Operation: GT64  # Int Literal: 0
                               sw $t0, -36($fp)
                               lw $t2, -28($fp)
@@ -885,15 +885,15 @@ lbl_21:                       lw $ra, -8($fp)  # END Function body  # Restore re
 global_testShadowingHelper:   sw $fp, -4($sp)  # Save frame pointer
                               move $fp, $sp  # Set new frame pointer
                               sw $ra, -8($fp)  # Save return address  # BEGIN Function body
-                              li $t2, 4  # Int Literal: 4
-                              sw $t2, -12($fp)
-                              lw $t1, -12($fp)
-                              sw $t1, global_var  # BEGIN Assigning var  # END Assigning var
+                              li $t1, 4  # Int Literal: 4
+                              sw $t1, -12($fp)
+                              lw $t2, -12($fp)
+                              sw $t2, global_var  # BEGIN Assigning var  # END Assigning var
                               sw $zero, -16($fp)  # Initializing var
-                              li $t4, 2  # Int Literal: 2
-                              sw $t4, -20($fp)
-                              lw $t3, -20($fp)
-                              sw $t3, -16($fp)  # BEGIN Assigning var  # END Assigning var
+                              li $t3, 2  # Int Literal: 2
+                              sw $t3, -20($fp)
+                              lw $t4, -20($fp)
+                              sw $t4, -16($fp)  # BEGIN Assigning var  # END Assigning var
                               lw $v0, -16($fp)  # BEGIN Return
 lbl_22:                       lw $ra, -8($fp)  # END Function body  # Restore return address
                               lw $fp, -4($fp)  # Restore frame pointer
@@ -939,75 +939,75 @@ global_testLongExpression:    sw $fp, -4($sp)  # Save frame pointer
                               lw $t0, 0($fp)  # Getting argument \\"isFirstCall\\"
                               sw $t0, -12($fp)
                               sw $zero, -16($fp)  # Initializing a
-                              li $t2, 1  # Int Literal: 1
-                              sw $t2, -20($fp)
-                              lw $t1, -20($fp)
-                              sw $t1, -16($fp)  # BEGIN Assigning a  # END Assigning a
+                              li $t1, 1  # Int Literal: 1
+                              sw $t1, -20($fp)
+                              lw $t2, -20($fp)
+                              sw $t2, -16($fp)  # BEGIN Assigning a  # END Assigning a
                               sw $zero, -24($fp)  # Initializing b
-                              li $t4, 2  # Int Literal: 2
-                              sw $t4, -28($fp)
-                              lw $t3, -28($fp)
-                              sw $t3, -24($fp)  # BEGIN Assigning b  # END Assigning b
+                              li $t3, 2  # Int Literal: 2
+                              sw $t3, -28($fp)
+                              lw $t4, -28($fp)
+                              sw $t4, -24($fp)  # BEGIN Assigning b  # END Assigning b
                               sw $zero, -32($fp)  # Initializing c
-                              li $t6, 3  # Int Literal: 3
-                              sw $t6, -36($fp)
-                              lw $t5, -36($fp)
-                              sw $t5, -32($fp)  # BEGIN Assigning c  # END Assigning c
+                              li $t5, 3  # Int Literal: 3
+                              sw $t5, -36($fp)
+                              lw $t6, -36($fp)
+                              sw $t6, -32($fp)  # BEGIN Assigning c  # END Assigning c
                               sw $zero, -40($fp)  # Initializing d
-                              li $t8, 4  # Int Literal: 4
-                              sw $t8, -44($fp)
-                              lw $t7, -44($fp)
-                              sw $t7, -40($fp)  # BEGIN Assigning d  # END Assigning d
+                              li $t7, 4  # Int Literal: 4
+                              sw $t7, -44($fp)
+                              lw $t8, -44($fp)
+                              sw $t8, -40($fp)  # BEGIN Assigning d  # END Assigning d
                               sw $zero, -48($fp)  # Initializing e
-                              li $t0, 5  # Int Literal: 5
-                              sw $t0, -52($fp)
-                              lw $t9, -52($fp)
-                              sw $t9, -48($fp)  # BEGIN Assigning e  # END Assigning e
+                              li $t9, 5  # Int Literal: 5
+                              sw $t9, -52($fp)
+                              lw $t0, -52($fp)
+                              sw $t0, -48($fp)  # BEGIN Assigning e  # END Assigning e
                               sw $zero, -56($fp)  # Initializing f
-                              li $t2, 6  # Int Literal: 6
-                              sw $t2, -60($fp)
-                              lw $t1, -60($fp)
-                              sw $t1, -56($fp)  # BEGIN Assigning f  # END Assigning f
+                              li $t1, 6  # Int Literal: 6
+                              sw $t1, -60($fp)
+                              lw $t2, -60($fp)
+                              sw $t2, -56($fp)  # BEGIN Assigning f  # END Assigning f
                               sw $zero, -64($fp)  # Initializing g
-                              li $t4, 7  # Int Literal: 7
-                              sw $t4, -68($fp)
-                              lw $t3, -68($fp)
-                              sw $t3, -64($fp)  # BEGIN Assigning g  # END Assigning g
+                              li $t3, 7  # Int Literal: 7
+                              sw $t3, -68($fp)
+                              lw $t4, -68($fp)
+                              sw $t4, -64($fp)  # BEGIN Assigning g  # END Assigning g
                               lw $t9, -12($fp)  # BEGIN if  # BEGIN If Condition
                               beq $zero, $t9, lbl_25  # END If Condition
-                              lw $t7, -16($fp)  # BEGIN True Branch  # Operation: SUB64  # Operation: MULT64  # Operation: ADD64
-                              lw $t8, -24($fp)
-                              add $t6, $t7, $t8
-                              sw $t6, -72($fp)
-                              lw $t0, -40($fp)  # Operation: DIV64
-                              lw $t1, -32($fp)
-                              div $t0, $t1
-                              mflo $t9
-                              sw $t9, -76($fp)
-                              lw $t3, -72($fp)
-                              lw $t4, -76($fp)
-                              mult $t3, $t4
-                              mflo $t2
-                              sw $t2, -80($fp)
-                              li $t5, 0  # Operation: DIV64  # Int Literal: 0
-                              sw $t5, -84($fp)
-                              lw $t6, -84($fp)  # Setting argument 1
-                              sw $t6, -88($fp)
+                              lw $t6, -16($fp)  # BEGIN True Branch  # Operation: SUB64  # Operation: MULT64  # Operation: ADD64
+                              lw $t7, -24($fp)
+                              add $t5, $t6, $t7
+                              sw $t5, -72($fp)
+                              lw $t9, -40($fp)  # Operation: DIV64
+                              lw $t0, -32($fp)
+                              div $t9, $t0
+                              mflo $t8
+                              sw $t8, -76($fp)
+                              lw $t2, -72($fp)
+                              lw $t3, -76($fp)
+                              mult $t2, $t3
+                              mflo $t1
+                              sw $t1, -80($fp)
+                              li $t4, 0  # Operation: DIV64  # Int Literal: 0
+                              sw $t4, -84($fp)
+                              lw $t5, -84($fp)  # Setting argument 1
+                              sw $t5, -88($fp)
                               addi $sp, $sp, -88  # BEGIN Calling testLongExpression
                               jal global_testLongExpression
                               addi $sp, $sp, 88  # END Calling testLongExpression
                               sw $v0, -92($fp)
-                              lw $t8, -92($fp)
-                              lw $t9, -48($fp)
-                              div $t8, $t9
-                              mflo $t7
-                              sw $t7, -96($fp)
-                              lw $t1, -80($fp)
-                              lw $t2, -96($fp)
-                              sub $t0, $t1, $t2
-                              sw $t0, -100($fp)
-                              lw $t5, -100($fp)
-                              sw $t5, -16($fp)  # BEGIN Assigning a  # END Assigning a
+                              lw $t7, -92($fp)
+                              lw $t8, -48($fp)
+                              div $t7, $t8
+                              mflo $t6
+                              sw $t6, -96($fp)
+                              lw $t0, -80($fp)
+                              lw $t1, -96($fp)
+                              sub $t9, $t0, $t1
+                              sw $t9, -100($fp)
+                              lw $t2, -100($fp)
+                              sw $t2, -16($fp)  # BEGIN Assigning a  # END Assigning a
                               lw $t7, -16($fp)  # Setting argument 1
                               sw $t7, -112($fp)
                               li $t3, 2  # Operation: NEG64  # Int Literal: 2
@@ -1021,32 +1021,32 @@ global_testLongExpression:    sw $fp, -4($sp)  # Save frame pointer
                               jal global_assert
                               addi $sp, $sp, 116  # END True Branch  # END Calling assert
                               j lbl_26
-lbl_25:                       lw $t0, -56($fp)  # BEGIN False Branch  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64
-                              lw $t1, -64($fp)
-                              add $t9, $t0, $t1
-                              sw $t9, -120($fp)
-                              lw $t3, -48($fp)
-                              lw $t4, -120($fp)
-                              add $t2, $t3, $t4
-                              sw $t2, -124($fp)
-                              lw $t6, -40($fp)
-                              lw $t7, -124($fp)
-                              add $t5, $t6, $t7
-                              sw $t5, -128($fp)
-                              lw $t9, -32($fp)
-                              lw $t0, -128($fp)
+lbl_25:                       lw $t9, -56($fp)  # BEGIN False Branch  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64
+                              lw $t0, -64($fp)
                               add $t8, $t9, $t0
-                              sw $t8, -132($fp)
-                              lw $t2, -24($fp)
-                              lw $t3, -132($fp)
+                              sw $t8, -120($fp)
+                              lw $t2, -48($fp)
+                              lw $t3, -120($fp)
                               add $t1, $t2, $t3
-                              sw $t1, -136($fp)
-                              lw $t5, -16($fp)
-                              lw $t6, -136($fp)
+                              sw $t1, -124($fp)
+                              lw $t5, -40($fp)
+                              lw $t6, -124($fp)
                               add $t4, $t5, $t6
-                              sw $t4, -140($fp)
-                              lw $t8, -140($fp)
-                              sw $t8, -16($fp)  # BEGIN Assigning a  # END Assigning a
+                              sw $t4, -128($fp)
+                              lw $t8, -32($fp)
+                              lw $t9, -128($fp)
+                              add $t7, $t8, $t9
+                              sw $t7, -132($fp)
+                              lw $t1, -24($fp)
+                              lw $t2, -132($fp)
+                              add $t0, $t1, $t2
+                              sw $t0, -136($fp)
+                              lw $t4, -16($fp)
+                              lw $t5, -136($fp)
+                              add $t3, $t4, $t5
+                              sw $t3, -140($fp)
+                              lw $t6, -140($fp)
+                              sw $t6, -16($fp)  # BEGIN Assigning a  # END Assigning a
                               lw $t8, -16($fp)  # Setting argument 1
                               sw $t8, -148($fp)
                               li $t7, 28  # Int Literal: 28

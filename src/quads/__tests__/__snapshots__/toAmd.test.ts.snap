@@ -292,10 +292,10 @@ lbl_6:                        subq $72, %rsp  # BEGIN Calling break
                               push %r13
                               push %r14
                               push %r15
-                              movq global_globalPointer, %r14  # Setting argument 1
-                              push %r14
-                              movq -32(%rbp), %r14  # Setting argument 2
-                              push %r14
+                              movq global_globalPointer, %r13  # Setting argument 1
+                              push %r13
+                              movq -32(%rbp), %r13  # Setting argument 2
+                              push %r13
                               callq global_twice
                               popq %r15
                               popq %r14
@@ -304,8 +304,8 @@ lbl_6:                        subq $72, %rsp  # BEGIN Calling break
                               popq %rbx
                               addq $120, %rsp  # END Calling twice
                               movq %rax, -104(%rbp)
-                              movq -104(%rbp), %r13
-                              movq %r13, -80(%rbp)  # BEGIN Assigning result  # END Assigning result
+                              movq -104(%rbp), %r14
+                              movq %r14, -80(%rbp)  # BEGIN Assigning result  # END Assigning result
                               movq $str_5, %rdi  # BEGIN Output  # String Literal: \\"Calling a function returned from another function:\\\\n\\"
                               subq $104, %rsp  # BEGIN Calling printString
                               push %rbx
@@ -785,8 +785,8 @@ lbl_17:                       movq $10, -32(%rbp)  # BEGIN if  # BEGIN If Condit
                               jmp lbl_17  # END for loop  # END if  # END True Branch
 lbl_18:                       movq $0, -56(%rbp)  # Initializing b
                               movq $10, -64(%rbp)  # Int Literal: 10
-                              movq -64(%rbp), %r14
-                              movq %r14, -56(%rbp)  # BEGIN Assigning b  # END Assigning b
+                              movq -64(%rbp), %r15
+                              movq %r15, -56(%rbp)  # BEGIN Assigning b  # END Assigning b
 lbl_19:                       movq $0, -72(%rbp)  # BEGIN for loop  # BEGIN if  # BEGIN If Condition  # Operation: GT64  # Int Literal: 0
                               movq -56(%rbp), %r13
                               movq -72(%rbp), %r14
@@ -1681,12 +1681,12 @@ lbl_21:                       leave  # END Function body
 global_testShadowingHelper:   push %rbp
                               movq %rsp, %rbp  # BEGIN Function body
                               movq $4, -24(%rbp)  # Int Literal: 4
-                              movq -24(%rbp), %r12
-                              movq %r12, global_var  # BEGIN Assigning var  # END Assigning var
+                              movq -24(%rbp), %r13
+                              movq %r13, global_var  # BEGIN Assigning var  # END Assigning var
                               movq $0, -32(%rbp)  # Initializing var
                               movq $2, -40(%rbp)  # Int Literal: 2
-                              movq -40(%rbp), %r14
-                              movq %r14, -32(%rbp)  # BEGIN Assigning var  # END Assigning var
+                              movq -40(%rbp), %r15
+                              movq %r15, -32(%rbp)  # BEGIN Assigning var  # END Assigning var
                               movq -32(%rbp), %rax  # BEGIN Return
 lbl_22:                       leave  # END Function body
                               retq
@@ -1757,49 +1757,49 @@ global_testLongExpression:    push %rbp
                               movq %rbx, -24(%rbp)
                               movq $0, -32(%rbp)  # Initializing a
                               movq $1, -40(%rbp)  # Int Literal: 1
-                              movq -40(%rbp), %r12
-                              movq %r12, -32(%rbp)  # BEGIN Assigning a  # END Assigning a
+                              movq -40(%rbp), %r13
+                              movq %r13, -32(%rbp)  # BEGIN Assigning a  # END Assigning a
                               movq $0, -48(%rbp)  # Initializing b
                               movq $2, -56(%rbp)  # Int Literal: 2
-                              movq -56(%rbp), %r14
-                              movq %r14, -48(%rbp)  # BEGIN Assigning b  # END Assigning b
+                              movq -56(%rbp), %r15
+                              movq %r15, -48(%rbp)  # BEGIN Assigning b  # END Assigning b
                               movq $0, -64(%rbp)  # Initializing c
                               movq $3, -72(%rbp)  # Int Literal: 3
-                              movq -72(%rbp), %rbx
-                              movq %rbx, -64(%rbp)  # BEGIN Assigning c  # END Assigning c
+                              movq -72(%rbp), %r12
+                              movq %r12, -64(%rbp)  # BEGIN Assigning c  # END Assigning c
                               movq $0, -80(%rbp)  # Initializing d
                               movq $4, -88(%rbp)  # Int Literal: 4
-                              movq -88(%rbp), %r13
-                              movq %r13, -80(%rbp)  # BEGIN Assigning d  # END Assigning d
+                              movq -88(%rbp), %r14
+                              movq %r14, -80(%rbp)  # BEGIN Assigning d  # END Assigning d
                               movq $0, -96(%rbp)  # Initializing e
                               movq $5, -104(%rbp)  # Int Literal: 5
-                              movq -104(%rbp), %r15
-                              movq %r15, -96(%rbp)  # BEGIN Assigning e  # END Assigning e
+                              movq -104(%rbp), %rbx
+                              movq %rbx, -96(%rbp)  # BEGIN Assigning e  # END Assigning e
                               movq $0, -112(%rbp)  # Initializing f
                               movq $6, -120(%rbp)  # Int Literal: 6
-                              movq -120(%rbp), %r12
-                              movq %r12, -112(%rbp)  # BEGIN Assigning f  # END Assigning f
+                              movq -120(%rbp), %r13
+                              movq %r13, -112(%rbp)  # BEGIN Assigning f  # END Assigning f
                               movq $0, -128(%rbp)  # Initializing g
                               movq $7, -136(%rbp)  # Int Literal: 7
-                              movq -136(%rbp), %r14
-                              movq %r14, -128(%rbp)  # BEGIN Assigning g  # END Assigning g
+                              movq -136(%rbp), %r15
+                              movq %r15, -128(%rbp)  # BEGIN Assigning g  # END Assigning g
                               movq -24(%rbp), %r15  # BEGIN if  # BEGIN If Condition
                               cmpq $0, %r15
                               je lbl_25  # END If Condition
-                              movq -32(%rbp), %r13  # BEGIN True Branch  # Operation: SUB64  # Operation: MULT64  # Operation: ADD64
-                              movq -48(%rbp), %r14
-                              movq %r13, %r12
-                              addq %r14, %r12
-                              movq %r12, -144(%rbp)
-                              movq -80(%rbp), %rbx  # Operation: DIV64
-                              movq -64(%rbp), %r12
+                              movq -32(%rbp), %r12  # BEGIN True Branch  # Operation: SUB64  # Operation: MULT64  # Operation: ADD64
+                              movq -48(%rbp), %r13
+                              movq %r12, %rbx
+                              addq %r13, %rbx
+                              movq %rbx, -144(%rbp)
+                              movq -80(%rbp), %r15  # Operation: DIV64
+                              movq -64(%rbp), %rbx
                               movq $0, %rdx
-                              movq %rbx, %rax
-                              idivq %r12
+                              movq %r15, %rax
+                              idivq %rbx
                               movq %rax, -152(%rbp)
-                              movq -144(%rbp), %r14
+                              movq -144(%rbp), %r13
                               movq -152(%rbp), %rax
-                              imulq %r14
+                              imulq %r13
                               movq %rax, -160(%rbp)
                               movq $0, -168(%rbp)  # Operation: DIV64  # BEGIN Calling testLongExpression  # Int Literal: 0
                               subq $176, %rsp
@@ -1808,8 +1808,8 @@ global_testLongExpression:    push %rbp
                               push %r13
                               push %r14
                               push %r15
-                              movq -168(%rbp), %r12  # Setting argument 1
-                              push %r12
+                              movq -168(%rbp), %rbx  # Setting argument 1
+                              push %rbx
                               callq global_testLongExpression
                               popq %r15
                               popq %r14
@@ -1818,19 +1818,19 @@ global_testLongExpression:    push %rbp
                               popq %rbx
                               addq $184, %rsp  # END Calling testLongExpression
                               movq %rax, -184(%rbp)
-                              movq -184(%rbp), %r14
-                              movq -96(%rbp), %r15
+                              movq -184(%rbp), %r13
+                              movq -96(%rbp), %r14
                               movq $0, %rdx
-                              movq %r14, %rax
-                              idivq %r15
+                              movq %r13, %rax
+                              idivq %r14
                               movq %rax, -192(%rbp)
-                              movq -160(%rbp), %r12
-                              movq -192(%rbp), %r13
-                              movq %r12, %rbx
-                              subq %r13, %rbx
-                              movq %rbx, -200(%rbp)
-                              movq -200(%rbp), %rbx
-                              movq %rbx, -32(%rbp)  # BEGIN Assigning a  # END Assigning a
+                              movq -160(%rbp), %rbx
+                              movq -192(%rbp), %r12
+                              movq %rbx, %r15
+                              subq %r12, %r15
+                              movq %r15, -200(%rbp)
+                              movq -200(%rbp), %r13
+                              movq %r13, -32(%rbp)  # BEGIN Assigning a  # END Assigning a
                               movq $2, -208(%rbp)  # BEGIN Calling assert  # Operation: NEG64  # Int Literal: 2
                               movq -208(%rbp), %r15
                               neg %r15
@@ -1853,38 +1853,38 @@ global_testLongExpression:    push %rbp
                               popq %rbx
                               addq $248, %rsp  # END True Branch  # END Calling assert
                               jmp lbl_26
-lbl_25:                       movq -112(%rbp), %rbx  # BEGIN False Branch  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64
-                              movq -128(%rbp), %r12
-                              movq %rbx, %r15
-                              addq %r12, %r15
-                              movq %r15, -240(%rbp)
-                              movq -96(%rbp), %r14
-                              movq -240(%rbp), %r15
-                              movq %r14, %r13
-                              addq %r15, %r13
-                              movq %r13, -248(%rbp)
-                              movq -80(%rbp), %r12
-                              movq -248(%rbp), %r13
-                              movq %r12, %rbx
-                              addq %r13, %rbx
-                              movq %rbx, -256(%rbp)
-                              movq -64(%rbp), %r15
-                              movq -256(%rbp), %rbx
+lbl_25:                       movq -112(%rbp), %r15  # BEGIN False Branch  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64  # Operation: ADD64
+                              movq -128(%rbp), %rbx
                               movq %r15, %r14
                               addq %rbx, %r14
-                              movq %r14, -264(%rbp)
-                              movq -48(%rbp), %r13
-                              movq -264(%rbp), %r14
+                              movq %r14, -240(%rbp)
+                              movq -96(%rbp), %r13
+                              movq -240(%rbp), %r14
                               movq %r13, %r12
                               addq %r14, %r12
-                              movq %r12, -272(%rbp)
-                              movq -32(%rbp), %rbx
-                              movq -272(%rbp), %r12
+                              movq %r12, -248(%rbp)
+                              movq -80(%rbp), %rbx
+                              movq -248(%rbp), %r12
                               movq %rbx, %r15
                               addq %r12, %r15
-                              movq %r15, -280(%rbp)
-                              movq -280(%rbp), %r14
-                              movq %r14, -32(%rbp)  # BEGIN Assigning a  # END Assigning a
+                              movq %r15, -256(%rbp)
+                              movq -64(%rbp), %r14
+                              movq -256(%rbp), %r15
+                              movq %r14, %r13
+                              addq %r15, %r13
+                              movq %r13, -264(%rbp)
+                              movq -48(%rbp), %r12
+                              movq -264(%rbp), %r13
+                              movq %r12, %rbx
+                              addq %r13, %rbx
+                              movq %rbx, -272(%rbp)
+                              movq -32(%rbp), %r15
+                              movq -272(%rbp), %rbx
+                              movq %r15, %r14
+                              addq %rbx, %r14
+                              movq %r14, -280(%rbp)
+                              movq -280(%rbp), %r12
+                              movq %r12, -32(%rbp)  # BEGIN Assigning a  # END Assigning a
                               movq $28, -288(%rbp)  # BEGIN Calling assert  # Int Literal: 28
                               subq $312, %rsp
                               push %rbx

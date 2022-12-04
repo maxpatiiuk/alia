@@ -40,7 +40,7 @@ fun_b:  nop
         enter b
         getarg 1 [d]
         [tmp6] := 3 ADD64 [c]
-        [c] := [tmp1]
+        [c] := [tmp5]
         [tmp8] := 3 ADD64 [c]
         REPORT [tmp8]
         REPORT [a]
@@ -139,9 +139,9 @@ fun_main_a_A_A_a_A_a_A_A_A_A_A_A_A_A:  nop
                                        getarg 1 [a]
                                        [b] := [tmp1]
                                        [tmp8] := 3 ADD64 [c]
-                                       [c] := [tmp2]
+                                       [c] := [tmp6]
                                        [c] := [tmp8]
-                                       [c] := [tmp7]
+                                       [c] := [tmp9]
                                        IFZ [tmp12] GOTO lbl_3
                                        REPORT [c]
                                        goto lbl_4
@@ -153,50 +153,50 @@ lbl_4:                                 nop
                                        REPORT [tmp17]
 lbl_5:                                 nop
                                        [tmp19] := 3 SUB64 [c]
-                                       [c] := [tmp3]
+                                       [c] := [tmp7]
                                        [tmp21] := 3 ADD64 [c]
-                                       [c] := [tmp8]
+                                       [c] := [tmp2]
                                        [tmp23] := 3 DIV64 [c]
-                                       [c] := [tmp3]
+                                       [c] := [tmp7]
                                        [tmp25] := 3 MULT64 [c]
-                                       [c] := [tmp8]
+                                       [c] := [tmp2]
                                        [tmp27] := 3 ADD64 [c]
-                                       [c] := [tmp3]
+                                       [c] := [tmp7]
                                        [tmp29] := 3 ADD64 [c]
-                                       [c] := [tmp8]
+                                       [c] := [tmp2]
                                        [tmp31] := 3 ADD64 [c]
-                                       [c] := [tmp3]
+                                       [c] := [tmp7]
                                        [tmp33] := 3 ADD64 [c]
-                                       [c] := [tmp8]
+                                       [c] := [tmp2]
                                        [tmp35] := 3 ADD64 [c]
-                                       [c] := [tmp3]
+                                       [c] := [tmp7]
                                        [tmp37] := 3 ADD64 [c]
-                                       [c] := [tmp8]
+                                       [c] := [tmp2]
                                        [tmp39] := 3 ADD64 [c]
-                                       [c] := [tmp3]
+                                       [c] := [tmp7]
                                        [tmp41] := 3 ADD64 [c]
-                                       [c] := [tmp8]
+                                       [c] := [tmp2]
                                        [tmp43] := 3 ADD64 [c]
-                                       [c] := [tmp3]
+                                       [c] := [tmp7]
                                        [tmp45] := 3 ADD64 [c]
-                                       [c] := [tmp8]
+                                       [c] := [tmp2]
                                        [tmp47] := 3 ADD64 [c]
-                                       [c] := [tmp3]
+                                       [c] := [tmp7]
                                        [tmp49] := 3 ADD64 [c]
-                                       [c] := [tmp8]
+                                       [c] := [tmp2]
                                        [tmp51] := 3 ADD64 [c]
-                                       [c] := [tmp3]
+                                       [c] := [tmp7]
                                        [tmp53] := 3 ADD64 [c]
-                                       [c] := [tmp8]
+                                       [c] := [tmp2]
                                        [tmp55] := 3 ADD64 [c]
-                                       [c] := [tmp3]
+                                       [c] := [tmp7]
                                        [c] := [c] SUB64 1
                                        [c] := [c] ADD64 1
                                        [tmp58] := NEG64 [c]
-                                       [c] := [tmp2]
+                                       [c] := [tmp5]
                                        [tmp60] := [c] ADD64 3
                                        [tmp61] := NEG64 [tmp60]
-                                       [c] := [tmp6]
+                                       [c] := [tmp3]
 lbl_2:                                 nop
                                        leave main_a_A_A_a_A_a_A_A_A_A_A_A_A_A
 [BEGIN d LOCALS]
@@ -228,7 +228,6 @@ tmp21 (tmp var of 8 bytes)
 tmp22 (tmp var of 8 bytes)
 tmp23 (tmp var of 8 bytes)
 tmp24 (tmp var of 8 bytes)
-tmp25 (tmp var of 8 bytes)
 [END d LOCALS]
 fun_d:   nop
          enter d
@@ -241,13 +240,13 @@ fun_d:   nop
          [tmp6] := 1 AND64 [v]
          [tmp7] := NOT64 [tmp6]
          [tmp9] := [tmp7] OR64 0
-         [v] := [tmp1]
+         [v] := [tmp2]
          [tmp10] := [d] GT64 [d]
          [tmp11] := [d] LT64 [d]
          [tmp12] := [tmp10] EQ64 [tmp11]
-         [v] := [tmp3]
+         [v] := [tmp2]
          [tmp13] := [d] NEQ64 [d]
-         [v] := [tmp3]
+         [v] := [tmp6]
          setarg 1 4
          call b
 lbl_7:   nop
@@ -255,18 +254,18 @@ lbl_7:   nop
          setarg 1 4
          call b
          getret [tmp19]
-         [d] := [tmp0]
+         [d] := [tmp2]
          goto lbl_7
 lbl_8:   nop
 lbl_9:   nop
          IFZ [tmp22] GOTO lbl_10
          REPORT [i]
-         [tmp24] := [tmp24] ADD64 1
-         [i] := [tmp8]
+         [tmp24] := [i] ADD64 1
+         [i] := [tmp2]
          goto lbl_9
 lbl_10:  nop
-         MAYHEM [tmp26]
-         [d] := [tmp3]
+         MAYHEM [tmp25]
+         [d] := [tmp4]
 lbl_6:   nop
          leave d`);
 });

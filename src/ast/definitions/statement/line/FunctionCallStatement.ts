@@ -27,6 +27,6 @@ export class FunctionCallStatement extends LineStatement {
   }
 
   public toQuads(context: QuadsContext) {
-    return this.expression.toPartialQuads(context);
+    return this.expression.toPartialQuads(context, false);
   }
 }

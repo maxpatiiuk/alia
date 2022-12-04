@@ -20,8 +20,6 @@ export const declareLinkages = ({ builder, module }: LlvmContext): void =>
       [builder.getInt8PtrTy()],
       false
     ),
-    // FIXME: run infile.dg tests
-    // FIXME: update mips and amd tests
     // FIXME: add llvm tests
     // FIXME: test this
     getBool: llvm.FunctionType.get(builder.getInt1Ty(), [], false),
