@@ -7,15 +7,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/maxxxxxdlp/tts-reader.git"
+    "url": "git+https://github.com/maxpatiiuk/tts-reader.git"
   },
   "type": "module",
   "author": "Max Patiiuk",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/maxxxxxdlp/tts-reader/issues"
+    "url": "https://github.com/maxpatiiuk/tts-reader/issues"
   },
-  "homepage": "https://github.com/maxxxxxdlp/tts-reader#readme",
+  "homepage": "https://github.com/maxpatiiuk/tts-reader#readme",
   "dependencies": {
     "chalk": "^5.1.2",
     "commander": "^9.4.0",

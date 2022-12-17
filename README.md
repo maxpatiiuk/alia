@@ -330,9 +330,9 @@ Three parsers have been implemented:
 - LL(1) Parser
 
   LL(1) parser was implemented in a separate project and is available at
-  [maxxxxxdlp/leto](https://github.com/maxxxxxdlp/leto).
+  [maxpatiiuk/leto](https://github.com/maxpatiiuk/leto).
 
-  Unlike this project, `maxxxxxdlp/leto` is geared towards making it trivially
+  Unlike this project, `maxpatiiuk/leto` is geared towards making it trivially
   easy to customize the grammar and the syntax-directed translation.
 
 #### Syntax-directed translation
@@ -633,9 +633,9 @@ A high-level overview of the steps necessary to extend the Alia language:
 - Add test cases for the changes made in each of the above steps.
 
 If you are interested in a language that is easier to customize, take a look at
-[maxxxxxdlp/leto](https://github.com/maxxxxxdlp/leto).
+[maxpatiiuk/leto](https://github.com/maxpatiiuk/leto).
 
-Unlike this project, `maxxxxxdlp/leto` is geared towards making it trivially
+Unlike this project, `maxpatiiuk/leto` is geared towards making it trivially
 easy to customize the grammar and the syntax-directed translation.
 
 ## Appendix 2: Generating a graph of the grammar
