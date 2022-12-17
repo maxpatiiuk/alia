@@ -80,7 +80,7 @@ run in an [interpreter](#running-interpreter).
         + [MIPS](#mips-1)
         + [x64](#x64)
         + [LLVM](#llvm)
-    * [Appendix 4: Naming](#appendix-3-naming)
+    * [Appendix 4: Naming](#appendix-4-naming)
 
 ## Prerequisites
 
@@ -327,12 +327,13 @@ Three parsers have been implemented:
 
   [More information about CYK parsers](https://en.wikipedia.org/wiki/CYK_algorithm)
 
-- LR(1) Parser
+- LL(1) Parser
 
-  // TODO: update the URL
+  LL(1) parser was implemented in a separate project and is available at
+  [maxxxxxdlp/leto](https://github.com/maxxxxxdlp/leto).
 
-  LR(1) parser was implemented in a separate project and is available at
-  [maxxxxxdlp/lr1-paresr](https://github.com/maxxxxxdlp/lr1-paresr)
+  Unlike this project, `maxxxxxdlp/leto` is geared towards making it trivially
+  easy to customize the grammar and the syntax-directed translation.
 
 #### Syntax-directed translation
 
@@ -629,6 +630,12 @@ A high-level overview of the steps necessary to extend the Alia language:
 - If necessary, define new instructions.
   See [Final code generation](#final-code-generation)
 - Add test cases for the changes made in each of the above steps.
+
+If you are interested in a language that is easier to customize, take a look at
+[maxxxxxdlp/leto](https://github.com/maxxxxxdlp/leto).
+
+Unlike this project, `maxxxxxdlp/leto` is geared towards making it trivially
+easy to customize the grammar and the syntax-directed translation.
 
 ## Appendix 2: Generating a graph of the grammar
 
