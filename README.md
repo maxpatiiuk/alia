@@ -40,7 +40,7 @@ run in an [interpreter](#running-interpreter).
 
 ## Contents
 
-- [alia](#alia)
+- [Alia](#alia)
     * [Contents](#contents)
     * [Prerequisites](#prerequisites)
     * [Installation](#installation)
@@ -220,7 +220,7 @@ Jest is used for unit testing.
 You can run it like this:
 
 ```sh
-make test
+npm test
 ```
 
 For example, automated tests for the interpreter are in

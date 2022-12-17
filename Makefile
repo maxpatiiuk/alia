@@ -8,9 +8,6 @@ LLC := /home/a807d786/llvm_dist/bin/llc
 all:
 	npm install
 
-test:
-	npm test
-
 link:
 	gcc -o ./amdStd.o -c ./src/instructions/definitions/std/amd.c
 	as -o asm.a $(OUTFILE)
