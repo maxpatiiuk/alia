@@ -1,4 +1,3 @@
-import { theories } from '../../../../t2/src/tests/utils.js';
 import {
   exportsForTests,
   findAllSubsets,
@@ -6,6 +5,7 @@ import {
   lineToString,
   saturateSets,
 } from '../firstSets.js';
+import {theories} from '../../tests/utils.js';
 
 const { getSetsLength, buildSet } = exportsForTests;
 

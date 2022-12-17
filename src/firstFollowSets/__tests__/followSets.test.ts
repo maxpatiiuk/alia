@@ -1,9 +1,9 @@
-import { theories } from '../../../../t2/src/tests/utils.js';
 import {
   exportsForTests,
   findAllIndexesOf,
   getFollowSets,
 } from '../followSets.js';
+import {theories} from '../../tests/utils.js';
 
 const { findTerminalEndings } = exportsForTests;
 
