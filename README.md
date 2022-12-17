@@ -584,7 +584,8 @@ declaration.
 
 ## `alia` Documentation
 
-// TODO: add documentation on the grammar, names and types
+[Language Specification](./docs/README.md) includes detailed description of the
+Lexical system, Syntactic analysis and the Type System.
 
 ## Development Documentation
 
@@ -730,9 +731,7 @@ The following pages have been helpful during the development of the compiler.
 
 ## Appendix 4: Naming
 
-The name of the language comes from "Alia Cult" in the Dune book series.
-No special meaning resides behind the choice; I just though it sounds cool,
-is short, yet distinct.
+The language is named after "Alia Atreides" from the Dune book series.
 
 My #1 source of sci-fi sounding terms is the [Dune terminology](https://dune.fandom.com/wiki/List_of_Dune_terminology)
 page. Also, glossaries of sci-fi terms are helpful
