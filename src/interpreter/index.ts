@@ -1,5 +1,5 @@
 /**
- * TypeScript-based interpreter for Drewgon
+ * TypeScript-based interpreter for Alia
  */
 
 import { createInterface } from 'node:readline/promises';
@@ -11,8 +11,8 @@ const stream = createInterface({
   output: process.stdout,
 });
 console.log(
-  'Welcome to dragoninterp!\n' +
-    'Enter Drewgon code to be interpreted\n' +
+  'Welcome to aliainterp!\n' +
+    'Enter Alia code to be interpreted\n' +
     'Enter :help for help\n'
 );
 

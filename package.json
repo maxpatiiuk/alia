@@ -1,7 +1,7 @@
 {
-  "name": "dgc",
+  "name": "alia",
   "version": "1.0.0",
-  "description": "The ultimate Drewgon compiler",
+  "description": "The ultimate Alia compiler",
   "scripts": {
     "test": "tsc && jest"
   },

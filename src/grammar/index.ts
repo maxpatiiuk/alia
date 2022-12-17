@@ -1,5 +1,5 @@
 /**
- * A grammar for Drewgon, with support for syntax directed translation
+ * A grammar for Alia, with support for syntax directed translation
  *
  * Relies on the tokens defined in ./src/tokens/
  * Also defines the rules for translation from parse tree to AST nodes
@@ -62,7 +62,7 @@ function type<T extends AstNode, V extends RA<new (...args: RA<any>) => T>>(
 }
 
 /**
- * A type-safe definition of a context-free grammar for Drewgon language
+ * A type-safe definition of a context-free grammar for Alia language
  * Need to wrap in store() to fix circular dependency
  */
 export const grammar = store(() =>

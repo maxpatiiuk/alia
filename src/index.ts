@@ -9,7 +9,7 @@ import fs from 'node:fs';
 import { run } from './frontEnd.js';
 import { processAst } from './backEnd.js';
 
-program.name('dgc').description('The ultimate Drewgon compiler');
+program.name('alia').description('The ultimate Alia compiler');
 
 let input = '';
 

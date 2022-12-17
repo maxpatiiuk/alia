@@ -1,12 +1,10 @@
-# dgc
+# Alia
 
-The ultimate Drewgon compiler and interpreter.
-
-// TODO: rename the language (check for references to dg, dgc, dragon, Drewgon)
+The ultimate Alia compiler and interpreter.
 
 Written in TypeScript.
 
-Drewgon follows c-like syntax. Example code:
+Alia follows c-like syntax. Example code:
 
 ```javascript
 int x;
@@ -32,17 +30,17 @@ int main() {
 }
 ```
 
-A larger example is provided in [`./infile.dg`](./infile.dg). It includes an
+A larger example is provided in [`./infile.alia`](./infile.alia). It includes an
 implementation of a tiny testing library, that is then used to test the very
 language it is written in.
 
-Drewgon can be compiled down
+Alia can be compiled down
 to [x64, MIPS, and LLVM assembly](#running-compiler). It can also be
 run in an [interpreter](#running-interpreter).
 
 ## Contents
 
-- [dgc](#dgc)
+- [alia](#alia)
     * [Contents](#contents)
     * [Prerequisites](#prerequisites)
     * [Installation](#installation)
@@ -72,7 +70,7 @@ run in an [interpreter](#running-interpreter).
                 * [MIPS](#mips)
                 * [x64 and LLVM](#x64-and-llvm)
             - [Interpreter](#interpreter)
-    * [`dgc` Documentation](#dgc-documentation)
+    * [`alia` Documentation](#alia-documentation)
     * [Development Documentation](#development-documentation)
     * [Appendix 1: Extending the language](#appendix-1-extending-the-language)
     * [Appendix 2: Generating a graph of the grammar](#appendix-2-generating-a-graph-of-the-grammar)
@@ -82,6 +80,7 @@ run in an [interpreter](#running-interpreter).
         + [MIPS](#mips-1)
         + [x64](#x64)
         + [LLVM](#llvm)
+    * [Appendix 4: Naming](#appendix-3-naming)
 
 ## Prerequisites
 
@@ -97,7 +96,7 @@ run in an [interpreter](#running-interpreter).
    ,
    if it isn't found automatically.
 
-2. Install dgc dependencies:
+2. Install alia dependencies:
 
    ```sh
    npm install
@@ -108,7 +107,7 @@ run in an [interpreter](#running-interpreter).
 To see available options, run the script with the `--help` argument:
 
 ```sh
-./dgc --help
+./alia --help
 ```
 
 ### Compiling to x64
@@ -116,7 +115,7 @@ To see available options, run the script with the `--help` argument:
 Example call:
 
 ```sh
-./dgc infile.dg -o outfile.s
+./alia infile.alia -o outfile.s
 ```
 
 By default, compilation runs intermediate code optimization and final code
@@ -149,7 +148,7 @@ Example of generated x64 assembly:
 Example call:
 
 ```
-./dgc infile.dg -m mips.asm 2> errors.txt
+./alia infile.alia -m mips.asm 2> errors.txt
 ```
 
 Then, open `mips.asm` in MARS and run it.
@@ -172,7 +171,7 @@ Workflow for an x64 machine:
 
 ```sh
 # Compile to LLVM assembly
-./dgc infile.dg -l llvm.ll
+./alia infile.alia -l llvm.ll
 
 # Optimize the LLVM assembly
 # NOTE, you will have to change the paths to the LLVM binaries
@@ -197,12 +196,12 @@ Example LLVM output:
 Start the interpreter:
 
 ```sh
-./dragoninterp
+./aliainterp
 ```
 
 The interpreter supports several meta-commands. Type `:help` to see those.
 
-Several restrictions are lifted when running Drewgon in an interpreter:
+Several restrictions are lifted when running Alia in an interpreter:
 
 - Semicolon for the last line is optional
 - Variable re-declarations are treated as shadowing the variable, rather than
@@ -236,7 +235,7 @@ Example test run:
 
 A deep dive into the architecture of the compiler follows.
 
-`dgc` consists of 5 parts. When compiling a program, you go through each of
+`alia` consists of 5 parts. When compiling a program, you go through each of
 these
 stages in order:
 
@@ -262,7 +261,7 @@ of the file.
 You can run the compiler in tokenizing-only mode like this:
 
 ```sh
-./dgc infile.dg --tokensOutput tokens.out
+./alia infile.alia --tokensOutput tokens.out
 ```
 
 This would output the token stream into `./tokens.out` text file.
@@ -288,7 +287,7 @@ Three parsers have been implemented:
   This parser is used by default. You can explicitly specify it like this:
 
   ```sh
-  ./dgc infile.dg --parser SLR -m mips.asm
+  ./alia infile.alia --parser SLR -m mips.asm
   ```
 
   The source code for the SLR parser is in [`./src/slrParser`](./src/slrParser)
@@ -317,7 +316,7 @@ Three parsers have been implemented:
   You can run the CYK Parser like this:
 
   ```sh
-  ./dgc infile.dg --parser CYK
+  ./alia infile.alia --parser CYK
   ```
 
   The program will exit with exit code 0 on successful parsing.
@@ -360,7 +359,7 @@ Source code is in [`./src/unparseParseTree`](./src/unparseParseTree)
 Example call:
 
 ```sh
-./dgc infile.dg --unparseMode parseTree --unparse pretty-output.dg
+./alia infile.alia --unparseMode parseTree --unparse pretty-output.alia
 ```
 
 ##### Abstract syntax tree (AST) generation
@@ -385,7 +384,7 @@ AST can be used as an excellent source for pretty-printing the code.
 Example call:
 
 ```sh
-./dgc infile.dg --unparse pretty-output.dg
+./alia infile.alia --unparse pretty-output.alia
 ```
 
 (you don't have to specify the `--unparseMode ast` argument, as it is the
@@ -401,8 +400,6 @@ thrown.
 
 > Name analysis is the process of assigning a scope to each identifier in the
 > program. It also checks for duplicate declarations and undeclared identifiers.
->
-> – according to GitHub Copilot
 
 The definitions of all AST nodes are
 in [`./src/ast/definition/`](./src/ast/definitions)
@@ -420,8 +417,6 @@ Example name analysis output:
 
 > Type analysis is the process of assigning a type to each identifier in the
 > program. It also checks for type mismatches and other type-related errors.
->
-> – according to GitHub Copilot
 
 [More information about type analysis](https://en.wikipedia.org/wiki/Type_system)
 
@@ -442,7 +437,7 @@ You can also output the prettified source code with name analysis and type
 analysis annotations like this:
 
 ```sh
-./dgc infile.dg --namedUnparse named.dg
+./alia infile.alia --namedUnparse named.alia
 ```
 
 This is useful for debugging.
@@ -470,7 +465,7 @@ All Quads are defined in the [./src/quads](./src/quads) directory.
 For debugging purposes, you can make the compiler output the intermediate code:
 
 ```sh
-./dgc infile.dg -a 3ac.txt
+./alia infile.alia -a 3ac.txt
 ```
 
 Example Quads output:
@@ -586,13 +581,13 @@ value.
 Since function pointers are supported, the variable value may point to function
 declaration.
 
-## `dgc` Documentation
+## `alia` Documentation
 
 // TODO: add documentation on the grammar, names and types
 
 ## Development Documentation
 
-`dgc` is built using TypeScript.
+`alia` is built using TypeScript.
 
 You can run TypeScript in Node.js using on-the-fly transpilation like this:
 
@@ -620,7 +615,7 @@ follow [the assembly debugging commands](http://web.cecs.pdx.edu/~apt/cs510comp/
 
 ## Appendix 1: Extending the language
 
-A high-level overview of the steps necessary to extend the Drewgon language:
+A high-level overview of the steps necessary to extend the Alia language:
 
 - Read the [Compiler Architecture](#architecture) section of this document
 - If necessary, add additional tokens.
@@ -651,7 +646,7 @@ be converted into an SVG or a PNG.
 First, create a `parser.dot` text file (in the DOT format):
 
 ```
-./dgc infile.dg --diagramPath parser.dot
+./alia infile.alia --diagramPath parser.dot
 ```
 
 Then, convert it into a `parser.svg` image (assuming dot is installed):
@@ -725,3 +720,14 @@ The following pages have been helpful during the development of the compiler.
 
 - https://ecotrust-canada.github.io/markdown-toc/
 - https://carbon.now.sh/
+
+## Appendix 4: Naming
+
+The name of the language comes from "Alia Cult" in the Dune book series.
+No special meaning resides behind the choice; I just though it sounds cool,
+is short, yet distinct.
+
+My #1 source of sci-fi sounding terms is the [Dune terminology](https://dune.fandom.com/wiki/List_of_Dune_terminology)
+page. Also, glossaries of sci-fi terms are helpful
+([techrepublic.com](https://www.techrepublic.com/article/75-words-every-sci-fi-fan-should-know/),
+[bowdoin.edu](https://courses.bowdoin.edu/ital-2500-spring-2015/terminology/))

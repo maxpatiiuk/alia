@@ -211,7 +211,7 @@ export class GlobalQuad extends Quad {
     this.checkForMain();
 
     const context = new llvm.LLVMContext();
-    const module = new llvm.Module('dgc', context);
+    const module = new llvm.Module('alia', context);
     const builder = new llvm.IRBuilder(context);
 
     const partialContext: LlvmContext = {
